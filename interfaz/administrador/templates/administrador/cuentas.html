@@ -1,0 +1,131 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Cuentas Bancarias &mdash; yape.ia Administrador{% endblock %}
+{% block admin_title %}Cuentas Bancarias{% endblock %}
+{% block admin_subtitle %}Registro de todas las cuentas vinculadas a usuarios del sistema{% endblock %}
+
+{% block admin_content %}
+
+<!-- Stats Row -->
+<div class="stats-row">
+  <div class="stat-pill">
+    <span class="stat-pill-icon"><i class="fa-solid fa-credit-card"></i></span>
+    <span>{{ cuentas|length }} cuentas en total</span>
+  </div>
+  <div class="stat-pill">
+    <span class="stat-pill-icon" style="color:var(--color-success)"><i class="fa-solid fa-circle-check"></i></span>
+    <span>{{ cuentas | selectattr('estado', 'equalto', 'ACTIVA') | list | length }} activas</span>
+  </div>
+  <div class="stat-pill">
+    <span class="stat-pill-icon" style="color:#f59e0b"><i class="fa-solid fa-piggy-bank"></i></span>
+    <span>
+      S/ {{ "%.2f"|format(cuentas | map(attribute='saldo') | list | sum) }} saldo total
+    </span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h3 class="card-title">
+        <i class="fa-solid fa-credit-card" style="color:var(--color-primary);margin-right:8px"></i>
+        Cuentas Registradas en la Base de Datos
+      </h3>
+      <p style="font-size:.85rem;color:var(--text-muted);margin-top:.25rem">
+        Visualización de todas las cuentas bancarias vinculadas a usuarios del sistema.
+      </p>
+    </div>
+    <span class="badge badge-accent">{{ cuentas|length }} en total</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Número de Cuenta</th>
+          <th>Titular</th>
+          <th>Correo</th>
+          <th>Tipo</th>
+          <th>Saldo</th>
+          <th>Estado</th>
+          <th>Fecha Creación</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in cuentas %}
+        <tr>
+          <td><code style="font-size:.82rem;color:var(--text-muted)">#{{ c.id_cuenta }}</code></td>
+
+          <td>
+            <div style="display:flex;align-items:center;gap:.5rem">
+              <span style="font-family:var(--font-heading);font-weight:700;letter-spacing:.05em;color:var(--text-primary)">
+                {{ c.numero_cuenta }}
+              </span>
+            </div>
+          </td>
+
+          <td>
+            <div class="user-cell">
+              <div class="user-avatar-sm" style="width:30px;height:30px;font-size:.8rem">
+                {{ c.nombre[0] | upper }}
+              </div>
+              <div class="user-cell-info">
+                <strong>{{ c.nombre }} {{ c.apellido }}</strong>
+                <small style="color:var(--text-muted);display:block">ID #{{ c.id_usuario }}</small>
+              </div>
+            </div>
+          </td>
+
+          <td style="color:var(--text-secondary);font-size:.85rem">{{ c.correo }}</td>
+
+          <td>
+            {% if c.tipo_cuenta == 'AHORRO' %}
+              <span class="badge" style="background:rgba(99,102,241,.15);color:#818cf8;border-color:rgba(99,102,241,.3)">
+                <i class="fa-solid fa-piggy-bank" style="margin-right:4px"></i> Ahorro
+              </span>
+            {% elif c.tipo_cuenta == 'CORRIENTE' %}
+              <span class="badge" style="background:rgba(20,184,166,.15);color:#2dd4bf;border-color:rgba(20,184,166,.3)">
+                <i class="fa-solid fa-building-columns" style="margin-right:4px"></i> Corriente
+              </span>
+            {% else %}
+              <span class="badge badge-accent">
+                <i class="fa-solid fa-wallet" style="margin-right:4px"></i> {{ c.tipo_cuenta }}
+              </span>
+            {% endif %}
+          </td>
+
+          <td>
+            <strong style="font-family:var(--font-heading);color:{% if c.saldo > 1000 %}var(--color-success){% elif c.saldo > 0 %}var(--text-primary){% else %}var(--color-danger){% endif %}">
+              S/ {{ "%.2f"|format(c.saldo) }}
+            </strong>
+          </td>
+
+          <td>
+            <span class="badge {% if c.estado == 'ACTIVA' %}badge-success{% else %}badge-danger{% endif %}">
+              <i class="fa-solid {% if c.estado == 'ACTIVA' %}fa-circle{% else %}fa-circle-dot{% endif %}" style="font-size:.65rem;margin-right:4px"></i>
+              {{ c.estado }}
+            </span>
+          </td>
+
+          <td style="color:var(--text-muted);font-size:.82rem">
+            {{ c.fecha_creacion[:10] if c.fecha_creacion else '—' }}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8">
+            <div class="empty-state">
+              <div class="empty-state-icon"><i class="fa-solid fa-credit-card"></i></div>
+              <strong>Sin cuentas registradas</strong>
+              <p>Aún no hay cuentas bancarias en el sistema.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

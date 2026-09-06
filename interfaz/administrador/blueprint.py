@@ -86,6 +86,7 @@ def create_admin_blueprint(
                 "admin_config_correo": f"{name}.admin_config_correo",
                 "admin_eliminar_usuario": f"{name}.admin_eliminar_usuario",
                 "admin_eliminar_todos_usuarios": f"{name}.admin_eliminar_todos_usuarios",
+                "admin_cuentas": f"{name}.admin_cuentas",
                 "logout": f"{name}.admin_logout",
                 "admin_logout": f"{name}.admin_logout",
             }
@@ -177,6 +178,16 @@ def create_admin_blueprint(
             "administrador/usuarios.html",
             usuarios=usuarios,
             active_page="admin_usuarios"
+        )
+
+    @bp.route("/cuentas")
+    @admin_guard
+    def admin_cuentas():
+        cuentas = data_provider.get_cuentas()
+        return render_template(
+            "administrador/cuentas.html",
+            cuentas=cuentas,
+            active_page="admin_cuentas"
         )
 
     @bp.route("/usuario/<int:id_usuario>/toggle", methods=["POST", "GET"])

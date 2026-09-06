@@ -48,6 +48,11 @@
         <span>Usuarios</span>
       </a>
 
+      <a href="{{ url_for('admin_cuentas') }}" class="sidebar-link {% if active_page == 'admin_cuentas' %}active{% endif %}" id="link-cuentas">
+        <span class="link-icon"><i class="fa-solid fa-credit-card"></i></span>
+        <span>Cuentas Bancarias</span>
+      </a>
+
       <div class="nav-section-title">Inteligencia & Modelos</div>
 
       <a href="{{ url_for('admin_estadisticas') }}" class="sidebar-link {% if request.endpoint == 'admin_estadisticas' %}active{% endif %}" id="link-estadisticas">

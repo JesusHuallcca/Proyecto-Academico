@@ -645,7 +645,24 @@ class SQLiteAdminDataProvider(BaseAdminDataProvider):
     def get_confusion_matrices(self) -> Dict[str, Any]:
         return self._mock_fallback.get_confusion_matrices()
 
+    def get_cuentas(self) -> List[Dict[str, Any]]:
+        """Retorna el listado de todas las cuentas bancarias con datos del usuario propietario."""
+        try:
+            con = self._conectar()
+            rows = con.execute("""
+                SELECT c.id_cuenta, c.numero_cuenta, c.tipo_cuenta, c.saldo, c.estado, c.fecha_creacion,
+                       u.id_usuario, u.nombre, u.apellido, u.correo
+                FROM cuentas c
+                JOIN usuarios u ON c.id_usuario = u.id_usuario
+                ORDER BY c.id_cuenta ASC
+            """).fetchall()
+            con.close()
+            return [dict(r) for r in rows]
+        except Exception:
+            return []
+
     def delete_user(self, id_usuario: int) -> Tuple[bool, Optional[str]]:
+
         """Elimina un usuario no-admin y todos sus datos relacionados."""
         try:
             con = self._conectar()
