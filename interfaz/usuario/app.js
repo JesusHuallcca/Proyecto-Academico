@@ -279,23 +279,265 @@ function inicializarEventos() {
         alert("📱 En producción compartiría tu QR vía WhatsApp, correo o descarga.");
     });
 
-    // Modal Servicios
+    // ============================================================
+    // MODAL SERVICIOS (PAGOS DE SERVICIOS - SIN RECARGAS)
+    // ============================================================
     const btnServicios = document.getElementById("btnServicios");
     const modalServicios = document.getElementById("modalServicios");
     const btnCloseModalServicios = document.getElementById("btnCloseModalServicios");
+    const serviciosGridWrap = document.getElementById("serviciosGridWrap");
+    const servicioFormWrap = document.getElementById("servicioFormWrap");
+    const btnBackServiciosList = document.getElementById("btnBackServiciosList");
+
     if (btnServicios && modalServicios) {
-        btnServicios.addEventListener("click", () => { modalServicios.style.display = "flex"; });
+        btnServicios.addEventListener("click", () => {
+            modalServicios.style.display = "flex";
+            if (serviciosGridWrap) serviciosGridWrap.style.display = "block";
+            if (servicioFormWrap) servicioFormWrap.style.display = "none";
+        });
     }
+
     if (btnCloseModalServicios && modalServicios) {
-        btnCloseModalServicios.addEventListener("click", () => { modalServicios.style.display = "none"; });
+        btnCloseModalServicios.addEventListener("click", () => {
+            modalServicios.style.display = "none";
+        });
     }
-    // Servicios individuales — simulación de clic
-    ["svcLuz","svcAgua","svcCelular","svcCable","svcInternet","svcSeguro"].forEach(id => {
-        document.getElementById(id)?.addEventListener("click", (e) => {
-            const name = e.currentTarget.querySelector("span")?.textContent || id;
-            alert(`💡 Servicio "${name}" seleccionado.\nEn producción se abriría el formulario de pago BCP.`);
+
+    if (btnBackServiciosList) {
+        btnBackServiciosList.addEventListener("click", () => {
+            if (serviciosGridWrap) serviciosGridWrap.style.display = "block";
+            if (servicioFormWrap) servicioFormWrap.style.display = "none";
+        });
+    }
+
+    // Configuración de tarjetas de servicios
+    const serviceButtons = document.querySelectorAll(".servicio-card");
+    serviceButtons.forEach(card => {
+        card.addEventListener("click", () => {
+            const svcName = card.getAttribute("data-service") || card.querySelector("span")?.textContent || "Servicio";
+            const companies = (card.getAttribute("data-companies") || "").split(",").filter(c => c.trim());
+
+            const badge = document.getElementById("badgeCurrentService");
+            if (badge) badge.textContent = svcName;
+
+            const inputSvcEmpresa = document.getElementById("inputSvcEmpresa");
+            const chipsList = document.getElementById("companyChipsList");
+
+            if (chipsList) {
+                chipsList.innerHTML = "";
+                companies.forEach((comp, idx) => {
+                    const chip = document.createElement("button");
+                    chip.type = "button";
+                    chip.className = `company-chip ${idx === 0 ? "active" : ""}`;
+                    chip.textContent = comp;
+                    chip.addEventListener("click", () => {
+                        document.querySelectorAll(".company-chip").forEach(c => c.classList.remove("active"));
+                        chip.classList.add("active");
+                        if (inputSvcEmpresa) inputSvcEmpresa.value = comp;
+                    });
+                    chipsList.appendChild(chip);
+                });
+            }
+
+            if (inputSvcEmpresa && companies.length > 0) {
+                inputSvcEmpresa.value = companies[0];
+            }
+
+            actualizarBotonSubmitServicio();
+
+            if (serviciosGridWrap) serviciosGridWrap.style.display = "none";
+            if (servicioFormWrap) servicioFormWrap.style.display = "block";
         });
     });
+
+    // Montos rápidos en servicios
+    document.querySelectorAll(".btn-quick-amt-svc").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const addVal = parseFloat(btn.getAttribute("data-val")) || 0;
+            const input = document.getElementById("inputSvcMonto");
+            if (input) {
+                const cur = parseFloat(input.value) || 0;
+                input.value = (cur + addVal).toFixed(2);
+                actualizarBotonSubmitServicio();
+            }
+        });
+    });
+
+    document.getElementById("inputSvcMonto")?.addEventListener("input", actualizarBotonSubmitServicio);
+
+    const formPagoServicio = document.getElementById("formPagoServicio");
+    if (formPagoServicio) {
+        formPagoServicio.addEventListener("submit", procesarPagoServicio);
+    }
+
+    // ============================================================
+    // MODAL TRANSFERENCIA (PLIN, AGORA, BIM, TUNKI, OTROS BANCOS)
+    // ============================================================
+    const btnOpenTransfer = document.getElementById("btnOpenTransfer");
+    const modalTransferencia = document.getElementById("modalTransferencia");
+    const btnCloseModalTransferencia = document.getElementById("btnCloseModalTransferencia");
+
+    if (btnOpenTransfer && modalTransferencia) {
+        btnOpenTransfer.addEventListener("click", () => {
+            modalTransferencia.style.display = "flex";
+            actualizarBotonSubmitTransfer();
+        });
+    }
+
+    if (btnCloseModalTransferencia && modalTransferencia) {
+        btnCloseModalTransferencia.addEventListener("click", () => {
+            modalTransferencia.style.display = "none";
+        });
+    }
+
+    let entidadTransferenciaActual = "Plin";
+    const bankPills = document.querySelectorAll(".bank-pill");
+    bankPills.forEach(pill => {
+        pill.addEventListener("click", () => {
+            bankPills.forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            entidadTransferenciaActual = pill.getAttribute("data-bank") || "Plin";
+
+            const targetName = document.getElementById("transferTargetName");
+            const lblDest = document.getElementById("lblTransferDest");
+            const inputDest = document.getElementById("inputTransferDest");
+
+            if (targetName) targetName.textContent = `${entidadTransferenciaActual} (Interoperable)`;
+
+            if (entidadTransferenciaActual === "Otros Bancos") {
+                if (lblDest) lblDest.textContent = "Número de Cuenta o CCI (20 dígitos)";
+                if (inputDest) {
+                    inputDest.placeholder = "Ej: 002-194-001234567890-12";
+                    inputDest.value = "002-194-001234567890-12";
+                }
+            } else {
+                if (lblDest) lblDest.textContent = `Número de celular asociado a ${entidadTransferenciaActual}`;
+                if (inputDest) {
+                    inputDest.placeholder = "Ej: 987 654 321";
+                    inputDest.value = "914 555 888";
+                }
+            }
+            actualizarBotonSubmitTransfer();
+        });
+    });
+
+    document.querySelectorAll(".btn-quick-amt-tf").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const addVal = parseFloat(btn.getAttribute("data-val")) || 0;
+            const input = document.getElementById("inputTransferMonto");
+            if (input) {
+                const cur = parseFloat(input.value) || 0;
+                input.value = (cur + addVal).toFixed(2);
+                actualizarBotonSubmitTransfer();
+            }
+        });
+    });
+
+    document.getElementById("inputTransferMonto")?.addEventListener("input", actualizarBotonSubmitTransfer);
+
+    const formTransferencia = document.getElementById("formTransferencia");
+    if (formTransferencia) {
+        formTransferencia.addEventListener("submit", procesarTransferencia);
+    }
+
+    // ============================================================
+    // MODAL COMPRAS (SAGA, RIPLEY, METRO, TAMBO, ETC)
+    // ============================================================
+    const btnOpenCompras = document.getElementById("btnOpenCompras");
+    const modalCompras = document.getElementById("modalCompras");
+    const btnCloseModalCompras = document.getElementById("btnCloseModalCompras");
+
+    if (btnOpenCompras && modalCompras) {
+        btnOpenCompras.addEventListener("click", () => {
+            modalCompras.style.display = "flex";
+            actualizarBotonSubmitCompra();
+        });
+    }
+
+    if (btnCloseModalCompras && modalCompras) {
+        btnCloseModalCompras.addEventListener("click", () => {
+            modalCompras.style.display = "none";
+        });
+    }
+
+    const merchantChips = document.querySelectorAll(".merchant-chip");
+    merchantChips.forEach(chip => {
+        chip.addEventListener("click", () => {
+            merchantChips.forEach(c => c.classList.remove("active"));
+            chip.classList.add("active");
+            const mName = chip.getAttribute("data-name") || chip.textContent;
+            const input = document.getElementById("inputCompraComercio");
+            if (input) input.value = mName;
+        });
+    });
+
+    document.querySelectorAll(".btn-quick-amt-cp").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const addVal = parseFloat(btn.getAttribute("data-val")) || 0;
+            const input = document.getElementById("inputCompraMonto");
+            if (input) {
+                const cur = parseFloat(input.value) || 0;
+                input.value = (cur + addVal).toFixed(2);
+                actualizarBotonSubmitCompra();
+            }
+        });
+    });
+
+    document.getElementById("inputCompraMonto")?.addEventListener("input", actualizarBotonSubmitCompra);
+
+    const formCompras = document.getElementById("formCompras");
+    if (formCompras) {
+        formCompras.addEventListener("submit", procesarCompra);
+    }
+
+    // ============================================================
+    // MODAL RECARGAS (CLARO, MOVISTAR, ENTEL, BITEL)
+    // ============================================================
+    const btnOpenRecargas = document.getElementById("btnOpenRecargas");
+    const modalRecargas = document.getElementById("modalRecargas");
+    const btnCloseModalRecargas = document.getElementById("btnCloseModalRecargas");
+
+    if (btnOpenRecargas && modalRecargas) {
+        btnOpenRecargas.addEventListener("click", () => {
+            modalRecargas.style.display = "flex";
+            actualizarBotonSubmitRecarga();
+        });
+    }
+
+    if (btnCloseModalRecargas && modalRecargas) {
+        btnCloseModalRecargas.addEventListener("click", () => {
+            modalRecargas.style.display = "none";
+        });
+    }
+
+    let operadorRecargaActual = "Claro";
+    const telcoPills = document.querySelectorAll(".telco-pill");
+    telcoPills.forEach(pill => {
+        pill.addEventListener("click", () => {
+            telcoPills.forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            operadorRecargaActual = pill.getAttribute("data-operator") || "Claro";
+            actualizarBotonSubmitRecarga();
+        });
+    });
+
+    document.querySelectorAll(".btn-quick-amt-rc").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const val = parseFloat(btn.getAttribute("data-val")) || 10;
+            const input = document.getElementById("inputRecargaMonto");
+            if (input) {
+                input.value = val.toFixed(2);
+                actualizarBotonSubmitRecarga();
+            }
+        });
+    });
+
+    document.getElementById("inputRecargaMonto")?.addEventListener("input", actualizarBotonSubmitRecarga);
+
+    const formRecargas = document.getElementById("formRecargas");
+    if (formRecargas) {
+        formRecargas.addEventListener("submit", procesarRecarga);
+    }
 
     // Modal Yapear
     const btnOpenYapear = document.getElementById("btnOpenYapear");
@@ -402,6 +644,44 @@ function actualizarBotonSubmit() {
     if (inputMonto && btnYapearText) {
         const val = parseFloat(inputMonto.value) || 0;
         btnYapearText.textContent = `¡Yapear S/ ${val.toFixed(2)}!`;
+    }
+}
+
+function actualizarBotonSubmitServicio() {
+    const input = document.getElementById("inputSvcMonto");
+    const btnText = document.getElementById("btnSvcText");
+    if (input && btnText) {
+        const val = parseFloat(input.value) || 0;
+        btnText.textContent = `¡Pagar Servicio S/ ${val.toFixed(2)}!`;
+    }
+}
+
+function actualizarBotonSubmitTransfer() {
+    const input = document.getElementById("inputTransferMonto");
+    const btnText = document.getElementById("btnTransferText");
+    const target = document.getElementById("transferTargetName")?.textContent?.split(" ")[0] || "Plin";
+    if (input && btnText) {
+        const val = parseFloat(input.value) || 0;
+        btnText.textContent = `¡Transferir a ${target} S/ ${val.toFixed(2)}!`;
+    }
+}
+
+function actualizarBotonSubmitCompra() {
+    const input = document.getElementById("inputCompraMonto");
+    const btnText = document.getElementById("btnCompraText");
+    if (input && btnText) {
+        const val = parseFloat(input.value) || 0;
+        btnText.textContent = `¡Pagar Compra S/ ${val.toFixed(2)}!`;
+    }
+}
+
+function actualizarBotonSubmitRecarga() {
+    const input = document.getElementById("inputRecargaMonto");
+    const btnText = document.getElementById("btnRecargaText");
+    const op = document.querySelector(".telco-pill.active")?.getAttribute("data-operator") || "Claro";
+    if (input && btnText) {
+        const val = parseFloat(input.value) || 0;
+        btnText.textContent = `¡Recargar ${op} S/ ${val.toFixed(2)}!`;
     }
 }
 
@@ -723,6 +1003,12 @@ function renderizarListaTransacciones(transacciones, container) {
         } else if (tx.producto.toLowerCase().includes("transferencia")) {
             iconType = "tx-icon-transfer";
             iconSymbol = "⇄";
+        } else if (tx.producto.toLowerCase().includes("compra")) {
+            iconType = "tx-icon-compra";
+            iconSymbol = "🛍️";
+        } else if (tx.producto.toLowerCase().includes("recarga")) {
+            iconType = "tx-icon-recarga";
+            iconSymbol = "📱";
         }
 
         let statusClass = "status-approved";
@@ -804,6 +1090,57 @@ function renderizarHistorialCompleto() {
 // 8. PROCESAR YAPEO CON MACHINE LEARNING
 // ============================================================
 
+// Helper para mostrar comprobante exitoso adaptable a cualquier producto
+function mostrarVoucherExitoso({ titulo = "¡Yapeaste!", producto = "Yape", destinatarioLabel = "Destinatario:", destinatario, monto, fecha, codigo, mensaje }) {
+    const voucherTitle = document.getElementById("voucherTitle");
+    if (voucherTitle) voucherTitle.textContent = titulo;
+
+    const voucherBadge = document.getElementById("voucherProductBadge");
+    if (voucherBadge) voucherBadge.textContent = producto;
+
+    const destLabel = document.getElementById("voucherDestLabel");
+    if (destLabel) destLabel.textContent = destinatarioLabel;
+
+    document.getElementById("voucherAmount").textContent = `S/ ${parseFloat(monto).toFixed(2)}`;
+    document.getElementById("voucherDestinatario").textContent = destinatario;
+    document.getElementById("voucherFecha").textContent = fecha || new Date().toLocaleString();
+    document.getElementById("voucherCodigo").textContent = codigo || `YP-${Math.floor(100000 + Math.random()*900000)}`;
+    document.getElementById("voucherMensaje").textContent = mensaje || "Sin mensaje";
+
+    document.getElementById("modalVoucher").style.display = "flex";
+}
+
+// Helper para mostrar alerta de seguridad por detección de riesgo
+function mostrarAlertaSeguridad(data) {
+    const modalAlert = document.getElementById("modalSecurityAlert");
+    document.getElementById("alertRiskLevel").textContent = `${data.nivel_riesgo} (${data.probabilidad_fraude}%)`;
+    
+    const riskBar = document.getElementById("alertRiskBar");
+    if (riskBar) riskBar.style.width = `${Math.min(data.probabilidad_fraude, 100)}%`;
+
+    const factorsUl = document.getElementById("alertFactorsList");
+    if (factorsUl) {
+        factorsUl.innerHTML = "";
+        if (data.factores && data.factores.length > 0) {
+            data.factores.forEach(f => {
+                const li = document.createElement("li");
+                li.textContent = f;
+                factorsUl.appendChild(li);
+            });
+        } else {
+            const li = document.createElement("li");
+            li.textContent = "Desviación multivariable del perfil de usuario habitual.";
+            factorsUl.appendChild(li);
+        }
+    }
+
+    modalAlert.style.display = "flex";
+}
+
+// ============================================================
+// 8. PROCESAR YAPEO (PRODUCTO: YAPE)
+// ============================================================
+
 async function procesarYapeo(e) {
     e.preventDefault();
 
@@ -835,6 +1172,7 @@ async function procesarYapeo(e) {
 
     const payload = {
         user_id: usuarioActivo ? usuarioActivo.id_usuario : undefined,
+        producto: "Yape",
         monto: monto,
         destinatario: destinatario,
         mensaje: mensaje,
@@ -869,38 +1207,19 @@ async function procesarYapeo(e) {
             saldoActual = parseFloat(data.nuevo_saldo);
             renderizarSaldo();
 
-            document.getElementById("voucherAmount").textContent = `S/ ${monto.toFixed(2)}`;
-            document.getElementById("voucherDestinatario").textContent = destinatario;
-            document.getElementById("voucherFecha").textContent = data.fecha_hora || new Date().toLocaleString();
-            document.getElementById("voucherCodigo").textContent = data.codigo_operacion || `YP-${Math.floor(100000 + Math.random()*900000)}`;
-            document.getElementById("voucherMensaje").textContent = mensaje || "Sin mensaje";
-
-            document.getElementById("modalVoucher").style.display = "flex";
+            mostrarVoucherExitoso({
+                titulo: "¡Yapeaste!",
+                producto: "Yape",
+                destinatarioLabel: "Destinatario:",
+                destinatario: destinatario,
+                monto: monto,
+                fecha: data.fecha_hora,
+                codigo: data.codigo_operacion,
+                mensaje: mensaje
+            });
 
         } else if (data.status === "suspicious") {
-            const modalAlert = document.getElementById("modalSecurityAlert");
-            document.getElementById("alertRiskLevel").textContent = `${data.nivel_riesgo} (${data.probabilidad_fraude}%)`;
-            
-            const riskBar = document.getElementById("alertRiskBar");
-            if (riskBar) riskBar.style.width = `${Math.min(data.probabilidad_fraude, 100)}%`;
-
-            const factorsUl = document.getElementById("alertFactorsList");
-            if (factorsUl) {
-                factorsUl.innerHTML = "";
-                if (data.factores && data.factores.length > 0) {
-                    data.factores.forEach(f => {
-                        const li = document.createElement("li");
-                        li.textContent = f;
-                        factorsUl.appendChild(li);
-                    });
-                } else {
-                    const li = document.createElement("li");
-                    li.textContent = "Desviación multivariable del perfil de usuario habitual.";
-                    factorsUl.appendChild(li);
-                }
-            }
-
-            modalAlert.style.display = "flex";
+            mostrarAlertaSeguridad(data);
         }
 
         cargarTransacciones();
@@ -913,6 +1232,399 @@ async function procesarYapeo(e) {
     } finally {
         btnSubmit.disabled = false;
         btnText.textContent = `¡Yapear S/ ${monto.toFixed(2)}!`;
+        spinner.style.display = "none";
+    }
+}
+
+// ============================================================
+// 9. PROCESAR PAGO DE SERVICIOS (PRODUCTO: PAGO DE SERVICIOS)
+// ============================================================
+
+async function procesarPagoServicio(e) {
+    e.preventDefault();
+
+    const btnSubmit = document.getElementById("btnSubmitServicio");
+    const btnText = document.getElementById("btnSvcText");
+    const spinner = document.getElementById("spinnerSvc");
+
+    const servicioNombre = document.getElementById("badgeCurrentService")?.textContent || "Servicio";
+    const inputEmpresa = document.getElementById("inputSvcEmpresa");
+    const inputCodigo = document.getElementById("inputSvcCodigo");
+    const inputMonto = document.getElementById("inputSvcMonto");
+    const inputNota = document.getElementById("inputSvcNota");
+
+    const chkFraude = document.getElementById("chkSvcSimularFraude");
+    const chkDestNuevo = document.getElementById("chkSvcDestNuevo");
+    const chkHoraInusual = document.getElementById("chkSvcHoraInusual");
+
+    const monto = parseFloat(inputMonto?.value);
+    const empresa = inputEmpresa?.value.trim() || servicioNombre;
+    const codigo = inputCodigo?.value.trim() || "Suministro";
+    const nota = inputNota?.value.trim() || `Pago de ${servicioNombre}`;
+    const destinatario = `[${servicioNombre}] ${empresa} - N° ${codigo}`;
+
+    if (isNaN(monto) || monto <= 0) {
+        alert("Por favor ingresa un monto válido para el servicio.");
+        return;
+    }
+
+    btnSubmit.disabled = true;
+    btnText.textContent = "Verificando con IA Antifraude...";
+    spinner.style.display = "inline-block";
+
+    const payload = {
+        user_id: usuarioActivo ? usuarioActivo.id_usuario : undefined,
+        producto: "Pago de servicios",
+        monto: monto,
+        destinatario: destinatario,
+        mensaje: nota,
+        simular_fraude: chkFraude ? chkFraude.checked : false,
+        destinatario_nuevo: (chkDestNuevo && chkDestNuevo.checked) ? 1 : 0,
+        hora_inusual: (chkHoraInusual && chkHoraInusual.checked) ? 1 : 0,
+        cambio_dispositivo: 0
+    };
+
+    try {
+        const res = await fetch("/api/usuario/yapear", {
+            method: "POST",
+            headers: getAuthHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        document.getElementById("modalServicios").style.display = "none";
+
+        if (res.status === 403 || data.status === "blocked") {
+            alert(data.mensaje || "Tu cuenta está bloqueada por seguridad. Contacta con soporte BCP.");
+            cargarPerfilUsuario();
+            return;
+        }
+
+        if (res.status === 400) {
+            alert(data.mensaje || "Error al realizar el pago del servicio.");
+            return;
+        }
+
+        if (data.status === "success") {
+            saldoActual = parseFloat(data.nuevo_saldo);
+            renderizarSaldo();
+
+            mostrarVoucherExitoso({
+                titulo: "¡Pago de Servicio Exitoso!",
+                producto: "Pago de servicios",
+                destinatarioLabel: "Servicio / Empresa:",
+                destinatario: destinatario,
+                monto: monto,
+                fecha: data.fecha_hora,
+                codigo: data.codigo_operacion,
+                mensaje: nota
+            });
+        } else if (data.status === "suspicious") {
+            mostrarAlertaSeguridad(data);
+        }
+
+        cargarTransacciones();
+        cargarPerfilUsuario();
+        cargarResumenSeguridad();
+        cargarNotificaciones();
+
+    } catch (err) {
+        alert("Error de conexión con el servidor antifraude.");
+    } finally {
+        btnSubmit.disabled = false;
+        btnText.textContent = `¡Pagar Servicio S/ ${monto.toFixed(2)}!`;
+        spinner.style.display = "none";
+    }
+}
+
+// ============================================================
+// 10. PROCESAR TRANSFERENCIA (PRODUCTO: TRANSFERENCIA - PLIN, AGORA, BIM, TUNKI)
+// ============================================================
+
+async function procesarTransferencia(e) {
+    e.preventDefault();
+
+    const btnSubmit = document.getElementById("btnSubmitTransfer");
+    const btnText = document.getElementById("btnTransferText");
+    const spinner = document.getElementById("spinnerTransfer");
+
+    const inputDest = document.getElementById("inputTransferDest");
+    const inputNombre = document.getElementById("inputTransferNombre");
+    const inputMonto = document.getElementById("inputTransferMonto");
+    const inputNota = document.getElementById("inputTransferNota");
+
+    const chkFraude = document.getElementById("chkTransferFraude");
+    const chkDestNuevo = document.getElementById("chkTransferDestNuevo");
+    const chkMadrugada = document.getElementById("chkTransferMadrugada");
+
+    const monto = parseFloat(inputMonto?.value);
+    const destinoNum = inputDest?.value.trim() || "";
+    const titular = inputNombre?.value.trim() || "Contacto";
+    const nota = inputNota?.value.trim() || `Transferencia a ${entidadTransferenciaActual}`;
+    const destinatario = `[${entidadTransferenciaActual}] ${titular} (${destinoNum})`;
+
+    if (isNaN(monto) || monto <= 0) {
+        alert("Por favor ingresa un monto válido a transferir.");
+        return;
+    }
+
+    btnSubmit.disabled = true;
+    btnText.textContent = "Evaluando transferencia con IA...";
+    spinner.style.display = "inline-block";
+
+    const payload = {
+        user_id: usuarioActivo ? usuarioActivo.id_usuario : undefined,
+        producto: "Transferencia",
+        monto: monto,
+        destinatario: destinatario,
+        mensaje: nota,
+        simular_fraude: chkFraude ? chkFraude.checked : false,
+        destinatario_nuevo: (chkDestNuevo && chkDestNuevo.checked) ? 1 : 0,
+        hora_inusual: (chkMadrugada && chkMadrugada.checked) ? 1 : 0,
+        cambio_dispositivo: 0
+    };
+
+    try {
+        const res = await fetch("/api/usuario/yapear", {
+            method: "POST",
+            headers: getAuthHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        document.getElementById("modalTransferencia").style.display = "none";
+
+        if (res.status === 403 || data.status === "blocked") {
+            alert(data.mensaje || "Tu cuenta está bloqueada por seguridad. Contacta con soporte BCP.");
+            cargarPerfilUsuario();
+            return;
+        }
+
+        if (res.status === 400) {
+            alert(data.mensaje || "Error al realizar la transferencia.");
+            return;
+        }
+
+        if (data.status === "success") {
+            saldoActual = parseFloat(data.nuevo_saldo);
+            renderizarSaldo();
+
+            mostrarVoucherExitoso({
+                titulo: `¡Transferencia Exitosa a ${entidadTransferenciaActual}!`,
+                producto: "Transferencia",
+                destinatarioLabel: "Destinatario / Entidad:",
+                destinatario: destinatario,
+                monto: monto,
+                fecha: data.fecha_hora,
+                codigo: data.codigo_operacion,
+                mensaje: nota
+            });
+        } else if (data.status === "suspicious") {
+            mostrarAlertaSeguridad(data);
+        }
+
+        cargarTransacciones();
+        cargarPerfilUsuario();
+        cargarResumenSeguridad();
+        cargarNotificaciones();
+
+    } catch (err) {
+        alert("Error de conexión con el servidor antifraude.");
+    } finally {
+        btnSubmit.disabled = false;
+        btnText.textContent = `¡Transferir a ${entidadTransferenciaActual} S/ ${monto.toFixed(2)}!`;
+        spinner.style.display = "none";
+    }
+}
+
+// ============================================================
+// 11. PROCESAR COMPRAS (PRODUCTO: COMPRA)
+// ============================================================
+
+async function procesarCompra(e) {
+    e.preventDefault();
+
+    const btnSubmit = document.getElementById("btnSubmitCompra");
+    const btnText = document.getElementById("btnCompraText");
+    const spinner = document.getElementById("spinnerCompra");
+
+    const inputComercio = document.getElementById("inputCompraComercio");
+    const inputCodigo = document.getElementById("inputCompraCodigo");
+    const inputMonto = document.getElementById("inputCompraMonto");
+    const inputDetalle = document.getElementById("inputCompraDetalle");
+
+    const chkFraude = document.getElementById("chkCompraFraude");
+    const chkNuevo = document.getElementById("chkCompraNuevo");
+    const chkMadrugada = document.getElementById("chkCompraMadrugada");
+
+    const monto = parseFloat(inputMonto?.value);
+    const comercio = inputComercio?.value.trim() || "Comercio Afiliado";
+    const codigo = inputCodigo?.value.trim() || "TKT-POS";
+    const detalle = inputDetalle?.value.trim() || `Compra en ${comercio}`;
+    const destinatario = `[Comercio] ${comercio} (${codigo})`;
+
+    if (isNaN(monto) || monto <= 0) {
+        alert("Por favor ingresa un monto válido de compra.");
+        return;
+    }
+
+    btnSubmit.disabled = true;
+    btnText.textContent = "Validando compra con IA...";
+    spinner.style.display = "inline-block";
+
+    const payload = {
+        user_id: usuarioActivo ? usuarioActivo.id_usuario : undefined,
+        producto: "Compra",
+        monto: monto,
+        destinatario: destinatario,
+        mensaje: detalle,
+        simular_fraude: chkFraude ? chkFraude.checked : false,
+        destinatario_nuevo: (chkNuevo && chkNuevo.checked) ? 1 : 0,
+        hora_inusual: (chkMadrugada && chkMadrugada.checked) ? 1 : 0,
+        cambio_dispositivo: 0
+    };
+
+    try {
+        const res = await fetch("/api/usuario/yapear", {
+            method: "POST",
+            headers: getAuthHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        document.getElementById("modalCompras").style.display = "none";
+
+        if (res.status === 403 || data.status === "blocked") {
+            alert(data.mensaje || "Tu cuenta está bloqueada por seguridad. Contacta con soporte BCP.");
+            cargarPerfilUsuario();
+            return;
+        }
+
+        if (res.status === 400) {
+            alert(data.mensaje || "Error al realizar la compra.");
+            return;
+        }
+
+        if (data.status === "success") {
+            saldoActual = parseFloat(data.nuevo_saldo);
+            renderizarSaldo();
+
+            mostrarVoucherExitoso({
+                titulo: "¡Compra Exitosa!",
+                producto: "Compra",
+                destinatarioLabel: "Establecimiento / Comercio:",
+                destinatario: destinatario,
+                monto: monto,
+                fecha: data.fecha_hora,
+                codigo: data.codigo_operacion,
+                mensaje: detalle
+            });
+        } else if (data.status === "suspicious") {
+            mostrarAlertaSeguridad(data);
+        }
+
+        cargarTransacciones();
+        cargarPerfilUsuario();
+        cargarResumenSeguridad();
+        cargarNotificaciones();
+
+    } catch (err) {
+        alert("Error de conexión con el servidor antifraude.");
+    } finally {
+        btnSubmit.disabled = false;
+        btnText.textContent = `¡Pagar Compra S/ ${monto.toFixed(2)}!`;
+        spinner.style.display = "none";
+    }
+}
+
+// ============================================================
+// 12. PROCESAR RECARGAS DE CELULAR (PRODUCTO: RECARGA)
+// ============================================================
+
+async function procesarRecarga(e) {
+    e.preventDefault();
+
+    const btnSubmit = document.getElementById("btnSubmitRecarga");
+    const btnText = document.getElementById("btnRecargaText");
+    const spinner = document.getElementById("spinnerRecarga");
+
+    const inputNumero = document.getElementById("inputRecargaNumero");
+    const inputMonto = document.getElementById("inputRecargaMonto");
+
+    const chkFraude = document.getElementById("chkRecargaFraude");
+    const chkInusual = document.getElementById("chkRecargaInusual");
+
+    const monto = parseFloat(inputMonto?.value);
+    const numero = inputNumero?.value.trim() || "Celular";
+    const destinatario = `[Recarga ${operadorRecargaActual}] +51 ${numero}`;
+    const nota = `Recarga prepago ${operadorRecargaActual}`;
+
+    if (isNaN(monto) || monto <= 0) {
+        alert("Por favor ingresa un monto válido de recarga.");
+        return;
+    }
+
+    btnSubmit.disabled = true;
+    btnText.textContent = "Procesando recarga con IA...";
+    spinner.style.display = "inline-block";
+
+    const payload = {
+        user_id: usuarioActivo ? usuarioActivo.id_usuario : undefined,
+        producto: "Recarga",
+        monto: monto,
+        destinatario: destinatario,
+        mensaje: nota,
+        simular_fraude: chkFraude ? chkFraude.checked : false,
+        destinatario_nuevo: 0,
+        hora_inusual: (chkInusual && chkInusual.checked) ? 1 : 0,
+        cambio_dispositivo: 0
+    };
+
+    try {
+        const res = await fetch("/api/usuario/yapear", {
+            method: "POST",
+            headers: getAuthHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        document.getElementById("modalRecargas").style.display = "none";
+
+        if (res.status === 403 || data.status === "blocked") {
+            alert(data.mensaje || "Tu cuenta está bloqueada por seguridad. Contacta con soporte BCP.");
+            cargarPerfilUsuario();
+            return;
+        }
+
+        if (res.status === 400) {
+            alert(data.mensaje || "Error al realizar la recarga.");
+            return;
+        }
+
+        if (data.status === "success") {
+            saldoActual = parseFloat(data.nuevo_saldo);
+            renderizarSaldo();
+
+            mostrarVoucherExitoso({
+                titulo: "¡Recarga Exitosa!",
+                producto: "Recarga",
+                destinatarioLabel: "Línea / Operador:",
+                destinatario: destinatario,
+                monto: monto,
+                fecha: data.fecha_hora,
+                codigo: data.codigo_operacion,
+                mensaje: nota
+            });
+        } else if (data.status === "suspicious") {
+            mostrarAlertaSeguridad(data);
+        }
+
+        cargarTransacciones();
+        cargarPerfilUsuario();
+        cargarResumenSeguridad();
+        cargarNotificaciones();
+
+    } catch (err) {
+        alert("Error de conexión con el servidor antifraude.");
+    } finally {
+        btnSubmit.disabled = false;
+        btnText.textContent = `¡Recargar ${operadorRecargaActual} S/ ${monto.toFixed(2)}!`;
         spinner.style.display = "none";
     }
 }

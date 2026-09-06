@@ -1122,6 +1122,9 @@ def api_usuario_yapear():
 
     destinatario = str(datos.get("destinatario", "Contacto")).strip()
     mensaje_nota = str(datos.get("mensaje", "")).strip()
+    producto = str(datos.get("producto", "Yape")).strip()
+    if producto not in ["Yape", "Pago de servicios", "Compra", "Transferencia", "Recarga"]:
+        producto = "Yape"
 
     conexion = conectar_bd()
     cursor = conexion.cursor()
@@ -1215,7 +1218,7 @@ def api_usuario_yapear():
         "monto_promedio_usuario": monto_promedio,
         "hora": hora_actual,
         "dia_semana": dia_actual,
-        "producto": "Yape"
+        "producto": producto
     }
 
     # 3. Evaluación de Machine Learning
@@ -1241,11 +1244,11 @@ def api_usuario_yapear():
                 velocidad_operacion, llamada_reciente, cambio_dispositivo, edad, usuario_nuevo,
                 dias_desde_registro, operaciones_dia, operaciones_ultima_hora, alertas_ignoradas,
                 distancia_ubicacion, ubicacion_inusual, hora, dia_semana, resultado, fecha_analisis
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Yape', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             usuario["id_usuario"], usuario["id_cuenta"], usuario["id_dispositivo"],
             fecha_hora_str, monto, monto_promedio, saldo_actual, saldo_actual,
-            destinatario_nuevo, hora_inusual, velocidad_operacion, llamada_reciente,
+            producto, destinatario_nuevo, hora_inusual, velocidad_operacion, llamada_reciente,
             cambio_dispositivo, 32, 0, 240, operaciones_dia, 1, 0,
             distancia_ubicacion, ubicacion_inusual, hora_actual, dia_actual,
             resultado_tx, fecha_hora_str
@@ -1261,20 +1264,20 @@ def api_usuario_yapear():
 
         # Generar alerta de seguridad para el Administrador
         descripcion_alerta = (
-            f"Alerta {nivel_riesgo}: Intento de Yapeo de S/ {monto:.2f} hacia {destinatario}. "
+            f"Alerta {nivel_riesgo}: Intento de {producto} de S/ {monto:.2f} hacia {destinatario}. "
             f"Factores detectados: {'; '.join(factores) if factores else 'Patrón multivariable de riesgo.'}"
         )
         cursor.execute("""
             INSERT INTO alertas (
                 id_transaccion, nivel, tipo_alerta, descripcion, estado, fecha_alerta
-            ) VALUES (?, ?, 'YAPEO_ANOMALO', ?, 'PENDIENTE', ?)
+            ) VALUES (?, ?, 'TRANSACCION_ANOMALA', ?, 'PENDIENTE', ?)
         """, (id_transaccion, nivel_riesgo, descripcion_alerta, fecha_hora_str))
 
         # Registrar en historial
         cursor.execute("""
             INSERT INTO historial_acciones (id_usuario, id_transaccion, accion, descripcion, fecha)
             VALUES (?, ?, 'BLOQUEO_PREVENTIVO', ?, ?)
-        """, (usuario["id_usuario"], id_transaccion, f"Transacción en revisión por riesgo {prob_fraude}%", fecha_hora_str))
+        """, (usuario["id_usuario"], id_transaccion, f"Transacción de {producto} en revisión por riesgo {prob_fraude}%", fecha_hora_str))
 
         conexion.commit()
         conexion.close()
@@ -1283,12 +1286,13 @@ def api_usuario_yapear():
             "status": "suspicious",
             "decision": "DETENIDA_POR_SEGURIDAD",
             "id_transaccion": id_transaccion,
+            "producto": producto,
             "monto": monto,
             "destinatario": destinatario,
             "probabilidad_fraude": prob_fraude,
             "nivel_riesgo": nivel_riesgo,
             "factores": factores,
-            "mensaje": "Por tu seguridad, hemos pausado esta operación. Nuestro sistema inteligente de prevención de fraudes BCP ha detectado un comportamiento inusual.",
+            "mensaje": f"Por tu seguridad, hemos pausado esta operación de {producto}. Nuestro sistema inteligente de prevención de fraudes BCP ha detectado un comportamiento inusual.",
             "saldo_actual": nuevo_saldo
         })
 
@@ -1307,11 +1311,11 @@ def api_usuario_yapear():
                 velocidad_operacion, llamada_reciente, cambio_dispositivo, edad, usuario_nuevo,
                 dias_desde_registro, operaciones_dia, operaciones_ultima_hora, alertas_ignoradas,
                 distancia_ubicacion, ubicacion_inusual, hora, dia_semana, resultado, fecha_analisis
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Yape', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             usuario["id_usuario"], usuario["id_cuenta"], usuario["id_dispositivo"],
             fecha_hora_str, monto, monto_promedio, saldo_actual, nuevo_saldo,
-            destinatario_nuevo, hora_inusual, velocidad_operacion, llamada_reciente,
+            producto, destinatario_nuevo, hora_inusual, velocidad_operacion, llamada_reciente,
             cambio_dispositivo, 32, 0, 240, operaciones_dia, 1, 0,
             distancia_ubicacion, ubicacion_inusual, hora_actual, dia_actual,
             resultado_tx, fecha_hora_str
@@ -1336,13 +1340,14 @@ def api_usuario_yapear():
             "decision": "APROBADA",
             "id_transaccion": id_transaccion,
             "codigo_operacion": codigo_operacion,
+            "producto": producto,
             "monto": monto,
             "destinatario": destinatario,
             "mensaje_nota": mensaje_nota,
             "fecha_hora": fecha_hora_str,
             "nuevo_saldo": nuevo_saldo,
             "probabilidad_seguridad": prob_normal,
-            "mensaje": "¡Yapeo realizado con éxito!"
+            "mensaje": f"¡Operación de {producto} realizada con éxito!"
         })
 
 
