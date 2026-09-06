@@ -5,6 +5,12 @@ Integración modular, desacoplada, compatible con el nuevo diseño y vistas comp
 
 from pathlib import Path
 from functools import wraps
+import json
+import os
+import smtplib
+import ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify, current_app
 from .data_provider import BaseAdminDataProvider, MockAdminDataProvider
 from .config import AdminConfig
@@ -77,6 +83,7 @@ def create_admin_blueprint(
                 "admin_reportes": f"{name}.admin_reportes",
                 "admin_fraudes": f"{name}.admin_fraudes",
                 "admin_perfil": f"{name}.admin_perfil",
+                "admin_config_correo": f"{name}.admin_config_correo",
                 "logout": f"{name}.admin_logout",
                 "admin_logout": f"{name}.admin_logout",
             }
@@ -310,6 +317,86 @@ def create_admin_blueprint(
             perfil=perfil,
             kpis=kpis,
             active_page="admin_perfil"
+        )
+
+    @bp.route("/config-correo", methods=["GET", "POST"])
+    @admin_guard
+    def admin_config_correo():
+        interfaz_dir = CURRENT_DIR.parent
+        ruta_cfg = interfaz_dir / "config_correo.json"
+
+        cfg_actual = {"gmail_emisor": "", "gmail_password_app": ""}
+        if ruta_cfg.exists():
+            try:
+                with open(ruta_cfg, "r", encoding="utf-8") as f:
+                    cfg_actual = json.load(f)
+            except Exception:
+                pass
+
+        if request.method == "POST":
+            accion = request.form.get("accion", "guardar")
+
+            if accion == "guardar":
+                emisor = request.form.get("gmail_emisor", "").strip().lower()
+                password = request.form.get("gmail_password_app", "").strip().replace(" ", "")
+
+                if not emisor or not password:
+                    flash("Por favor ingresa el correo Gmail y la contraseña de aplicación de Google.", "danger")
+                else:
+                    try:
+                        context = ssl.create_default_context()
+                        with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as server:
+                            server.starttls(context=context)
+                            server.login(emisor, password)
+
+                        with open(ruta_cfg, "w", encoding="utf-8") as f:
+                            json.dump({"gmail_emisor": emisor, "gmail_password_app": password}, f, indent=2)
+
+                        cfg_actual = {"gmail_emisor": emisor, "gmail_password_app": password}
+                        flash("✓ Conexión exitosa con smtp.gmail.com. Credenciales guardadas correctamente.", "success")
+                    except Exception as e:
+                        flash(f"Error al autenticar con Gmail ({e}). Verifica que la verificación en 2 pasos esté activa y la contraseña sea de 16 caracteres.", "danger")
+
+            elif accion == "test_envio":
+                destino = request.form.get("correo_prueba", "").strip().lower()
+                if not destino or "@" not in destino:
+                    flash("Ingresa un correo destinatario válido para la prueba.", "warning")
+                else:
+                    emisor = cfg_actual.get("gmail_emisor", "")
+                    password = cfg_actual.get("gmail_password_app", "")
+                    if not emisor or not password:
+                        flash("Primero debes configurar y guardar el remitente de Gmail.", "danger")
+                    else:
+                        try:
+                            msg = MIMEMultipart("alternative")
+                            msg["Subject"] = "Prueba de Servidor SMTP - Yape Antifraude BCP"
+                            msg["From"] = f"Yape Notificaciones <{emisor}>"
+                            msg["To"] = destino
+                            cuerpo = """
+                            <div style="font-family: sans-serif; background: #0B0F19; color: #FFFFFF; padding: 24px; border-radius: 12px;">
+                                <h2 style="color: #00D2C4;">✓ Conexión Exitosa</h2>
+                                <p>Este es un correo de prueba enviado desde el <strong>Centro Antifraude BCP - Yape</strong>.</p>
+                                <p style="color: #94A3B8; font-size: 13px;">El servidor SMTP de Gmail está correctamente autenticado y listo para despachar códigos OTP.</p>
+                            </div>
+                            """
+                            msg.attach(MIMEText(cuerpo, "html"))
+
+                            context = ssl.create_default_context()
+                            with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as server:
+                                server.starttls(context=context)
+                                server.login(emisor, password)
+                                server.sendmail(emisor, destino, msg.as_string())
+
+                            flash(f"✓ Correo de prueba despachado exitosamente a {destino}.", "success")
+                        except Exception as e:
+                            flash(f"Error en envío de prueba: {e}", "danger")
+
+        kpis = data_provider.get_kpis()
+        return render_template(
+            "administrador/config_correo.html",
+            config_correo=cfg_actual,
+            kpis=kpis,
+            active_page="admin_config_correo"
         )
 
     @bp.route("/logout")

@@ -115,41 +115,6 @@
             margin-bottom: 1.25rem;
         }
 
-        /* Config status badge */
-        .config-status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.74rem;
-            font-weight: 700;
-            padding: 0.32rem 0.75rem;
-            border-radius: 20px;
-            cursor: pointer;
-            border: 1px solid #E2E8F0;
-            background: #F8FAFC;
-            color: #475569;
-            margin-bottom: 1.2rem;
-            transition: 0.2s;
-        }
-
-        .config-status-badge:hover {
-            background: #F1F5F9;
-            border-color: #CBD5E1;
-            transform: translateY(-1px);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #94A3B8;
-        }
-
-        .status-dot.active {
-            background: var(--success-green);
-            box-shadow: 0 0 8px var(--success-green);
-        }
-
         .step-indicator {
             display: flex;
             justify-content: center;
@@ -346,34 +311,6 @@
             color: var(--success-green);
         }
 
-        .alert-config-callout {
-            background: #FFFBEB;
-            border: 1px solid #FDE68A;
-            border-radius: 14px;
-            padding: 0.9rem 1rem;
-            margin-bottom: 1.2rem;
-            text-align: left;
-            display: none;
-        }
-
-        .btn-open-config-alert {
-            display: inline-block;
-            background: var(--yape-purple);
-            color: white;
-            border: none;
-            padding: 0.45rem 0.9rem;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-top: 0.5rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-open-config-alert:hover {
-            filter: brightness(1.1);
-        }
-
         .footer-links {
             display: flex;
             flex-direction: column;
@@ -409,100 +346,6 @@
             cursor: not-allowed;
         }
 
-        /* ==================================================== */
-        /* MODAL CONFIGURACIÓN REMITENTE GMAIL                  */
-        /* ==================================================== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(11, 15, 25, 0.75);
-            backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.2s ease;
-            padding: 1.2rem;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-card {
-            background: #FFFFFF;
-            width: 100%;
-            max-width: 480px;
-            border-radius: 28px;
-            padding: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            position: relative;
-            transform: scale(0.95);
-            transition: 0.2s ease;
-            text-align: left;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-overlay.active .modal-card {
-            transform: scale(1);
-        }
-
-        .modal-close-btn {
-            position: absolute;
-            top: 1.25rem;
-            right: 1.25rem;
-            background: #F1F5F9;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-weight: 800;
-            color: #64748B;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
-
-        .modal-close-btn:hover {
-            background: #E2E8F0;
-            color: #0F172A;
-        }
-
-        .instruction-box-gmail {
-            background: #EFF6FF;
-            border: 1px solid #BFDBFE;
-            border-radius: 14px;
-            padding: 0.9rem;
-            margin: 1rem 0;
-            font-size: 0.78rem;
-            color: #1E40AF;
-            line-height: 1.5;
-        }
-
-        .instruction-box-gmail ol {
-            padding-left: 1.2rem;
-            margin-top: 0.35rem;
-        }
-
-        .instruction-box-gmail li {
-            margin-bottom: 0.3rem;
-        }
-
-        .instruction-box-gmail a {
-            color: #1D4ED8;
-            font-weight: 700;
-            text-decoration: underline;
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -516,13 +359,6 @@
         
         <div class="brand-logo-wrap">Y</div>
 
-        <!-- Botón de estado de configuración Gmail -->
-        <button type="button" class="config-status-badge" id="btnConfigEstado" title="Configurar correo emisor de Gmail">
-            <span class="status-dot" id="dotConfig"></span>
-            <span id="textConfigEstado">Verificando conexión Gmail...</span>
-            <span>⚙️</span>
-        </button>
-
         <!-- Indicador de Pasos -->
         <div class="step-indicator">
             <span class="step-pill active" id="stepPill1">1. Tus Datos</span>
@@ -532,19 +368,6 @@
         <!-- Alertas generales -->
         <div class="alert-message alert-error" id="msgError"></div>
         <div class="alert-message alert-success" id="msgSuccess"></div>
-
-        <!-- Alerta especial si falta configuración de remitente Gmail -->
-        <div class="alert-config-callout" id="alertConfigPrompt">
-            <div style="font-weight: 800; font-size: 0.85rem; color: #92400E; margin-bottom: 4px;">
-                ⚙️ Se requiere configurar el remitente Gmail
-            </div>
-            <p style="font-size: 0.78rem; color: #B45309; line-height: 1.4;" id="textConfigPromptMsg">
-                Para que el código de verificación llegue directo al aplicativo de Gmail en tu celular, conecta una cuenta emisora con su Contraseña de Aplicación de Google.
-            </p>
-            <button type="button" class="btn-open-config-alert" id="btnAbrirModalConfig">
-                Configurar Remitente Gmail Ahora ➔
-            </button>
-        </div>
 
         <!-- ==================================================== -->
         <!-- PASO 1: FORMULARIO DE DATOS PERSONALES               -->
@@ -638,54 +461,7 @@
 
         <div class="footer-links">
             <a href="/usuario/login">¿Ya tienes una cuenta? <strong>Inicia sesión aquí</strong></a>
-            <a href="javascript:void(0)" id="btnFooterConfig">⚙️ Configurar servidor de correo Gmail</a>
             <a href="/">← Volver al Portal Principal</a>
-        </div>
-    </div>
-
-    <!-- ==================================================== -->
-    <!-- MODAL DE CONFIGURACIÓN DE REMITENTE GMAIL            -->
-    <!-- ==================================================== -->
-    <div class="modal-overlay" id="modalConfig">
-        <div class="modal-card">
-            <button type="button" class="modal-close-btn" id="btnCerrarModal">✕</button>
-            
-            <h2 style="font-size: 1.3rem; font-weight: 800; color: #1E293B; margin-bottom: 0.3rem;">
-                ⚙️ Remitente Gmail para Envíos
-            </h2>
-            <p style="font-size: 0.82rem; color: #64748B; margin-bottom: 1rem;">
-                Configura la cuenta de Gmail desde la cual el sistema enviará los códigos reales a los celulares de los usuarios.
-            </p>
-
-            <div class="alert-message alert-error" id="modalMsgError"></div>
-            <div class="alert-message alert-success" id="modalMsgSuccess"></div>
-
-            <form id="formConfigCorreo">
-                <div class="form-group">
-                    <label>Correo Gmail Emisor</label>
-                    <input type="email" id="cfgEmisor" placeholder="ejemplo.yape@gmail.com" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Contraseña de Aplicación de Google (16 letras)</label>
-                    <input type="password" id="cfgPassword" placeholder="abcd efgh ijkl mnop" required autocomplete="new-password">
-                </div>
-
-                <div class="instruction-box-gmail">
-                    <strong>💡 ¿Cómo obtener tu contraseña de aplicación de 16 caracteres?</strong>
-                    <ol>
-                        <li>Ingresa a tu cuenta de Google en: <a href="https://myaccount.google.com/security" target="_blank" rel="noopener">myaccount.google.com/security</a></li>
-                        <li>Asegúrate de tener activa la <strong>Verificación en 2 pasos</strong>.</li>
-                        <li>Entra a <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">myaccount.google.com/apppasswords</a></li>
-                        <li>En "Nombre de la app", escribe <strong>Yape</strong> y haz clic en <strong>Crear</strong>.</li>
-                        <li>Copia los 16 caracteres generados y pégalos aquí arriba.</li>
-                    </ol>
-                </div>
-
-                <button type="submit" class="btn-submit-action" id="btnGuardarConfig" style="margin-bottom: 0.5rem;">
-                    💾 Guardar y Probar Conexión
-                </button>
-            </form>
         </div>
     </div>
 
@@ -706,24 +482,7 @@
 
         const msgError = document.getElementById("msgError");
         const msgSuccess = document.getElementById("msgSuccess");
-        const alertConfigPrompt = document.getElementById("alertConfigPrompt");
-        const textConfigPromptMsg = document.getElementById("textConfigPromptMsg");
-        const btnAbrirModalConfig = document.getElementById("btnAbrirModalConfig");
         const displayCorreo = document.getElementById("displayCorreo");
-
-        // Elementos de Configuración de Gmail
-        const btnConfigEstado = document.getElementById("btnConfigEstado");
-        const btnFooterConfig = document.getElementById("btnFooterConfig");
-        const dotConfig = document.getElementById("dotConfig");
-        const textConfigEstado = document.getElementById("textConfigEstado");
-        const modalConfig = document.getElementById("modalConfig");
-        const btnCerrarModal = document.getElementById("btnCerrarModal");
-        const formConfigCorreo = document.getElementById("formConfigCorreo");
-        const cfgEmisor = document.getElementById("cfgEmisor");
-        const cfgPassword = document.getElementById("cfgPassword");
-        const btnGuardarConfig = document.getElementById("btnGuardarConfig");
-        const modalMsgError = document.getElementById("modalMsgError");
-        const modalMsgSuccess = document.getElementById("modalMsgSuccess");
 
         let cachedUserData = null;
         let cooldownSeconds = 0;
@@ -732,7 +491,6 @@
         function ocultarMensajes() {
             msgError.style.display = "none";
             msgSuccess.style.display = "none";
-            alertConfigPrompt.style.display = "none";
         }
 
         function mostrarError(msg) {
@@ -746,93 +504,6 @@
             msgSuccess.textContent = msg;
             msgSuccess.style.display = "block";
         }
-
-        // Abrir y Cerrar Modal de Configuración
-        function abrirModal() {
-            modalMsgError.style.display = "none";
-            modalMsgSuccess.style.display = "none";
-            modalConfig.classList.add("active");
-        }
-
-        function cerrarModal() {
-            modalConfig.classList.remove("active");
-        }
-
-        btnConfigEstado.addEventListener("click", abrirModal);
-        btnFooterConfig.addEventListener("click", abrirModal);
-        btnAbrirModalConfig.addEventListener("click", abrirModal);
-        btnCerrarModal.addEventListener("click", cerrarModal);
-
-        modalConfig.addEventListener("click", (e) => {
-            if (e.target === modalConfig) {
-                cerrarModal();
-            }
-        });
-
-        // Consultar estado de configuración de Gmail al cargar
-        async function verificarEstadoGmail() {
-            try {
-                const res = await fetch("/api/auth/config-correo");
-                const data = await res.json();
-                if (data.configurado) {
-                    dotConfig.classList.add("active");
-                    textConfigEstado.textContent = "Gmail Remitente: " + data.gmail_emisor;
-                    cfgEmisor.value = data.gmail_emisor || "";
-                } else {
-                    dotConfig.classList.remove("active");
-                    textConfigEstado.textContent = "Gmail Remitente: No configurado";
-                }
-            } catch (e) {
-                textConfigEstado.textContent = "Error al verificar remitente";
-            }
-        }
-        verificarEstadoGmail();
-
-        // Guardar configuración de Gmail
-        formConfigCorreo.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            modalMsgError.style.display = "none";
-            modalMsgSuccess.style.display = "none";
-
-            btnGuardarConfig.disabled = true;
-            btnGuardarConfig.textContent = "Probando conexión con smtp.gmail.com...";
-
-            try {
-                const res = await fetch("/api/auth/config-correo", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        gmail_emisor: cfgEmisor.value.trim(),
-                        gmail_password_app: cfgPassword.value.trim()
-                    })
-                });
-
-                const data = await res.json();
-
-                if (res.ok && data.status === "success") {
-                    modalMsgSuccess.textContent = data.mensaje;
-                    modalMsgSuccess.style.display = "block";
-                    verificarEstadoGmail();
-
-                    setTimeout(() => {
-                        cerrarModal();
-                        // Si el usuario ya había intentado enviar código, reintentarlo automáticamente
-                        if (cachedUserData && step1.style.display !== "none") {
-                            formRegistro.dispatchEvent(new Event("submit"));
-                        }
-                    }, 1200);
-                } else {
-                    modalMsgError.textContent = data.mensaje || "Error al autenticar con Gmail.";
-                    modalMsgError.style.display = "block";
-                }
-            } catch (err) {
-                modalMsgError.textContent = "Error de conexión con el servidor.";
-                modalMsgError.style.display = "block";
-            } finally {
-                btnGuardarConfig.disabled = false;
-                btnGuardarConfig.textContent = "💾 Guardar y Probar Conexión";
-            }
-        });
 
         // 1. Envío de datos y solicitud de código al celular por Gmail
         formRegistro.addEventListener("submit", async (e) => {
@@ -876,9 +547,7 @@
                     iniciarCooldownReenvio(30);
                     mostrarExito("¡Código enviado a tu Gmail! Abre el aplicativo en tu celular para verlo.");
                 } else if (data.status === "need_config") {
-                    // Remitente Gmail no configurado
-                    textConfigPromptMsg.textContent = data.mensaje || "Configura el correo Gmail remitente para enviar el código a tu celular.";
-                    alertConfigPrompt.style.display = "block";
+                    mostrarError("El servicio de envío de códigos de seguridad no está disponible temporalmente. Por favor intenta más tarde o comunícate con soporte.");
                 } else {
                     mostrarError(data.mensaje || "Error al procesar el registro.");
                 }

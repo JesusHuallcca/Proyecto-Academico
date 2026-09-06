@@ -77,6 +77,9 @@
         <button class="tab-btn" data-tab="tab-models">
             <span class="tab-icon">🧠</span> Benchmark de Modelos ML
         </button>
+        <button class="tab-btn" data-tab="tab-config-smtp" id="tabBtnSmtp">
+            <span class="tab-icon">⚙️</span> Servidor Gmail / Notificaciones
+        </button>
     </nav>
 
     <!-- Contenedor Principal de Vistas -->
@@ -319,6 +322,99 @@
                     <p>
                         El modelo <strong>Gradient Boosting</strong> obtuvo un <strong>Accuracy del 98.65%</strong> y una <strong>Precisión del 98.29%</strong> en el dataset balanceado de Yape, superando a las redes neuronales densas (TensorFlow y PyTorch) en minimización de falsos positivos, garantizando que usuarios legítimos no sufran bloqueos innecesarios mientras se capturan eficazmente los patrones anómalos de fraude.
                     </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- PESTAÑA 5: SERVIDOR GMAIL & NOTIFICACIONES           -->
+        <!-- ==================================================== -->
+        <section class="tab-content" id="tab-config-smtp">
+            <div class="panel-card" style="margin-bottom: 1.5rem;">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title">Configuración del Servidor de Correo (SMTP Gmail)</h2>
+                        <span class="panel-subtitle">Administra la cuenta de despacho centralizado de códigos de seguridad para registro de usuarios</span>
+                    </div>
+                    <div id="smtpStatusBadge" style="background: rgba(31, 41, 55, 0.7); border: 1px solid var(--border-card); padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 8px;">
+                        <span class="status-pulse-green" id="smtpStatusPulse"></span>
+                        <span id="smtpStatusText">Verificando conexión...</span>
+                    </div>
+                </div>
+
+                <div id="alertAdminSmtp" style="display: none; padding: 0.9rem 1.2rem; border-radius: 12px; margin-bottom: 1.2rem; font-size: 0.85rem; font-weight: 600;"></div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+                    <!-- Formulario de Credenciales -->
+                    <div style="background: rgba(31, 41, 55, 0.4); border: 1px solid var(--border-card); border-radius: 16px; padding: 1.5rem;">
+                        <h3 style="font-size: 1.05rem; font-weight: 700; color: white; margin-bottom: 0.3rem;">
+                            ⚙️ Credenciales del Remitente
+                        </h3>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                            Los usuarios finales no tienen acceso ni visibilidad a estos datos. Solo el backend los utilizará para el envío automático de códigos.
+                        </p>
+
+                        <form id="formAdminConfigSmtp">
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                                    Correo Gmail Emisor
+                                </label>
+                                <input type="email" id="adminCfgEmisor" placeholder="ejemplo.yape@gmail.com" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-card); background: var(--bg-secondary); color: white; outline: none;">
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                                    Contraseña de Aplicación de Google (16 letras)
+                                </label>
+                                <div style="position: relative;">
+                                    <input type="password" id="adminCfgPassword" placeholder="abcd efgh ijkl mnop" required autocomplete="new-password" style="width: 100%; padding: 0.75rem 2.5rem 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-card); background: var(--bg-secondary); color: white; outline: none; font-family: monospace;">
+                                    <button type="button" id="btnToggleAdminPwd" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer;">👁️</button>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(0, 210, 196, 0.06); border: 1px solid rgba(0, 210, 196, 0.2); border-radius: 12px; padding: 0.9rem; margin-bottom: 1.25rem; font-size: 0.76rem; color: #CBD5E1; line-height: 1.45;">
+                                <strong style="color: var(--cyan);">💡 Pasos en Google:</strong>
+                                <ol style="padding-left: 1.2rem; margin-top: 0.3rem;">
+                                    <li>Activa <strong>Verificación en 2 pasos</strong> en tu cuenta Google.</li>
+                                    <li>Ingresa a <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: var(--cyan); text-decoration: underline;">myaccount.google.com/apppasswords</a>.</li>
+                                    <li>Crea la contraseña de app con nombre "Yape" y pega los 16 caracteres.</li>
+                                </ol>
+                            </div>
+
+                            <button type="submit" id="btnGuardarAdminSmtp" class="btn-action-simulate" style="width: 100%; justify-content: center; padding: 0.85rem; background: linear-gradient(135deg, var(--purple-yape), var(--purple)); color: white; border: none; font-weight: 700;">
+                                💾 Guardar y Probar Conexión SMTP
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Panel de Envíos de Prueba y Diagnóstico -->
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="background: rgba(31, 41, 55, 0.4); border: 1px solid var(--border-card); border-radius: 16px; padding: 1.5rem;">
+                            <h3 style="font-size: 1.05rem; font-weight: 700; color: white; margin-bottom: 0.3rem;">
+                                ⚡ Envío de Correo de Prueba
+                            </h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                Certifica la recepción del código y el filtrado antispam enviando un mensaje directo a tu celular o bandeja.
+                            </p>
+
+                            <form id="formAdminTestEnvio">
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                                        Destinatario de Prueba
+                                    </label>
+                                    <input type="email" id="adminTestDestino" placeholder="tu_correo_personal@gmail.com" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-card); background: var(--bg-secondary); color: white; outline: none;">
+                                </div>
+                                <button type="submit" id="btnAdminTestEnvio" class="btn-action-simulate" style="width: 100%; justify-content: center; padding: 0.85rem; background: rgba(0, 210, 196, 0.15); color: var(--cyan); border-color: rgba(0, 210, 196, 0.4); font-weight: 700;">
+                                    ✉️ Despachar Correo de Prueba
+                                </button>
+                            </form>
+                        </div>
+
+                        <div style="background: rgba(17, 24, 39, 0.6); border: 1px solid var(--border-card); border-radius: 16px; padding: 1.25rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+                            <strong style="color: white; display: block; margin-bottom: 4px;">🛡️ Configuración Definitiva del Sistema</strong>
+                            Al guardar las credenciales aquí, el archivo <code>config_correo.json</code> queda configurado permanentemente. La pantalla de registro de usuarios opera de forma 100% autónoma y no expondrá jamás ninguna configuración a los clientes.
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

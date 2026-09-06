@@ -27,6 +27,8 @@ from flask import Flask, request, jsonify, send_from_directory, render_template,
 # ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 PROJECT_ROOT = BASE_DIR.parent
 DB_PATH = BASE_DIR / "database" / "fraude_yape.db"
 MODELOS_DIR = PROJECT_ROOT / "modelos"
@@ -550,6 +552,29 @@ def api_config_correo():
     })
 
 
+@app.route("/api/admin/config-correo", methods=["GET", "POST"])
+def api_admin_config_correo():
+    """Alias administrativo para gestionar credenciales SMTP."""
+    return api_config_correo()
+
+
+@app.route("/api/admin/probar-correo", methods=["POST"])
+def api_admin_probar_correo():
+    """Permite al Administrador enviar un correo de prueba para verificar entregabilidad."""
+    datos = request.get_json() or {}
+    destinatario = str(datos.get("destinatario", "")).strip().lower()
+    if not destinatario or "@" not in destinatario:
+        return jsonify({"status": "error", "mensaje": "Ingresa una dirección de correo válida para la prueba."}), 400
+
+    codigo_test = f"{random.randint(100000, 999999)}"
+    exito, msg = enviar_correo_gmail(destinatario, codigo_test, "Administrador BCP")
+    if not exito:
+        return jsonify({"status": "error", "mensaje": f"Error en envío de prueba: {msg}"}), 500
+
+    return jsonify({"status": "success", "mensaje": f"¡Correo de prueba enviado con éxito a {destinatario}!"})
+
+
+
 def enviar_correo_gmail(destinatario, codigo, nombre):
     """
     Envía el código de verificación de 6 dígitos al correo Gmail del usuario
@@ -677,11 +702,12 @@ def api_registro_enviar_codigo():
     enviado_real, mensaje_envio = enviar_correo_gmail(correo, codigo_otp, nombre)
 
     if not enviado_real:
+        print(f"⚠️ [SMTP Yape] Fallo de envío a {correo}: {mensaje_envio}")
         return jsonify({
-            "status": "need_config",
-            "mensaje": mensaje_envio,
+            "status": "error",
+            "mensaje": "No se pudo enviar el código de verificación en este momento. Por favor intenta más tarde o comunícate con soporte.",
             "correo": correo
-        }), 400
+        }), 500
 
     return jsonify({
         "status": "success",

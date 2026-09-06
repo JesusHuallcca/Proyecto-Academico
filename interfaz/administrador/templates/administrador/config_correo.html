@@ -1,0 +1,169 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Servidor de Correo — yape.ia Administrador{% endblock %}
+{% block admin_title %}Configuración de Servidor de Correo (SMTP Gmail){% endblock %}
+
+{% block admin_content %}
+<!-- Alertas Flash -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div style="margin-bottom: 1.5rem;">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'error' else 'danger' }}" style="padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 0.75rem; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; background: {% if category == 'success' %}rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34D399;{% elif category == 'danger' %}rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #F87171;{% else %}rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #FBBF24;{% endif %}">
+          <span>{% if category == 'success' %}✓{% elif category == 'danger' %}⚠️{% else %}ℹ️{% endif %}</span>
+          <div>{{ message }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- Estado General del Servidor SMTP -->
+<div class="row" style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+  <div class="card" style="flex: 1; min-width: 320px; padding: 1.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-server" style="color: var(--color-primary);"></i>
+        Estado del Servidor de Despacho
+      </h3>
+      {% if config_correo.gmail_emisor and config_correo.gmail_password_app %}
+        <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 700; font-size: 0.75rem;">
+          ● ACTIVO / CONECTADO
+        </span>
+      {% else %}
+        <span class="badge badge-warning" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 700; font-size: 0.75rem;">
+          ● PENDIENTE DE CONFIGURACIÓN
+        </span>
+      {% endif %}
+    </div>
+
+    <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.25rem;">
+      Esta cuenta remitente es utilizada de manera centralizada y transparente por el backend para despachar los códigos de seguridad de 6 dígitos a los usuarios que se registran en Yape. Los usuarios <strong>no tienen acceso ni visibilidad</strong> sobre estos parámetros.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+      <div>
+        <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Host SMTP</span>
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-top: 2px;">smtp.gmail.com</div>
+      </div>
+      <div>
+        <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Puerto & Cifrado</span>
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-top: 2px;">587 (STARTTLS)</div>
+      </div>
+      <div>
+        <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Cuenta Emisora Actual</span>
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-accent); margin-top: 2px;">
+          {{ config_correo.gmail_emisor or 'No configurada' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row" style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+  <!-- Formulario de Credenciales SMTP -->
+  <div class="card" style="flex: 1.2; min-width: 320px; padding: 1.8rem;">
+    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.3rem;">
+      <i class="fa-solid fa-key" style="color: var(--color-primary); margin-right: 6px;"></i>
+      Credenciales del Remitente Gmail
+    </h3>
+    <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+      Actualiza la cuenta de Gmail del sistema y su contraseña de aplicación segura.
+    </p>
+
+    <form method="POST" action="{{ url_for('admin_config_correo') }}" id="formConfigCorreoAdmin">
+      <input type="hidden" name="accion" value="guardar">
+
+      <div class="form-group" style="margin-bottom: 1.2rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.4rem;">
+          Correo Gmail Emisor
+        </label>
+        <input type="email" name="gmail_emisor" class="form-control" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);" placeholder="ejemplo.yape@gmail.com" value="{{ config_correo.gmail_emisor or '' }}" required>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.2rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.4rem;">
+          Contraseña de Aplicación de Google (16 caracteres)
+        </label>
+        <div style="position: relative;">
+          <input type="password" id="inputPwdAdmin" name="gmail_password_app" class="form-control" style="width: 100%; padding: 0.75rem 2.8rem 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-family: monospace;" placeholder="abcd efgh ijkl mnop" value="{{ config_correo.gmail_password_app or '' }}" required autocomplete="new-password">
+          <button type="button" onclick="togglePwdVisibility()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px;">
+            <i class="fa-solid fa-eye" id="iconEye"></i>
+          </button>
+        </div>
+        <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; display: block;">
+          Generada en Google con verificación en 2 pasos (no uses tu clave personal regular).
+        </small>
+      </div>
+
+      <!-- Guía rápida de obtención -->
+      <div style="background: rgba(0, 210, 196, 0.05); border: 1px solid rgba(0, 210, 196, 0.2); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary);">
+        <strong style="color: var(--color-accent); display: block; margin-bottom: 6px;">
+          💡 ¿Cómo generar una Contraseña de Aplicación en Google?
+        </strong>
+        <ol style="margin-left: 1.2rem; margin-bottom: 0;">
+          <li>Ve a tu cuenta Google: <a href="https://myaccount.google.com/security" target="_blank" rel="noopener" style="color: var(--color-accent); text-decoration: underline;">myaccount.google.com/security</a></li>
+          <li>Activa la <strong>Verificación en 2 pasos</strong> si aún no la tienes.</li>
+          <li>Ingresa a: <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" style="color: var(--color-accent); text-decoration: underline;">myaccount.google.com/apppasswords</a></li>
+          <li>Asigna el nombre <strong>Yape</strong> y haz clic en <strong>Crear</strong>.</li>
+          <li>Copia la clave de 16 caracteres y pégala arriba.</li>
+        </ol>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-weight: 700; border-radius: 12px;">
+        <i class="fa-solid fa-floppy-disk" style="margin-right: 6px;"></i>
+        Guardar y Probar Conexión SMTP
+      </button>
+    </form>
+  </div>
+
+  <!-- Tarjeta de Prueba de Envío en Vivo -->
+  <div class="card" style="flex: 1; min-width: 300px; padding: 1.8rem; display: flex; flex-direction: column;">
+    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.3rem;">
+      <i class="fa-solid fa-paper-plane" style="color: var(--color-accent); margin-right: 6px;"></i>
+      Probar Envío de Correo Real
+    </h3>
+    <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+      Envía un correo de comprobación para certificar que los emails llegan sin problemas ni filtros de spam.
+    </p>
+
+    <form method="POST" action="{{ url_for('admin_config_correo') }}" style="margin-bottom: auto;">
+      <input type="hidden" name="accion" value="test_envio">
+
+      <div class="form-group" style="margin-bottom: 1.2rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.4rem;">
+          Correo Destinatario de Prueba
+        </label>
+        <input type="email" name="correo_prueba" class="form-control" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);" placeholder="tu_correo_personal@gmail.com" required>
+      </div>
+
+      <button type="submit" class="btn btn-secondary" style="width: 100%; padding: 0.85rem; font-weight: 700; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.06);">
+        <i class="fa-solid fa-bolt" style="color: var(--color-accent); margin-right: 6px;"></i>
+        Despachar Correo de Prueba
+      </button>
+    </form>
+
+    <div style="margin-top: 1.5rem; padding: 1rem; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-color); font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">
+      <strong>🛡️ Seguridad y Privacidad:</strong><br>
+      Las credenciales se conservan cifradas en el servidor local. Este ajuste es 100% independiente de los usuarios registrados, garantizando que el flujo de registro se mantenga limpio y seguro.
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePwdVisibility() {
+  const input = document.getElementById("inputPwdAdmin");
+  const icon = document.getElementById("iconEye");
+  if (input.type === "password") {
+    input.type = "text";
+    icon.classList.remove("fa-eye");
+    icon.classList.add("fa-eye-slash");
+  } else {
+    input.type = "password";
+    icon.classList.remove("fa-eye-slash");
+    icon.classList.add("fa-eye-line");
+    icon.classList.add("fa-eye");
+  }
+}
+</script>
+{% endblock %}

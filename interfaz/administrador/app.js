@@ -167,6 +167,9 @@ function inicializarEventos() {
             if (e.target === modalForensic) modalForensic.style.display = "none";
         });
     }
+
+    // 7. Inicializar Panel SMTP de Administrador
+    inicializarConfiguracionSmtp();
 }
 
 async function ejecutarSimulacion(tipo) {
@@ -741,3 +744,143 @@ async function resolverAlerta(idAlerta, accion) {
         alert("Error al resolver la alerta.");
     }
 }
+
+// ============================================================
+// GESTIÓN DEL SERVIDOR DE CORREO SMTP GMAIL (ADMINISTRADOR)
+// ============================================================
+
+function inicializarConfiguracionSmtp() {
+    const formConfig = document.getElementById("formAdminConfigSmtp");
+    const formTest = document.getElementById("formAdminTestEnvio");
+    const btnTogglePwd = document.getElementById("btnToggleAdminPwd");
+    const inputPwd = document.getElementById("adminCfgPassword");
+
+    if (btnTogglePwd && inputPwd) {
+        btnTogglePwd.addEventListener("click", () => {
+            inputPwd.type = inputPwd.type === "password" ? "text" : "password";
+        });
+    }
+
+    if (formConfig) {
+        formConfig.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btnGuardar = document.getElementById("btnGuardarAdminSmtp");
+            const emisor = document.getElementById("adminCfgEmisor").value.trim();
+            const password = inputPwd.value.trim();
+
+            btnGuardar.disabled = true;
+            btnGuardar.textContent = "Probando conexión con smtp.gmail.com:587...";
+            mostrarAlertaAdminSmtp("Conectando con Google SMTP mediante cifrado TLS...", "info");
+
+            try {
+                const res = await fetch("/api/admin/config-correo", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        gmail_emisor: emisor,
+                        gmail_password_app: password
+                    })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.status === "success") {
+                    mostrarAlertaAdminSmtp("✓ " + data.mensaje, "success");
+                    cargarEstadoSmtpAdmin();
+                } else {
+                    mostrarAlertaAdminSmtp("⚠️ " + (data.mensaje || "Error al autenticar con Gmail."), "danger");
+                }
+            } catch (err) {
+                mostrarAlertaAdminSmtp("Error de comunicación con el servidor.", "danger");
+            } finally {
+                btnGuardar.disabled = false;
+                btnGuardar.textContent = "💾 Guardar y Probar Conexión SMTP";
+            }
+        });
+    }
+
+    if (formTest) {
+        formTest.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btnTest = document.getElementById("btnAdminTestEnvio");
+            const destino = document.getElementById("adminTestDestino").value.trim();
+
+            btnTest.disabled = true;
+            btnTest.textContent = "Despachando correo de prueba...";
+            mostrarAlertaAdminSmtp(`Enviando código de prueba a ${destino}...`, "info");
+
+            try {
+                const res = await fetch("/api/admin/probar-correo", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ destinatario: destino })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.status === "success") {
+                    mostrarAlertaAdminSmtp("✓ " + data.mensaje, "success");
+                } else {
+                    mostrarAlertaAdminSmtp("⚠️ " + (data.mensaje || "Fallo en envío de prueba."), "danger");
+                }
+            } catch (err) {
+                mostrarAlertaAdminSmtp("Error al conectar con la API de prueba.", "danger");
+            } finally {
+                btnTest.disabled = false;
+                btnTest.textContent = "✉️ Despachar Correo de Prueba";
+            }
+        });
+    }
+
+    cargarEstadoSmtpAdmin();
+}
+
+async function cargarEstadoSmtpAdmin() {
+    const pulse = document.getElementById("smtpStatusPulse");
+    const text = document.getElementById("smtpStatusText");
+    const inputEmisor = document.getElementById("adminCfgEmisor");
+
+    if (!pulse || !text) return;
+
+    try {
+        const res = await fetch("/api/admin/config-correo");
+        const data = await res.json();
+
+        if (data.configurado) {
+            pulse.style.backgroundColor = "var(--success)";
+            pulse.style.boxShadow = "0 0 8px var(--success)";
+            text.innerHTML = `Conectado: <strong style="color: white;">${data.gmail_emisor}</strong>`;
+            if (inputEmisor && !inputEmisor.value) {
+                inputEmisor.value = data.gmail_emisor;
+            }
+        } else {
+            pulse.style.backgroundColor = "var(--warning)";
+            pulse.style.boxShadow = "0 0 8px var(--warning)";
+            text.textContent = "Remitente No Configurado";
+        }
+    } catch (err) {
+        pulse.style.backgroundColor = "var(--danger)";
+        text.textContent = "Error al consultar estado SMTP";
+    }
+}
+
+function mostrarAlertaAdminSmtp(mensaje, tipo) {
+    const box = document.getElementById("alertAdminSmtp");
+    if (!box) return;
+
+    box.style.display = "block";
+    box.textContent = mensaje;
+
+    if (tipo === "success") {
+        box.style.background = "rgba(16, 185, 129, 0.15)";
+        box.style.border = "1px solid rgba(16, 185, 129, 0.35)";
+        box.style.color = "#34D399";
+    } else if (tipo === "danger") {
+        box.style.background = "rgba(239, 68, 68, 0.15)";
+        box.style.border = "1px solid rgba(239, 68, 68, 0.35)";
+        box.style.color = "#F87171";
+    } else {
+        box.style.background = "rgba(0, 210, 196, 0.15)";
+        box.style.border = "1px solid rgba(0, 210, 196, 0.35)";
+        box.style.color = "var(--cyan)";
+    }
+}
+

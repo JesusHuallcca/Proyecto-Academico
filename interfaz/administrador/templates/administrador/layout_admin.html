@@ -82,6 +82,11 @@
         <span>Reportes</span>
       </a>
 
+      <a href="{{ url_for('admin_config_correo') }}" class="sidebar-link {% if request.endpoint == 'admin_config_correo' or active_page == 'admin_config_correo' %}active{% endif %}" id="link-config-correo">
+        <span class="link-icon"><i class="fa-solid fa-envelope-circle-check"></i></span>
+        <span>Servidor de Correo</span>
+      </a>
+
       <a href="{{ url_for('admin_perfil') }}" class="sidebar-link {% if request.endpoint == 'admin_perfil' or active_page == 'admin_perfil' %}active{% endif %}" id="link-sidebar-perfil">
         <span class="link-icon"><i class="fa-solid fa-user-shield"></i></span>
         <span>Mi Perfil</span>
