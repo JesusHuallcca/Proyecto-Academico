@@ -644,3 +644,67 @@ class SQLiteAdminDataProvider(BaseAdminDataProvider):
 
     def get_confusion_matrices(self) -> Dict[str, Any]:
         return self._mock_fallback.get_confusion_matrices()
+
+    def delete_user(self, id_usuario: int) -> Tuple[bool, Optional[str]]:
+        """Elimina un usuario no-admin y todos sus datos relacionados."""
+        try:
+            con = self._conectar()
+            # Verificar que no sea admin
+            row = con.execute("SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?", (id_usuario,)).fetchone()
+            if not row:
+                con.close()
+                return False, "Usuario no encontrado."
+            if row["tipo_usuario"] == "ADMIN":
+                con.close()
+                return False, "No se puede eliminar una cuenta de administrador."
+            cur = con.cursor()
+            # Eliminar datos relacionados en cascada
+            cur.execute("DELETE FROM historial_acciones WHERE id_usuario = ?", (id_usuario,))
+            # Obtener transacciones del usuario para borrar predicciones y alertas
+            trans_ids = [r[0] for r in cur.execute("SELECT id_transaccion FROM transacciones WHERE id_usuario = ?", (id_usuario,)).fetchall()]
+            if trans_ids:
+                placeholders = ",".join("?" * len(trans_ids))
+                cur.execute(f"DELETE FROM predicciones WHERE id_transaccion IN ({placeholders})", trans_ids)
+                cur.execute(f"DELETE FROM alertas WHERE id_transaccion IN ({placeholders})", trans_ids)
+            cur.execute("DELETE FROM transacciones WHERE id_usuario = ?", (id_usuario,))
+            cur.execute("DELETE FROM dispositivos WHERE id_usuario = ?", (id_usuario,))
+            cur.execute("DELETE FROM cuentas WHERE id_usuario = ?", (id_usuario,))
+            cur.execute("DELETE FROM codigos_verificacion WHERE correo = (SELECT correo FROM usuarios WHERE id_usuario = ?)", (id_usuario,))
+            cur.execute("DELETE FROM usuarios WHERE id_usuario = ?", (id_usuario,))
+            con.commit()
+            con.close()
+            return True, None
+        except Exception as e:
+            return False, str(e)
+
+    def delete_all_users(self) -> Tuple[bool, Optional[str]]:
+        """Elimina TODOS los usuarios no-admin y sus datos relacionados."""
+        try:
+            con = self._conectar()
+            cur = con.cursor()
+            # Obtener IDs de usuarios no-admin
+            non_admin_ids = [r[0] for r in cur.execute("SELECT id_usuario FROM usuarios WHERE tipo_usuario != 'ADMIN'").fetchall()]
+            if not non_admin_ids:
+                con.close()
+                return True, "No hay usuarios de prueba para eliminar."
+            placeholders = ",".join("?" * len(non_admin_ids))
+            cur.execute(f"DELETE FROM historial_acciones WHERE id_usuario IN ({placeholders})", non_admin_ids)
+            trans_ids = [r[0] for r in cur.execute(f"SELECT id_transaccion FROM transacciones WHERE id_usuario IN ({placeholders})", non_admin_ids).fetchall()]
+            if trans_ids:
+                t_phs = ",".join("?" * len(trans_ids))
+                cur.execute(f"DELETE FROM predicciones WHERE id_transaccion IN ({t_phs})", trans_ids)
+                cur.execute(f"DELETE FROM alertas WHERE id_transaccion IN ({t_phs})", trans_ids)
+            cur.execute(f"DELETE FROM transacciones WHERE id_usuario IN ({placeholders})", non_admin_ids)
+            cur.execute(f"DELETE FROM dispositivos WHERE id_usuario IN ({placeholders})", non_admin_ids)
+            cur.execute(f"DELETE FROM cuentas WHERE id_usuario IN ({placeholders})", non_admin_ids)
+            # Limpiar códigos de verificación de esos usuarios
+            correos = [r[0] for r in cur.execute(f"SELECT correo FROM usuarios WHERE id_usuario IN ({placeholders})", non_admin_ids).fetchall()]
+            if correos:
+                c_phs = ",".join("?" * len(correos))
+                cur.execute(f"DELETE FROM codigos_verificacion WHERE correo IN ({c_phs})", correos)
+            cur.execute(f"DELETE FROM usuarios WHERE id_usuario IN ({placeholders})", non_admin_ids)
+            con.commit()
+            con.close()
+            return True, f"Se eliminaron {len(non_admin_ids)} usuarios correctamente."
+        except Exception as e:
+            return False, str(e)

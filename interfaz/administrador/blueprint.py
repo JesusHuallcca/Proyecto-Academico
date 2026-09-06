@@ -84,6 +84,8 @@ def create_admin_blueprint(
                 "admin_fraudes": f"{name}.admin_fraudes",
                 "admin_perfil": f"{name}.admin_perfil",
                 "admin_config_correo": f"{name}.admin_config_correo",
+                "admin_eliminar_usuario": f"{name}.admin_eliminar_usuario",
+                "admin_eliminar_todos_usuarios": f"{name}.admin_eliminar_todos_usuarios",
                 "logout": f"{name}.admin_logout",
                 "admin_logout": f"{name}.admin_logout",
             }
@@ -197,6 +199,27 @@ def create_admin_blueprint(
             data_provider.update_user_status(int(id_usuario), nuevo_estado)
             flash("Estado del usuario actualizado.", "success")
         return redirect(url_for(f"{name}.admin_usuarios"))
+
+    @bp.route("/usuario/<int:id_usuario>/eliminar", methods=["POST"])
+    @admin_guard
+    def admin_eliminar_usuario(id_usuario):
+        ok, msg = data_provider.delete_user(id_usuario)
+        if ok:
+            flash(f"Usuario #{id_usuario} eliminado correctamente.", "success")
+        else:
+            flash(f"Error al eliminar: {msg}", "danger")
+        return redirect(url_for(f"{name}.admin_usuarios"))
+
+    @bp.route("/usuarios/eliminar-todos", methods=["POST"])
+    @admin_guard
+    def admin_eliminar_todos_usuarios():
+        ok, msg = data_provider.delete_all_users()
+        if ok:
+            flash(msg or "Todos los usuarios han sido eliminados.", "success")
+        else:
+            flash(f"Error al eliminar usuarios: {msg}", "danger")
+        return redirect(url_for(f"{name}.admin_usuarios"))
+
 
     @bp.route("/estadisticas")
     @admin_guard

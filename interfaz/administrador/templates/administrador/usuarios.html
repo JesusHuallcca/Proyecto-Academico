@@ -30,7 +30,18 @@
         Administración de accesos, roles y estados de cuenta.
       </p>
     </div>
-    <span class="badge badge-accent">{{ usuarios|length }} en total</span>
+    <div style="display:flex;gap:.5rem;align-items:center">
+      <span class="badge badge-accent">{{ usuarios|length }} en total</span>
+      <!-- Botón eliminar todos -->
+      {% set non_admins = usuarios | rejectattr('tipo_usuario', 'equalto', 'ADMIN') | list %}
+      {% if non_admins %}
+      <button type="button" class="btn btn-sm btn-danger"
+        style="display:flex;align-items:center;gap:.4rem"
+        onclick="confirmarEliminarTodos()">
+        <i class="fa-solid fa-trash-can"></i> Eliminar todos ({{ non_admins|length }})
+      </button>
+      {% endif %}
+    </div>
   </div>
 
   <div class="table-responsive">
@@ -45,7 +56,7 @@
           <th>Estado</th>
           <th>Transacciones</th>
           <th>Registro</th>
-          <th>Acción</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -76,17 +87,29 @@
           </td>
           <td>
             <strong style="font-family:var(--font-heading)">{{ u.total_transacciones }}</strong>
-            <small style="color:var(--text-muted)"> ops</small>
+            <small style="color:var(--text-muted)">ops</small>
           </td>
           <td style="color:var(--text-muted);font-size:.82rem">{{ u.fecha_registro[:10] if u.fecha_registro else '—' }}</td>
           <td>
             {% if u.tipo_usuario != 'ADMIN' %}
-              <form action="{{ url_for('admin_toggle_usuario', id_usuario=u.id_usuario) }}" method="POST" style="display:inline">
-                <button type="submit" class="btn btn-sm {% if u.estado == 'ACTIVO' %}btn-danger{% else %}btn-outline{% endif %}"
-                  onclick="return confirm('¿Confirmar cambio de estado de este usuario?')">
-                  {% if u.estado == 'ACTIVO' %}Desactivar{% else %}Activar{% endif %}
-                </button>
-              </form>
+              <div style="display:flex;gap:.35rem;align-items:center;flex-wrap:wrap">
+                <!-- Activar / Desactivar -->
+                <form action="{{ url_for('admin_toggle_usuario', id_usuario=u.id_usuario) }}" method="POST" style="display:inline">
+                  <button type="submit" class="btn btn-sm {% if u.estado == 'ACTIVO' %}btn-danger{% else %}btn-outline{% endif %}"
+                    onclick="return confirm('¿Confirmar cambio de estado de este usuario?')">
+                    {% if u.estado == 'ACTIVO' %}Desactivar{% else %}Activar{% endif %}
+                  </button>
+                </form>
+                <!-- Eliminar -->
+                <form action="{{ url_for('admin_eliminar_usuario', id_usuario=u.id_usuario) }}" method="POST" style="display:inline"
+                  onsubmit="return confirm('⚠️ ¿Eliminar definitivamente a {{ u.nombre }} {{ u.apellido }}?\n\nEsta acción borrará también sus transacciones, cuentas y dispositivos. No se puede deshacer.')">
+                  <button type="submit" class="btn btn-sm"
+                    style="background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.3);padding:.25rem .5rem"
+                    title="Eliminar usuario">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </form>
+              </div>
             {% else %}
               <span style="font-size:.8rem;color:var(--text-muted)"><i class="fa-solid fa-lock" style="margin-right:3px"></i> Protegido</span>
             {% endif %}
@@ -107,4 +130,21 @@
     </table>
   </div>
 </div>
+
+<!-- Formulario oculto para eliminar todos -->
+<form id="form-eliminar-todos" action="{{ url_for('admin_eliminar_todos_usuarios') }}" method="POST" style="display:none"></form>
+
+<script>
+function confirmarEliminarTodos() {
+  if (confirm('⚠️ ATENCIÓN: ¿Eliminar TODOS los usuarios no-administradores?\n\nEsta acción eliminará a todos los usuarios registrados, junto con sus transacciones, cuentas, dispositivos y datos relacionados.\n\nEscribe OK para confirmar.')) {
+    const confirmacion = prompt('Para confirmar, escribe: ELIMINAR TODO');
+    if (confirmacion && confirmacion.trim().toUpperCase() === 'ELIMINAR TODO') {
+      document.getElementById('form-eliminar-todos').submit();
+    } else {
+      alert('Operación cancelada. El texto no coincide.');
+    }
+  }
+}
+</script>
 {% endblock %}
+
