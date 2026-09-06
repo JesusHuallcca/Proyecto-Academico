@@ -1,0 +1,5 @@
+Modelo,Accuracy,Precision,Recall,F1-Score
+Regresión Logística,0.9155,0.4274,0.9193,0.5835
+Árbol de Decisión,0.9222,0.4473,0.8835,0.5939
+Random Forest,0.9546,0.5971,0.9068,0.7201
+Gradient Boosting,0.9865,0.9829,0.8043,0.8847

@@ -1,0 +1,17 @@
+RED NEURONAL TENSORFLOW / KERAS
+
+Umbral utilizado: 0.5
+
+Accuracy: 0.9527
+Precision: 0.5807
+Recall: 0.9550
+F1-Score: 0.7223
+
+              precision    recall  f1-score   support
+
+      Normal       1.00      0.95      0.97      9356
+      Fraude       0.58      0.95      0.72       644
+
+    accuracy                           0.95     10000
+   macro avg       0.79      0.95      0.85     10000
+weighted avg       0.97      0.95      0.96     10000

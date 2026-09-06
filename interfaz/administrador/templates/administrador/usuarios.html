@@ -1,0 +1,110 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Gestion de Usuarios &mdash; yape.ia Administrador{% endblock %}
+{% block admin_title %}Gestion de Usuarios y Roles{% endblock %}
+{% block admin_subtitle %}Control de accesos, estados de cuenta y auditoria de sesiones{% endblock %}
+
+{% block admin_content %}
+
+<!-- Stats Row -->
+<div class="stats-row">
+  <div class="stat-pill">
+    <span class="stat-pill-icon"><i class="fa-solid fa-users"></i></span>
+    <span>{{ usuarios|length }} usuarios registrados</span>
+  </div>
+  <div class="stat-pill">
+    <span class="stat-pill-icon" style="color:var(--color-success)"><i class="fa-solid fa-circle-check"></i></span>
+    <span>{{ usuarios | selectattr('estado', 'equalto', 'ACTIVO') | list | length }} activos</span>
+  </div>
+  <div class="stat-pill">
+    <span class="stat-pill-icon" style="color:var(--color-danger)"><i class="fa-solid fa-circle-xmark"></i></span>
+    <span>{{ usuarios | selectattr('estado', 'equalto', 'INACTIVO') | list | length }} inactivos</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h3 class="card-title"><i class="fa-solid fa-users-gear" style="color:var(--color-primary);margin-right:8px"></i> Usuarios Registrados en la Base de Datos</h3>
+      <p style="font-size:.85rem;color:var(--text-muted);margin-top:.25rem">
+        Administración de accesos, roles y estados de cuenta.
+      </p>
+    </div>
+    <span class="badge badge-accent">{{ usuarios|length }} en total</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Correo</th>
+          <th>Celular</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Transacciones</th>
+          <th>Registro</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in usuarios %}
+        <tr>
+          <td><code style="font-size:.82rem;color:var(--text-muted)">#{{ u.id_usuario }}</code></td>
+          <td>
+            <div class="user-cell">
+              <div class="user-avatar-sm">{{ u.nombre[0] | upper }}</div>
+              <div class="user-cell-info">
+                <strong>{{ u.nombre }} {{ u.apellido }}</strong>
+              </div>
+            </div>
+          </td>
+          <td style="color:var(--text-secondary)">{{ u.correo }}</td>
+          <td style="color:var(--text-muted)">{{ u.telefono or '—' }}</td>
+          <td>
+            {% if u.tipo_usuario == 'ADMIN' %}
+              <span class="badge" style="background:rgba(116,34,132,.15);color:var(--color-primary);border-color:var(--color-primary-glow)"><i class="fa-solid fa-shield" style="margin-right:4px"></i> ADMIN</span>
+            {% else %}
+              <span class="badge badge-accent"><i class="fa-solid fa-user" style="margin-right:4px"></i> USUARIO</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge {% if u.estado == 'ACTIVO' %}badge-success{% else %}badge-danger{% endif %}">
+              <i class="fa-solid {% if u.estado == 'ACTIVO' %}fa-circle{% else %}fa-circle-dot{% endif %}" style="font-size:.65rem;margin-right:4px"></i> {{ u.estado }}
+            </span>
+          </td>
+          <td>
+            <strong style="font-family:var(--font-heading)">{{ u.total_transacciones }}</strong>
+            <small style="color:var(--text-muted)"> ops</small>
+          </td>
+          <td style="color:var(--text-muted);font-size:.82rem">{{ u.fecha_registro[:10] if u.fecha_registro else '—' }}</td>
+          <td>
+            {% if u.tipo_usuario != 'ADMIN' %}
+              <form action="{{ url_for('admin_toggle_usuario', id_usuario=u.id_usuario) }}" method="POST" style="display:inline">
+                <button type="submit" class="btn btn-sm {% if u.estado == 'ACTIVO' %}btn-danger{% else %}btn-outline{% endif %}"
+                  onclick="return confirm('¿Confirmar cambio de estado de este usuario?')">
+                  {% if u.estado == 'ACTIVO' %}Desactivar{% else %}Activar{% endif %}
+                </button>
+              </form>
+            {% else %}
+              <span style="font-size:.8rem;color:var(--text-muted)"><i class="fa-solid fa-lock" style="margin-right:3px"></i> Protegido</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9">
+            <div class="empty-state">
+              <div class="empty-state-icon"><i class="fa-solid fa-users"></i></div>
+              <strong>Sin usuarios registrados</strong>
+              <p>Aun no hay usuarios en el sistema.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

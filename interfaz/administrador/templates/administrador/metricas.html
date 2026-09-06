@@ -1,0 +1,165 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Metricas de Evaluacion &mdash; yape.ia Administrador{% endblock %}
+{% block admin_title %}Metricas Detalladas de Clasificacion{% endblock %}
+{% block admin_subtitle %}Analisis comparativo de rendimiento de todos los modelos entrenados{% endblock %}
+
+{% block admin_content %}
+
+<!-- KPIs de Metricas -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-body">
+      <div class="kpi-title">Accuracy Global (Mejor)</div>
+      <div class="kpi-value" style="color:var(--color-success)">98.65%</div>
+      <div class="kpi-subtext">Gradient Boosting</div>
+      <div class="kpi-trend up"><i class="fa-solid fa-arrow-up"></i> Mejor modelo</div>
+    </div>
+    <div class="kpi-icon success"><i class="fa-solid fa-bullseye"></i></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-body">
+      <div class="kpi-title">Precision Anti-Falsos Positivos</div>
+      <div class="kpi-value" style="color:var(--color-primary)">98.29%</div>
+      <div class="kpi-subtext">Solo 9 falsas alarmas</div>
+    </div>
+    <div class="kpi-icon primary"><i class="fa-solid fa-shield-check"></i></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-body">
+      <div class="kpi-title">Recall PyTorch (Sensibilidad)</div>
+      <div class="kpi-value" style="color:var(--color-accent-dark)">96.27%</div>
+      <div class="kpi-subtext">Red Neuronal PyTorch</div>
+    </div>
+    <div class="kpi-icon accent"><i class="fa-solid fa-bolt"></i></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-body">
+      <div class="kpi-title">F1-Score Equilibrado</div>
+      <div class="kpi-value" style="color:var(--color-warning)">0.8847</div>
+      <div class="kpi-subtext">Media armónica Precision-Recall</div>
+    </div>
+    <div class="kpi-icon warning"><i class="fa-solid fa-chart-area"></i></div>
+  </div>
+</div>
+
+<!-- Graficos de Metricas -->
+<div class="charts-grid-2">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title">Metricas Comparativas por Algoritmo</h3>
+        <p class="chart-card-desc">Accuracy, Precision, Recall, F1-Score por modelo</p>
+      </div>
+      <span class="badge badge-primary">Bar Chart</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-comparacion-modelos"></canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title">Equilibrio Multidimensional</h3>
+        <p class="chart-card-desc">Vision radial de rendimiento comparativo</p>
+      </div>
+      <span class="badge badge-accent">Radar</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-radar-modelos"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Barras de Progreso por Metrica -->
+<div class="charts-grid-2" style="margin-bottom:1.8rem">
+  <div class="metric-progress-card">
+    <div class="card-header" style="margin-bottom:1rem">
+      <h3 class="card-title">Gradient Boosting &mdash; Metricas Detalladas</h3>
+      <span class="badge badge-success">En Produccion</span>
+    </div>
+    <div class="metric-item">
+      <div class="metric-header">
+        <span class="metric-name">Accuracy</span>
+        <span class="metric-val">98.65%</span>
+      </div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:98.65%"></div></div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-header">
+        <span class="metric-name">Precision</span>
+        <span class="metric-val">98.29%</span>
+      </div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:98.29%"></div></div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-header">
+        <span class="metric-name">Recall</span>
+        <span class="metric-val">80.43%</span>
+      </div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:80.43%"></div></div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-header">
+        <span class="metric-name">F1-Score</span>
+        <span class="metric-val">0.8847</span>
+      </div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:88.47%"></div></div>
+    </div>
+  </div>
+  <div class="metric-progress-card">
+    <div class="card-header" style="margin-bottom:1rem">
+      <h3 class="card-title">PyTorch Neural Net &mdash; Metricas</h3>
+      <span class="badge badge-accent">Alto Recall</span>
+    </div>
+    <div class="metric-item">
+      <div class="metric-header">
+        <span class="metric-name">Accuracy</span>
+        <span class="metric-val">97.83%</span>
+      </div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:97.83%"></div></div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-header">
+        <span class="metric-name">Precision</span>
+        <span class="metric-val">89.91%</span>
+      </div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:89.91%"></div></div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-header">
+        <span class="metric-name">Recall</span>
+        <span class="metric-val">96.27%</span>
+      </div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:96.27%"></div></div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-header">
+        <span class="metric-name">F1-Score</span>
+        <span class="metric-val">0.9298</span>
+      </div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:92.98%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Interpretacion Tecnica -->
+<div class="insight-card">
+  <h4>&#128270; Interpretacion Tecnica de Metricas en Deteccion de Fraude</h4>
+  <div class="insight-item">
+    <strong>Accuracy (98.65%):</strong>
+    En datasets desbalanceados como transacciones financieras (6.44% fraudes reales),
+    un accuracy alto es condicion necesaria pero no suficiente. Gradient Boosting logra el mayor accuracy.
+  </div>
+  <div class="insight-item">
+    <strong>Precision (98.29%):</strong>
+    Cuando el sistema emite una alerta de fraude, en un 98.29% es un fraude genuino.
+    Minimiza las molestias a clientes legitimos por falsas alarmas.
+  </div>
+  <div class="insight-item">
+    <strong>Recall (80.43% - 96.27%):</strong>
+    Las redes neuronales (PyTorch/TF) alcanzan hasta 96.27% de recall, capturando mas fraudes,
+    pero generando mas falsos positivos. Gradient Boosting equilibra con el mejor F1-Score (0.8847).
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Analistas | Centro Antifraude BCP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0B0F19;
+            --bg-card: #111827;
+            --bg-secondary: #1F2937;
+            --border-card: rgba(255, 255, 255, 0.08);
+            --cyan: #00D2C4;
+            --purple: #8A2BE2;
+            --purple-yape: #742284;
+            --danger: #EF4444;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 210, 196, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(116, 34, 132, 0.25) 0%, transparent 45%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            width: 100%;
+            max-width: 440px;
+            border-radius: 28px;
+            padding: 2.8rem 2.2rem;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 210, 196, 0.15);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .top-stripe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+        }
+
+        .shield-badge {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--purple-yape), var(--cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto 1.25rem auto;
+            box-shadow: 0 0 25px rgba(0, 210, 196, 0.4);
+        }
+
+        h1 {
+            font-size: 1.55rem;
+            font-weight: 800;
+            margin-bottom: 0.35rem;
+            background: linear-gradient(90deg, #FFFFFF, #D8B4E2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtext {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 0.45rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.85rem 1.1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-card);
+            background: var(--bg-secondary);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: white;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 2px rgba(0, 210, 196, 0.25);
+        }
+
+        .btn-submit-login {
+            width: 100%;
+            background: linear-gradient(135deg, var(--cyan), #00A89D);
+            color: #064E4B;
+            border: none;
+            padding: 0.95rem;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 210, 196, 0.3);
+            margin-top: 0.5rem;
+            margin-bottom: 1.2rem;
+            transition: 0.2s;
+        }
+
+        .btn-submit-login:hover {
+            filter: brightness(1.15);
+            transform: translateY(-2px);
+        }
+
+        .btn-demo-quick {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            color: var(--cyan);
+            padding: 0.75rem;
+            border-radius: 14px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .btn-demo-quick:hover {
+            background: rgba(0, 210, 196, 0.12);
+            border-color: var(--cyan);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-card);
+            padding-top: 1.25rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--cyan);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #F87171;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.7rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.2rem;
+            display: none;
+            text-align: left;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="top-stripe"></div>
+        
+        <div class="shield-badge">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+        </div>
+        <h1>Centro Antifraude BCP</h1>
+        <p class="subtext">Consola de Control y Operaciones de Ciberseguridad</p>
+
+        <div class="alert-error" id="loginError"></div>
+
+        <form id="formLogin">
+            <div class="form-group">
+                <label>Correo Corporativo</label>
+                <input type="email" id="inputCorreo" placeholder="admin@bcp.com" value="admin@bcp.com" required>
+            </div>
+
+            <div class="form-group">
+                <label>Clave de Acceso</label>
+                <input type="password" id="inputPassword" placeholder="••••••••" value="admin123" required>
+            </div>
+
+            <button type="submit" class="btn-submit-login" id="btnSubmit">
+                Ingresar a Consola SOC
+            </button>
+        </form>
+
+        <button type="button" class="btn-demo-quick" id="btnQuickDemo">
+            ⚡ Acceso Rápido Analista SOC (Demo)
+        </button>
+
+        <div class="footer-links">
+            <a href="/usuario/login">📱 Acceso a Billetera Yape (Usuario) ↗</a>
+            <a href="/">← Volver al Portal Principal</a>
+        </div>
+    </div>
+
+    <script>
+        const formLogin = document.getElementById("formLogin");
+        const inputCorreo = document.getElementById("inputCorreo");
+        const inputPassword = document.getElementById("inputPassword");
+        const btnSubmit = document.getElementById("btnSubmit");
+        const btnQuickDemo = document.getElementById("btnQuickDemo");
+        const loginError = document.getElementById("loginError");
+
+        function mostrarError(msg) {
+            loginError.textContent = msg;
+            loginError.style.display = "block";
+        }
+
+        formLogin.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            loginError.style.display = "none";
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = "Autenticando...";
+
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        correo: inputCorreo.value.trim(),
+                        password: inputPassword.value.trim(),
+                        portal: "ADMIN"
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok && data.status === "success") {
+                    window.location.href = data.redirect || "/admin";
+                } else {
+                    mostrarError(data.mensaje || "Credenciales incorrectas.");
+                }
+            } catch (err) {
+                mostrarError("No se pudo conectar con el servidor.");
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = "Ingresar a Consola SOC";
+            }
+        });
+
+        // Botón Demo Rápido
+        btnQuickDemo.addEventListener("click", () => {
+            inputCorreo.value = "admin@bcp.com";
+            inputPassword.value = "admin123";
+            formLogin.dispatchEvent(new Event("submit"));
+        });
+    </script>
+</body>
+</html>

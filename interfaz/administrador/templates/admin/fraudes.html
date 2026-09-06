@@ -1,0 +1,122 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Detección de Fraudes - Antifraude Yape{% endblock %}
+{% block breadcrumb %}Detección de Fraudes{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header-title">Alertas de Seguridad y Detección de Fraudes</h1>
+    <p class="page-header-desc">Operaciones categorizadas con anomalías severas o probabilidad de fraude superior al umbral crítico.</p>
+  </div>
+</div>
+
+<!-- FILTROS DE ESTADO DE ALERTA -->
+<div class="panel-card" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem;">
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <span style="font-size: 0.85rem; color: var(--text-dim); margin-right: 0.5rem; font-weight: 600;">Estado de Alerta:</span>
+    <a href="{{ url_for('admin.admin_fraudes', estado='TODOS') }}" class="btn btn-sm {% if estado_filtro == 'TODOS' %}btn-primary{% else %}btn-secondary{% endif %}">Todas</a>
+    <a href="{{ url_for('admin.admin_fraudes', estado='PENDIENTE') }}" class="btn btn-sm {% if estado_filtro == 'PENDIENTE' %}btn-primary{% else %}btn-secondary{% endif %}">Pendientes</a>
+    <a href="{{ url_for('admin.admin_fraudes', estado='REVISADA') }}" class="btn btn-sm {% if estado_filtro == 'REVISADA' %}btn-primary{% else %}btn-secondary{% endif %}">Revisadas</a>
+    <a href="{{ url_for('admin.admin_fraudes', estado='CONFIRMADA') }}" class="btn btn-sm {% if estado_filtro == 'CONFIRMADA' %}btn-primary{% else %}btn-secondary{% endif %}">Confirmadas</a>
+    <a href="{{ url_for('admin.admin_fraudes', estado='DESCARTADA') }}" class="btn btn-sm {% if estado_filtro == 'DESCARTADA' %}btn-primary{% else %}btn-secondary{% endif %}">Descartadas</a>
+  </div>
+</div>
+
+<!-- LISTADO DE ALERTAS -->
+<div class="panel-card">
+  {% if alertas %}
+    <div class="table-responsive">
+      <table class="data-table table-cards-mobile">
+        <thead>
+          <tr>
+            <th>ID Alerta</th>
+            <th>Nivel</th>
+            <th>Cliente</th>
+            <th>Producto</th>
+            <th>Monto</th>
+            <th>Prob. Fraude</th>
+            <th>Descripción / Causa</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in alertas %}
+            <tr>
+              <td data-label="ID Alerta">#ALT-{{ a.id_alerta }}</td>
+              <td data-label="Nivel">
+                {% if a.nivel == 'CRITICO' %}
+                  <span class="badge badge-danger">🔴 CRÍTICO</span>
+                {% elif a.nivel == 'ALTO' %}
+                  <span class="badge badge-danger">⚠️ ALTO</span>
+                {% else %}
+                  <span class="badge badge-warning">🟡 MEDIO</span>
+                {% endif %}
+              </td>
+              <td data-label="Cliente">
+                <strong>{{ a.nombre }} {{ a.apellido }}</strong>
+                <div style="font-size: 0.72rem; color: var(--text-dim);">{{ a.correo }}</div>
+              </td>
+              <td data-label="Producto">{{ a.producto }}</td>
+              <td data-label="Monto" style="font-family: var(--font-heading); font-weight: 700; color: #FFF;">
+                S/ {{ "%.2f"|format(a.monto) }}
+              </td>
+              <td data-label="Prob. Fraude">
+                <strong style="color: var(--color-danger); font-family: var(--font-heading);">
+                  {{ "%.1f"|format(a.probabilidad_fraude or 0) }}%
+                </strong>
+              </td>
+              <td data-label="Descripción" style="font-size: 0.82rem; color: var(--text-muted); max-width: 250px;">
+                {{ a.descripcion }}
+              </td>
+              <td data-label="Estado">
+                {% if a.estado == 'PENDIENTE' %}
+                  <span class="badge badge-warning">PENDIENTE</span>
+                {% elif a.estado == 'CONFIRMADA' %}
+                  <span class="badge badge-danger">CONFIRMADA</span>
+                {% elif a.estado == 'REVISADA' %}
+                  <span class="badge badge-cyan">REVISADA</span>
+                {% else %}
+                  <span class="badge badge-success">DESCARTADA</span>
+                {% endif %}
+              </td>
+              <td data-label="Acción">
+                <form action="{{ url_for('admin.admin_cambiar_alerta') }}" method="POST" style="display: flex; gap: 0.35rem;">
+                  <input type="hidden" name="id_alerta" value="{{ a.id_alerta }}">
+                  {% if a.estado == 'PENDIENTE' %}
+                    <button type="submit" name="nuevo_estado" value="REVISADA" class="btn btn-secondary btn-sm" title="Marcar como revisada">
+                      Revisar
+                    </button>
+                    <button type="submit" name="nuevo_estado" value="CONFIRMADA" class="btn btn-primary btn-sm" style="background: var(--color-danger);" title="Confirmar fraude">
+                      Confirmar
+                    </button>
+                  {% elif a.estado == 'REVISADA' %}
+                    <button type="submit" name="nuevo_estado" value="CONFIRMADA" class="btn btn-primary btn-sm" style="background: var(--color-danger);">
+                      Confirmar
+                    </button>
+                    <button type="submit" name="nuevo_estado" value="DESCARTADA" class="btn btn-secondary btn-sm">
+                      Descartar
+                    </button>
+                  {% else %}
+                    <span style="font-size: 0.75rem; color: var(--text-dim);">Gestionado</span>
+                  {% endif %}
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 3rem 1rem; color: var(--text-dim);">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem; color: var(--color-safe);">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <h3 style="color: #FFF; font-size: 1.15rem; margin-bottom: 0.35rem;">Sin alertas con el filtro actual</h3>
+      <p style="font-size: 0.85rem;">Todas las transacciones bajo este criterio se encuentran resueltas.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

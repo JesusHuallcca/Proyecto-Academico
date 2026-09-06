@@ -1,0 +1,254 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Comparación de Productos - Antifraude Yape{% endblock %}
+{% block breadcrumb %}Comparación de Productos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header-title">Comparación de Productos Financieros</h1>
+    <p class="page-header-desc">Análisis comparativo de volumen, ticket promedio y vulnerabilidad a fraude por tipo de producto.</p>
+  </div>
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <label for="filtroProducto" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Filtrar Producto:</label>
+      <select id="filtroProducto" class="form-control" style="min-height: 40px; min-width: 200px;">
+        <option value="TODOS" selected>-- Todos los Productos --</option>
+        {% for p in productos %}
+          <option value="{{ p.producto }}">{{ p.producto }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- TARJETAS POR PRODUCTO -->
+<div class="kpi-grid" id="productosCardsGrid">
+  {% for p in productos %}
+    <div class="kpi-card producto-card-item" data-producto="{{ p.producto }}">
+      <div class="kpi-header">
+        <span class="kpi-title" style="color: #FFF; font-weight: 700; font-size: 0.95rem;">{{ p.producto }}</span>
+        <span class="badge {% if p.porcentaje_fraude >= 6.5 %}badge-danger{% else %}badge-warning{% endif %}">
+          {{ p.porcentaje_fraude }}% Fraude
+        </span>
+      </div>
+      <div class="kpi-value" style="font-size: 1.6rem;">{{ "{:,}".format(p.operaciones) }}</div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Operaciones totales</div>
+      
+      <div style="display: flex; flex-direction: column; gap: 0.4rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle); font-size: 0.82rem;">
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-dim);">Monto Promedio:</span>
+          <strong>S/ {{ "%.2f"|format(p.monto_promedio) }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-dim);">Monto Mediana:</span>
+          <strong style="color: var(--yape-cyan);">S/ {{ "%.2f"|format(p.monto_mediana) }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-dim);">Fraudes Detectados:</span>
+          <strong style="color: var(--color-danger);">{{ p.fraudes }}</strong>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- GRÁFICOS COMPARATIVOS (CANTIDAD, MONTO PROMEDIO, % FRAUDE) -->
+<div class="panel-grid">
+  <!-- Gráfico 1: Transacciones por Producto -->
+  <div class="panel-col-4">
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h2 class="panel-title" style="font-size: 1rem;">Transacciones por Producto</h2>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas id="chartProdVolumen"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico 2: Monto Promedio vs Mediana -->
+  <div class="panel-col-4">
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h2 class="panel-title" style="font-size: 1rem;">Monto Promedio (S/)</h2>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas id="chartProdMonto"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico 3: Porcentaje de Fraude -->
+  <div class="panel-col-4">
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h2 class="panel-title" style="font-size: 1rem;">Tasa de Fraude (%)</h2>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas id="chartProdTasaFraude"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABLA DE RESULTADOS DE ANALISIS_POR_PRODUCTO.CSV -->
+<div class="panel-card">
+  <div class="panel-card-header">
+    <h2 class="panel-title">Resumen Tabular por Producto (resultados/analisis_por_producto.csv)</h2>
+    <span class="badge badge-primary">Datos Verificados</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table" id="tablaProductos">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Número de Transacciones</th>
+          <th>Promedio del Monto</th>
+          <th>Mediana del Monto</th>
+          <th>Cantidad de Fraudes</th>
+          <th>Porcentaje de Fraude</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in productos %}
+          <tr data-producto="{{ p.producto }}">
+            <td><strong style="color: #FFF; font-size: 0.95rem;">{{ p.producto }}</strong></td>
+            <td style="font-family: var(--font-heading); font-weight: 700;">{{ "{:,}".format(p.operaciones) }}</td>
+            <td>S/ {{ "%.2f"|format(p.monto_promedio) }}</td>
+            <td style="color: var(--yape-cyan); font-weight: 600;">S/ {{ "%.2f"|format(p.monto_mediana) }}</td>
+            <td style="color: var(--color-danger); font-weight: 700;">{{ "{:,}".format(p.fraudes) }}</td>
+            <td>
+              <span class="badge {% if p.porcentaje_fraude >= 6.5 %}badge-danger{% else %}badge-warning{% endif %}">
+                {{ p.porcentaje_fraude }}%
+              </span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const productosData = {{ productos|tojson }};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const selectProd = document.getElementById('filtroProducto');
+  const cards = document.querySelectorAll('.producto-card-item');
+  const filas = document.querySelectorAll('#tablaProductos tbody tr');
+
+  selectProd.addEventListener('change', (e) => {
+    const val = e.target.value;
+    cards.forEach(c => {
+      c.style.display = (val === 'TODOS' || c.getAttribute('data-producto') === val) ? '' : 'none';
+    });
+    filas.forEach(f => {
+      f.style.display = (val === 'TODOS' || f.getAttribute('data-producto') === val) ? '' : 'none';
+    });
+  });
+
+  const labels = productosData.map(p => p.producto);
+
+  // 1. Gráfico de Volumen
+  const ctxVol = document.getElementById('chartProdVolumen');
+  if (ctxVol) {
+    new Chart(ctxVol, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Operaciones',
+          data: productosData.map(p => p.operaciones),
+          backgroundColor: '#732282',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 11 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } }
+        }
+      }
+    });
+  }
+
+  // 2. Gráfico de Monto Promedio
+  const ctxMonto = document.getElementById('chartProdMonto');
+  if (ctxMonto) {
+    new Chart(ctxMonto, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Promedio',
+            data: productosData.map(p => p.monto_promedio),
+            backgroundColor: '#00D2B5',
+            borderRadius: 6
+          },
+          {
+            label: 'Mediana',
+            data: productosData.map(p => p.monto_mediana),
+            backgroundColor: '#9d4edd',
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { color: '#94A3B8', font: { size: 11 } } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 11 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } }
+        }
+      }
+    });
+  }
+
+  // 3. Gráfico de Tasa de Fraude
+  const ctxTasa = document.getElementById('chartProdTasaFraude');
+  if (ctxTasa) {
+    new Chart(ctxTasa, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '% Fraude',
+          data: productosData.map(p => p.porcentaje_fraude),
+          borderColor: '#EF4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.15)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 6,
+          pointBackgroundColor: '#EF4444'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 11 } } },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#94A3B8' },
+            min: 5.5,
+            max: 7.5
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,8 @@
+MEJOR MODELO - DETECCIÓN DE FRAUDE
+==================================================
+
+Modelo: Gradient Boosting
+Accuracy: 0.9865
+Precision: 0.9829
+Recall: 0.8043
+F1-Score: 0.8847

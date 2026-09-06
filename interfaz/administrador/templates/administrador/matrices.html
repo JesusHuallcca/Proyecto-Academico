@@ -1,0 +1,131 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Matrices de Confusión — yape.ia Administrador{% endblock %}
+{% block admin_title %}Matrices de Confusión de los Modelos{% endblock %}
+
+{% block admin_content %}
+<div class="matrix-container">
+  <!-- 1. Gradient Boosting (Modelo General / Mejor) -->
+  <div class="matrix-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+      <h3 style="font-size: 1.1rem; color: var(--text-primary); font-weight: 700;">Gradient Boosting</h3>
+      <span class="badge badge-success">Mejor F1-Score</span>
+    </div>
+    <p style="font-size: 0.8rem; color: var(--text-muted);">Fuente: <code>resultados/matriz_confusion.csv</code></p>
+
+    <div class="matrix-grid">
+      <div></div>
+      <div class="matrix-cell-header">Pred: Normal</div>
+      <div class="matrix-cell-header">Pred: Fraude</div>
+
+      <div class="matrix-cell-header" style="display: flex; align-items: center;">Real: Normal</div>
+      <div class="matrix-cell-value matrix-cell-vn">
+        {{ "{:,}".format(matrices.gradient_boosting.verdaderos_negativos) }}
+        <span class="matrix-cell-label">VN (Verdadero Negativo)</span>
+      </div>
+      <div class="matrix-cell-value matrix-cell-fp">
+        {{ matrices.gradient_boosting.falsos_positivos }}
+        <span class="matrix-cell-label">FP (Falso Positivo)</span>
+      </div>
+
+      <div class="matrix-cell-header" style="display: flex; align-items: center;">Real: Fraude</div>
+      <div class="matrix-cell-value matrix-cell-fn">
+        {{ matrices.gradient_boosting.falsos_negativos }}
+        <span class="matrix-cell-label">FN (Falso Negativo)</span>
+      </div>
+      <div class="matrix-cell-value matrix-cell-vp">
+        {{ matrices.gradient_boosting.verdaderos_positivos }}
+        <span class="matrix-cell-label">VP (Verdadero Positivo)</span>
+      </div>
+    </div>
+
+    <div style="background: var(--bg-tertiary); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.82rem; display: flex; justify-content: space-between;">
+      <span><strong>Accuracy:</strong> {{ matrices.gradient_boosting.accuracy }}%</span>
+      <span><strong>Precision:</strong> {{ matrices.gradient_boosting.precision }}%</span>
+      <span><strong>Recall:</strong> {{ matrices.gradient_boosting.recall }}%</span>
+    </div>
+  </div>
+
+  <!-- 2. PyTorch (Red Neuronal) -->
+  <div class="matrix-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+      <h3 style="font-size: 1.1rem; color: var(--text-primary); font-weight: 700;">PyTorch Deep Learning</h3>
+      <span class="badge badge-accent">Alto Recall (96.27%)</span>
+    </div>
+    <p style="font-size: 0.8rem; color: var(--text-muted);">Fuente: <code>matriz_confusion_pytorch.csv</code></p>
+
+    <div class="matrix-grid">
+      <div></div>
+      <div class="matrix-cell-header">Pred: Normal</div>
+      <div class="matrix-cell-header">Pred: Fraude</div>
+
+      <div class="matrix-cell-header" style="display: flex; align-items: center;">Real: Normal</div>
+      <div class="matrix-cell-value matrix-cell-vn">
+        {{ "{:,}".format(matrices.pytorch.verdaderos_negativos) }}
+        <span class="matrix-cell-label">VN</span>
+      </div>
+      <div class="matrix-cell-value matrix-cell-fp">
+        {{ matrices.pytorch.falsos_positivos }}
+        <span class="matrix-cell-label">FP</span>
+      </div>
+
+      <div class="matrix-cell-header" style="display: flex; align-items: center;">Real: Fraude</div>
+      <div class="matrix-cell-value matrix-cell-fn">
+        {{ matrices.pytorch.falsos_negativos }}
+        <span class="matrix-cell-label">FN</span>
+      </div>
+      <div class="matrix-cell-value matrix-cell-vp">
+        {{ matrices.pytorch.verdaderos_positivos }}
+        <span class="matrix-cell-label">VP</span>
+      </div>
+    </div>
+
+    <div style="background: var(--bg-tertiary); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.82rem; display: flex; justify-content: space-between;">
+      <span><strong>Accuracy:</strong> {{ matrices.pytorch.accuracy }}%</span>
+      <span><strong>Precision:</strong> {{ matrices.pytorch.precision }}%</span>
+      <span><strong>Recall:</strong> {{ matrices.pytorch.recall }}%</span>
+    </div>
+  </div>
+
+  <!-- 3. TensorFlow / Keras (Red Neuronal) -->
+  <div class="matrix-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+      <h3 style="font-size: 1.1rem; color: var(--text-primary); font-weight: 700;">TensorFlow / Keras</h3>
+      <span class="badge badge-primary">Deep Learning</span>
+    </div>
+    <p style="font-size: 0.8rem; color: var(--text-muted);">Fuente: <code>matriz_confusion_tensorflow.csv</code></p>
+
+    <div class="matrix-grid">
+      <div></div>
+      <div class="matrix-cell-header">Pred: Normal</div>
+      <div class="matrix-cell-header">Pred: Fraude</div>
+
+      <div class="matrix-cell-header" style="display: flex; align-items: center;">Real: Normal</div>
+      <div class="matrix-cell-value matrix-cell-vn">
+        {{ "{:,}".format(matrices.tensorflow.verdaderos_negativos) }}
+        <span class="matrix-cell-label">VN</span>
+      </div>
+      <div class="matrix-cell-value matrix-cell-fp">
+        {{ matrices.tensorflow.falsos_positivos }}
+        <span class="matrix-cell-label">FP</span>
+      </div>
+
+      <div class="matrix-cell-header" style="display: flex; align-items: center;">Real: Fraude</div>
+      <div class="matrix-cell-value matrix-cell-fn">
+        {{ matrices.tensorflow.falsos_negativos }}
+        <span class="matrix-cell-label">FN</span>
+      </div>
+      <div class="matrix-cell-value matrix-cell-vp">
+        {{ matrices.tensorflow.verdaderos_positivos }}
+        <span class="matrix-cell-label">VP</span>
+      </div>
+    </div>
+
+    <div style="background: var(--bg-tertiary); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.82rem; display: flex; justify-content: space-between;">
+      <span><strong>Accuracy:</strong> {{ matrices.tensorflow.accuracy }}%</span>
+      <span><strong>Precision:</strong> {{ matrices.tensorflow.precision }}%</span>
+      <span><strong>Recall:</strong> {{ matrices.tensorflow.recall }}%</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

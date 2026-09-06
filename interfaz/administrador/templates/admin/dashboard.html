@@ -1,0 +1,369 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Dashboard Administrador - Antifraude Yape{% endblock %}
+{% block breadcrumb %}Dashboard Administrador{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header-title">Dashboard Antifraude BCP - Yape</h1>
+    <p class="page-header-desc">Métricas consolidadas del proyecto con base de datos real (50,000+ registros analizados).</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <button type="button" class="btn btn-secondary btn-sm" id="btnSimularNormal" title="Simular transacción normal">🟢 +1 Normal</button>
+    <button type="button" class="btn btn-secondary btn-sm" id="btnSimularFraude" style="border-color: rgba(239, 68, 68, 0.4); color: #FCA5A5;" title="Simular transacción sospechosa/fraude">⚠️ +1 Fraude</button>
+    <button type="button" class="btn btn-primary btn-sm" id="btnSimularRafaga" title="Simular ráfaga de 5 transacciones">⚡ Ráfaga (5)</button>
+    <button type="button" class="btn btn-secondary btn-sm" id="btnResetDemo" style="color: var(--text-dim);" title="Reiniciar base de datos al estado demo">🔄 Reset</button>
+    <a href="{{ url_for('admin.admin_transacciones') }}" class="btn btn-secondary btn-sm">Transacciones</a>
+    <a href="{{ url_for('admin.admin_reportes') }}" class="btn btn-primary btn-sm">Reporte</a>
+  </div>
+</div>
+
+<!-- TARJETAS DE INFORMACIÓN GENERAL (REQUISITO 8 CON DATOS REALES) -->
+<div class="kpi-grid">
+  <!-- Total de transacciones -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-title">Total Transacciones</span>
+      <div class="kpi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+      </div>
+    </div>
+    <div class="kpi-value">{{ "{:,}".format(kpis.total_transacciones) }}</div>
+    <div class="kpi-meta">
+      <span style="color: var(--yape-cyan);">{{ kpis.transacciones_en_vivo }} en vivo</span> &bull; 50,000 dataset base
+    </div>
+  </div>
+
+  <!-- Transacciones legítimas -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-title">Transacciones Legítimas</span>
+      <div class="kpi-icon" style="color: var(--color-safe); background: var(--color-safe-bg);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+    </div>
+    <div class="kpi-value" style="color: var(--color-safe);">{{ "{:,}".format(kpis.transacciones_legitimas) }}</div>
+    <div class="kpi-meta">{{ "%.2f"|format(100 - kpis.porcentaje_fraude) }}% del volumen total</div>
+  </div>
+
+  <!-- Fraudes detectados -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-title">Fraudes Detectados</span>
+      <div class="kpi-icon" style="color: var(--color-danger); background: var(--color-danger-bg);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="kpi-value" style="color: var(--color-danger);">{{ "{:,}".format(kpis.fraudes_detectados) }}</div>
+    <div class="kpi-meta">Tasa: <strong>{{ "%.2f"|format(kpis.porcentaje_fraude) }}%</strong></div>
+  </div>
+
+  <!-- Porcentaje de Fraude -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-title">Porcentaje de Fraude</span>
+      <div class="kpi-icon" style="color: var(--color-warning); background: var(--color-warning-bg);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M16 12l-4-4-4 4M12 16V9"></path>
+        </svg>
+      </div>
+    </div>
+    <div class="kpi-value" style="color: var(--color-warning);">{{ "%.2f"|format(kpis.porcentaje_fraude) }}%</div>
+    <div class="kpi-meta">Control de riesgo bancario</div>
+  </div>
+
+  <!-- Monto promedio -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-title">Monto Promedio</span>
+      <div class="kpi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+          <line x1="12" y1="8" x2="12" y2="16"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="kpi-value">S/ {{ "%.2f"|format(kpis.monto_promedio) }}</div>
+    <div class="kpi-meta">Media aritmética real</div>
+  </div>
+
+  <!-- Mediana del monto -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-title">Mediana del Monto</span>
+      <div class="kpi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="21" x2="4" y2="14"></line>
+          <line x1="12" y1="21" x2="12" y2="8"></line>
+          <line x1="20" y1="21" x2="20" y2="3"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="kpi-value">S/ {{ "%.2f"|format(kpis.monto_mediana) }}</div>
+    <div class="kpi-meta">Percentil 50 real</div>
+  </div>
+</div>
+
+<!-- GRÁFICOS PRINCIPALES DEL DASHBOARD -->
+<div class="panel-grid">
+  <!-- Gráfico: Fraudes vs Legítimas -->
+  <div class="panel-col-5">
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h2 class="panel-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+          </svg>
+          Fraudes vs Legítimas
+        </h2>
+        <span class="badge badge-cyan">Real Project Data</span>
+      </div>
+      <div class="chart-container" style="height: 280px;">
+        <canvas id="chartFraudeVsLegitima"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico: Transacciones por Producto -->
+  <div class="panel-col-7">
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h2 class="panel-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          Volumen por Producto Yape
+        </h2>
+        <a href="{{ url_for('admin.admin_productos') }}" class="btn btn-secondary btn-sm">Ver Detalle</a>
+      </div>
+      <div class="chart-container" style="height: 280px;">
+        <canvas id="chartVolumenProductos"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESUMEN DE MEJOR MODELO Y ALERTAS RECIENTES -->
+<div class="panel-grid">
+  <div class="panel-col-6">
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h2 class="panel-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          Mejor Modelo Seleccionado
+        </h2>
+        <span class="badge badge-success">🏆 Ganador Oficial</span>
+      </div>
+      <div style="background: rgba(115, 34, 130, 0.1); border: 1px solid rgba(115, 34, 130, 0.3); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1rem;">
+        <div style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: #FFF;">
+          Gradient Boosting
+        </div>
+        <div style="font-size: 0.85rem; color: var(--yape-cyan); margin-top: 0.25rem;">
+          Modelo de mayor desempeño en clasificación antifraude BCP
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; text-align: center;">
+        <div style="background: var(--bg-input); padding: 0.75rem; border-radius: var(--radius-sm);">
+          <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Accuracy</span>
+          <div style="font-weight: 800; color: var(--color-safe); font-size: 1.15rem; font-family: var(--font-heading);">98.65%</div>
+        </div>
+        <div style="background: var(--bg-input); padding: 0.75rem; border-radius: var(--radius-sm);">
+          <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Precision</span>
+          <div style="font-weight: 800; color: var(--yape-cyan); font-size: 1.15rem; font-family: var(--font-heading);">98.29%</div>
+        </div>
+        <div style="background: var(--bg-input); padding: 0.75rem; border-radius: var(--radius-sm);">
+          <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Recall</span>
+          <div style="font-weight: 800; color: #FFF; font-size: 1.15rem; font-family: var(--font-heading);">80.43%</div>
+        </div>
+        <div style="background: var(--bg-input); padding: 0.75rem; border-radius: var(--radius-sm);">
+          <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">F1-Score</span>
+          <div style="font-weight: 800; color: var(--accent-purple); font-size: 1.15rem; font-family: var(--font-heading);">88.47%</div>
+        </div>
+      </div>
+      <div style="margin-top: 1.25rem; text-align: right;">
+        <a href="{{ url_for('admin.admin_modelos') }}" class="btn btn-secondary btn-sm">Ver Comparativa Completa</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-col-6">
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h2 class="panel-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          </svg>
+          Alertas Recientes del Sistema
+        </h2>
+        <a href="{{ url_for('admin.admin_fraudes') }}" class="btn btn-secondary btn-sm">Ver Todas</a>
+      </div>
+
+      {% if alertas %}
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          {% for a in alertas[:3] %}
+            <div style="background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <span class="badge {% if a.nivel in ['ALTO', 'CRITICO'] %}badge-danger{% else %}badge-warning{% endif %}">{{ a.nivel }}</span>
+                  <strong style="color: #FFF; font-size: 0.9rem;">{{ a.producto }} - S/ {{ "%.2f"|format(a.monto) }}</strong>
+                </div>
+                <span style="font-size: 0.78rem; color: var(--text-muted);">{{ a.nombre }} {{ a.apellido }} ({{ a.correo }})</span>
+              </div>
+              <div style="text-align: right;">
+                <span class="badge badge-primary">{{ a.estado }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 2rem; color: var(--text-dim);">
+          No hay alertas pendientes de revisión.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Gráfico 1: Fraude vs Legítimo (Doughnut)
+  const ctxFraude = document.getElementById('chartFraudeVsLegitima');
+  if (ctxFraude) {
+    new Chart(ctxFraude, {
+      type: 'doughnut',
+      data: {
+        labels: ['Legítimas (Normales)', 'Fraudes Detectados'],
+        datasets: [{
+          data: [{{ kpis.transacciones_legitimas }}, {{ kpis.fraudes_detectados }}],
+          backgroundColor: ['#10B981', '#EF4444'],
+          borderColor: 'transparent',
+          borderWidth: 2,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', size: 12 } }
+          }
+        },
+        cutout: '70%'
+      }
+    });
+  }
+
+  // Gráfico 2: Volumen por Producto
+  const ctxProd = document.getElementById('chartVolumenProductos');
+  if (ctxProd) {
+    new Chart(ctxProd, {
+      type: 'bar',
+      data: {
+        labels: {{ productos_labels|tojson }},
+        datasets: [{
+          label: 'Transacciones',
+          data: {{ productos_volumen|tojson }},
+          backgroundColor: '#732282',
+          borderRadius: 8,
+          hoverBackgroundColor: '#00D2B5'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#94A3B8' }
+          },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#94A3B8' }
+          }
+        }
+      }
+    });
+  }
+
+  // Manejadores de simulación de tráfico en tiempo real
+  async function ejecutarSimulacion(tipo, btn) {
+    if (btn) {
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+    }
+    try {
+      const res = await fetch('/api/admin/simular', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tipo })
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        window.location.reload();
+      } else {
+        alert(data.mensaje || 'Error al simular tráfico');
+      }
+    } catch (e) {
+      alert('Error de conexión al simular tráfico.');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    }
+  }
+
+  const btnNormal = document.getElementById('btnSimularNormal');
+  if (btnNormal) btnNormal.addEventListener('click', (e) => ejecutarSimulacion('normal', e.currentTarget));
+
+  const btnFraude = document.getElementById('btnSimularFraude');
+  if (btnFraude) btnFraude.addEventListener('click', (e) => ejecutarSimulacion('fraude', e.currentTarget));
+
+  const btnRafaga = document.getElementById('btnSimularRafaga');
+  if (btnRafaga) btnRafaga.addEventListener('click', (e) => ejecutarSimulacion('rafaga', e.currentTarget));
+
+  const btnReset = document.getElementById('btnResetDemo');
+  if (btnReset) btnReset.addEventListener('click', async (e) => {
+    if (!confirm('¿Seguro que deseas reiniciar los datos de demostración?')) return;
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/admin/reset-demo', { method: 'POST' });
+      const data = await res.json();
+      if (data.status === 'success') {
+        window.location.reload();
+      } else {
+        alert(data.mensaje || 'Error al reiniciar datos');
+      }
+    } catch (e) {
+      alert('Error de conexión.');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+});
+</script>
+{% endblock %}

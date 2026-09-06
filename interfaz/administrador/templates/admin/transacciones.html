@@ -1,0 +1,201 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Auditoría de Transacciones - Antifraude Yape{% endblock %}
+{% block breadcrumb %}Transacciones{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header-title">Auditoría de Transacciones</h1>
+    <p class="page-header-desc">Registro y monitoreo en tiempo real de todas las operaciones procesadas por los clientes.</p>
+  </div>
+</div>
+
+<!-- BARRA DE FILTROS -->
+<div class="panel-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+  <form method="GET" action="{{ url_for('admin.admin_transacciones') }}" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+    <div style="flex: 1; min-width: 180px;">
+      <label class="form-label" for="f_resultado">Resultado</label>
+      <select name="resultado" id="f_resultado" class="form-control" style="min-height: 40px;">
+        <option value="TODOS" {% if request.args.get('resultado') == 'TODOS' %}selected{% endif %}>Todos los resultados</option>
+        <option value="SEGURA" {% if request.args.get('resultado') == 'SEGURA' %}selected{% endif %}>🟢 Segura</option>
+        <option value="EN REVISIÓN" {% if request.args.get('resultado') == 'EN REVISIÓN' %}selected{% endif %}>🟡 En revisión</option>
+        <option value="POSIBLE FRAUDE" {% if request.args.get('resultado') == 'POSIBLE FRAUDE' %}selected{% endif %}>🔴 Posible Fraude</option>
+      </select>
+    </div>
+
+    <div style="flex: 1; min-width: 180px;">
+      <label class="form-label" for="f_producto">Producto</label>
+      <select name="producto" id="f_producto" class="form-control" style="min-height: 40px;">
+        <option value="TODOS" {% if request.args.get('producto') == 'TODOS' %}selected{% endif %}>Todos los productos</option>
+        <option value="Yape" {% if request.args.get('producto') == 'Yape' %}selected{% endif %}>Yape</option>
+        <option value="Pago de servicios" {% if request.args.get('producto') == 'Pago de servicios' %}selected{% endif %}>Pago de servicios</option>
+        <option value="Recarga" {% if request.args.get('producto') == 'Recarga' %}selected{% endif %}>Recarga</option>
+        <option value="Transferencia" {% if request.args.get('producto') == 'Transferencia' %}selected{% endif %}>Transferencia</option>
+        <option value="Compra" {% if request.args.get('producto') == 'Compra' %}selected{% endif %}>Compra</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-sm" style="height: 40px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      Filtrar
+    </button>
+    <a href="{{ url_for('admin.admin_transacciones') }}" class="btn btn-secondary btn-sm" style="height: 40px;">Limpiar</a>
+  </form>
+</div>
+
+<!-- TABLA DE TRANSACCIONES -->
+<div class="panel-card">
+  <div class="table-responsive">
+    <table class="data-table table-cards-mobile">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Fecha / Hora</th>
+          <th>Producto</th>
+          <th>Monto</th>
+          <th>Resultado</th>
+          <th>Prob. Fraude</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if transacciones %}
+          {% for t in transacciones %}
+            <tr>
+              <td data-label="ID">#{{ t.id_transaccion }}</td>
+              <td data-label="Cliente">
+                <strong>{{ t.nombre }} {{ t.apellido }}</strong>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">{{ t.correo }}</div>
+              </td>
+              <td data-label="Fecha / Hora">{{ t.fecha_hora[:16] if t.fecha_hora else '-' }}</td>
+              <td data-label="Producto">
+                <span class="badge badge-primary">{{ t.producto }}</span>
+              </td>
+              <td data-label="Monto" style="font-family: var(--font-heading); font-weight: 700; color: #FFF;">
+                S/ {{ "%.2f"|format(t.monto) }}
+              </td>
+              <td data-label="Resultado">
+                {% if t.resultado == 'SEGURA' %}
+                  <span class="badge badge-success">🟢 SEGURA</span>
+                {% elif t.resultado == 'EN REVISIÓN' %}
+                  <span class="badge badge-warning">🟡 EN REVISIÓN</span>
+                {% else %}
+                  <span class="badge badge-danger">🔴 POSIBLE FRAUDE</span>
+                {% endif %}
+              </td>
+              <td data-label="Prob. Fraude">
+                {% if t.probabilidad_fraude is not none %}
+                  <strong style="font-family: var(--font-heading); {% if t.probabilidad_fraude >= 70 %}color: var(--color-danger);{% elif t.probabilidad_fraude >= 30 %}color: var(--color-warning);{% else %}color: var(--color-safe);{% endif %}">
+                    {{ "%.2f"|format(t.probabilidad_fraude) }}%
+                  </strong>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td data-label="Acción">
+                <button type="button" class="btn btn-secondary btn-sm btn-ver-detalle" 
+                  data-id="{{ t.id_transaccion }}"
+                  data-cliente="{{ t.nombre }} {{ t.apellido }}"
+                  data-correo="{{ t.correo }}"
+                  data-monto="{{ '%.2f'|format(t.monto) }}"
+                  data-producto="{{ t.producto }}"
+                  data-resultado="{{ t.resultado }}"
+                  data-prob="{{ '%.2f'|format(t.probabilidad_fraude or 0) }}"
+                  data-saldoant="{{ '%.2f'|format(t.saldo_anterior or 0) }}"
+                  data-saldopost="{{ '%.2f'|format(t.saldo_posterior or 0) }}"
+                  data-hora="{{ t.hora }}"
+                  data-edad="{{ t.edad }}"
+                  data-destnuevo="{{ t.destinatario_nuevo }}"
+                  data-disp="{{ t.cambio_dispositivo }}"
+                  data-dist="{{ t.distancia_ubicacion }}"
+                  data-vel="{{ t.velocidad_operacion }}">
+                  Detalle
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-dim);">
+              No se encontraron transacciones con los filtros seleccionados.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL DE DETALLE DE LA TRANSACCIÓN -->
+<div class="modal-overlay" id="modalDetalleTransaccion">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTransId">Detalle de Transacción</h3>
+      <button type="button" class="modal-close" data-modal-close>&times;</button>
+    </div>
+    <div class="modal-body" id="modalTransBody">
+      <!-- Se inyecta con Javascript -->
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-modal-close>Cerrar</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('modalDetalleTransaccion');
+  const modalId = document.getElementById('modalTransId');
+  const modalBody = document.getElementById('modalTransBody');
+
+  document.querySelectorAll('.btn-ver-detalle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const d = btn.dataset;
+      modalId.textContent = `Transacción #${d.id} - ${d.producto}`;
+      modalBody.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.88rem;">
+          <div style="padding: 0.5rem; background: var(--bg-input); border-radius: var(--radius-sm);">
+            <span style="color: var(--text-dim); font-size: 0.75rem;">Cliente:</span>
+            <div style="font-weight: 600; color: #FFF;">${d.cliente}</div>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">${d.correo}</span>
+          </div>
+          <div style="padding: 0.5rem; background: var(--bg-input); border-radius: var(--radius-sm);">
+            <span style="color: var(--text-dim); font-size: 0.75rem;">Monto / Saldo:</span>
+            <div style="font-weight: 700; color: var(--yape-cyan);">S/ ${d.monto}</div>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Saldo Post: S/ ${d.saldopost}</span>
+          </div>
+          <div style="padding: 0.5rem; background: var(--bg-input); border-radius: var(--radius-sm);">
+            <span style="color: var(--text-dim); font-size: 0.75rem;">Resultado IA:</span>
+            <div style="font-weight: 700;">${d.resultado} (${d.prob}% Fraude)</div>
+          </div>
+          <div style="padding: 0.5rem; background: var(--bg-input); border-radius: var(--radius-sm);">
+            <span style="color: var(--text-dim); font-size: 0.75rem;">Velocidad / Hora:</span>
+            <div>${d.vel}s &bull; Hora: ${d.hora}:00</div>
+          </div>
+          <div style="padding: 0.5rem; background: var(--bg-input); border-radius: var(--radius-sm);">
+            <span style="color: var(--text-dim); font-size: 0.75rem;">Destinatario Nuevo:</span>
+            <div>${d.destnuevo == '1' ? '⚠️ Sí' : 'No'}</div>
+          </div>
+          <div style="padding: 0.5rem; background: var(--bg-input); border-radius: var(--radius-sm);">
+            <span style="color: var(--text-dim); font-size: 0.75rem;">Cambio Dispositivo:</span>
+            <div>${d.disp == '1' ? '⚠️ Sí' : 'No'}</div>
+          </div>
+          <div style="padding: 0.5rem; background: var(--bg-input); border-radius: var(--radius-sm); grid-column: span 2;">
+            <span style="color: var(--text-dim); font-size: 0.75rem;">Distancia entre Operaciones:</span>
+            <div>${d.dist} km desde la última ubicación habitual</div>
+          </div>
+        </div>
+      `;
+      modal.classList.add('active');
+    });
+  });
+});
+</script>
+{% endblock %}

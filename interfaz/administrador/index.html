@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Monitoreo Antifraude | BCP Yape</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js para visualizaciones interactivas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/admin/styles.css">
+</head>
+<body>
+
+    <!-- Header Principal del Centro Antifraude -->
+    <header class="admin-header">
+        <div class="header-left">
+            <div class="brand-logo-wrap">
+                <div class="shield-badge">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-title">Centro Antifraude BCP - Yape</h1>
+                    <span class="brand-subtitle">Consola de Inteligencia Artificial & Ciberseguridad</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-center">
+            <div class="model-status-chip" title="Modelo de Machine Learning en ejecución activa">
+                <span class="status-pulse-green"></span>
+                <span>Modelo: <strong id="modelNameBadge">Gradient Boosting (98.65% Acc)</strong></span>
+            </div>
+            <div class="sync-status-chip">
+                <span>🔄 Sincronizado en Vivo con Yape</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <!-- Botones de Acción y Simulación -->
+            <div class="simulation-actions">
+                <button class="btn-action-simulate btn-sim-burst" id="btnSimBurst" title="Simular 5 transacciones (4 normales y 1 fraude)">
+                    ⚡ Simular Ráfaga
+                </button>
+                <button class="btn-action-simulate btn-sim-fraud" id="btnSimFraud" title="Simular intento de ataque de fraude">
+                    🚨 Simular Fraude
+                </button>
+                <button class="btn-action-simulate btn-reset-demo" id="btnResetDemo" title="Restaurar estado inicial">
+                    ↺ Reset Demo
+                </button>
+            </div>
+            <a href="/usuario" target="_blank" class="btn-open-user" title="Abrir App de Usuario Yape">
+                📱 Abrir Mi Yape ↗
+            </a>
+            <button id="btnLogoutAdmin" class="btn-action-simulate" style="background: rgba(239, 68, 68, 0.15); color: #F87171; border-color: rgba(239, 68, 68, 0.35);" title="Cerrar sesión de Administrador">
+                🚪 Salir
+            </button>
+        </div>
+    </header>
+
+    <!-- Barra de Navegación por Pestañas -->
+    <nav class="admin-tabs-nav">
+        <button class="tab-btn active" data-tab="tab-overview">
+            <span class="tab-icon">📊</span> Resumen & Métricas Clave
+        </button>
+        <button class="tab-btn" data-tab="tab-transactions">
+            <span class="tab-icon">⚡</span> Monitoreo en Vivo (Transacciones)
+            <span class="tab-badge" id="badgeTxCount">50</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-alerts">
+            <span class="tab-icon">🚨</span> Alertas de Fraude
+            <span class="tab-badge badge-danger" id="badgeAlertsCount">15</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-models">
+            <span class="tab-icon">🧠</span> Benchmark de Modelos ML
+        </button>
+    </nav>
+
+    <!-- Contenedor Principal de Vistas -->
+    <main class="admin-content-container">
+
+        <!-- ==================================================== -->
+        <!-- PESTAÑA 1: RESUMEN Y GRÁFICOS ANALÍTICOS             -->
+        <!-- ==================================================== -->
+        <section class="tab-content active" id="tab-overview">
+            
+            <!-- Tarjetas de KPIs Principales -->
+            <div class="kpi-grid">
+                <!-- KPI 1: Total Transacciones -->
+                <div class="kpi-card card-cyan">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Transacciones Totales</span>
+                        <div class="kpi-icon-wrap">📋</div>
+                    </div>
+                    <div class="kpi-value" id="kpiTotalTx">0</div>
+                    <div class="kpi-footer">
+                        <span>Volumen evaluado:</span>
+                        <strong id="kpiVolumenTotal">S/ 0.00</strong>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Tasa de Fraude -->
+                <div class="kpi-card card-purple">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Tasa de Fraude Detectada</span>
+                        <div class="kpi-icon-wrap">🛡️</div>
+                    </div>
+                    <div class="kpi-value-wrap">
+                        <span class="kpi-value text-danger" id="kpiTasaFraude">0.0%</span>
+                        <span class="kpi-subtext" id="kpiTotalFraudes">0 sospechosas</span>
+                    </div>
+                    <div class="kpi-footer">
+                        <span>Precisión del algoritmo:</span>
+                        <strong style="color: var(--cyan);">98.65%</strong>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Dinero Protegido / Salvado -->
+                <div class="kpi-card card-emerald">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Dinero Protegido (Salvado)</span>
+                        <div class="kpi-icon-wrap">💰</div>
+                    </div>
+                    <div class="kpi-value text-success" id="kpiDineroProtegido">S/ 0.00</div>
+                    <div class="kpi-footer">
+                        <span>Monto bloqueado preventivamente</span>
+                    </div>
+                </div>
+
+                <!-- KPI 4: Alertas Críticas Pendientes -->
+                <div class="kpi-card card-red">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Alertas Críticas Pendientes</span>
+                        <div class="kpi-icon-wrap">⚠️</div>
+                    </div>
+                    <div class="kpi-value text-warning" id="kpiAlertasPendientes">0</div>
+                    <div class="kpi-footer">
+                        <span>Requieren resolución de analista</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos Interactivos (Grid de 4 visualizaciones) -->
+            <div class="charts-grid">
+                
+                <!-- Gráfico 1: Evolución Temporal de Transacciones -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">Evolución de Operaciones en el Tiempo</h3>
+                            <span class="chart-subtitle">Volumen de transacciones legítimas vs. sospechosas</span>
+                        </div>
+                        <div class="chart-legend-custom">
+                            <span class="leg-item"><span class="leg-dot cyan"></span> Normales</span>
+                            <span class="leg-item"><span class="leg-dot red"></span> Sospechosas</span>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="chartTimeline"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico 2: Distribución por Nivel de Riesgo (Dona) -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">Distribución por Nivel de Riesgo</h3>
+                            <span class="chart-subtitle">Categorización según probabilidad del modelo</span>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap doughnut-wrap">
+                        <canvas id="chartRiskDist"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico 3: Fraude por Tipo de Producto (Barras) -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">Detección de Fraude por Canal / Producto</h3>
+                            <span class="chart-subtitle">Yape, Pago de Servicios, Recargas, Transferencias</span>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="chartProducts"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico 4: Rendimiento de Modelos ML -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">Rendimiento de Modelos de Inteligencia Artificial</h3>
+                            <span class="chart-subtitle">Accuracy, Precision, Recall y F1-Score</span>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="chartModels"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================== -->
+        <!-- PESTAÑA 2: MONITOREO EN VIVO (TRANSACCIONES)        -->
+        <!-- ==================================================== -->
+        <section class="tab-content" id="tab-transactions">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title">Transmisión en Vivo de Transacciones</h2>
+                        <span class="panel-subtitle">Feed en tiempo real sincronizado con la base de datos</span>
+                    </div>
+                    <div class="panel-controls">
+                        <div class="search-box">
+                            <input type="text" id="inputSearchTx" placeholder="Buscar por usuario o ID...">
+                        </div>
+                        <select id="selectFilterTx" class="custom-select">
+                            <option value="">Todas las transacciones</option>
+                            <option value="APROBADA">Solo Aprobadas (Normales)</option>
+                            <option value="SOSPECHOSA">Solo Sospechosas (Fraude)</option>
+                        </select>
+                        <button class="btn-refresh-data" id="btnRefreshAdminTx">↻ Actualizar</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="admin-table" id="tableTransactions">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha / Hora</th>
+                                <th>Usuario</th>
+                                <th>Producto</th>
+                                <th>Monto</th>
+                                <th>Probabilidad Fraude</th>
+                                <th>Nivel Riesgo</th>
+                                <th>Resultado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyTransactions">
+                            <!-- Filas cargadas dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================================================== -->
+        <!-- PESTAÑA 3: GESTIÓN DE ALERTAS DE FRAUDE             -->
+        <!-- ==================================================== -->
+        <section class="tab-content" id="tab-alerts">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title">Centro de Gestión de Alertas</h2>
+                        <span class="panel-subtitle">Revisa y toma decisiones en tiempo real sobre transacciones bloqueadas</span>
+                    </div>
+                    <div class="panel-controls">
+                        <select id="selectFilterAlerts" class="custom-select">
+                            <option value="">Todos los estados</option>
+                            <option value="PENDIENTE" selected>Pendientes de Revisión</option>
+                            <option value="REVISADA">Revisadas</option>
+                            <option value="CONFIRMADA">Confirmadas (Fraude)</option>
+                            <option value="DESCARTADA">Descartadas (Falso Positivo)</option>
+                        </select>
+                        <button class="btn-refresh-data" id="btnRefreshAdminAlerts">↻ Actualizar</button>
+                    </div>
+                </div>
+
+                <div class="alerts-cards-list" id="alertsCardsList">
+                    <!-- Las tarjetas de alertas se cargan dinámicamente -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================================================== -->
+        <!-- PESTAÑA 4: BENCHMARK Y AUDITORÍA DE MODELOS ML      -->
+        <!-- ==================================================== -->
+        <section class="tab-content" id="tab-models">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title">Evaluación Comparativa de Modelos de IA</h2>
+                        <span class="panel-subtitle">Modelos entrenados y evaluados para detección de fraude en Yape</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Modelo</th>
+                                <th>Tipo de Algoritmo</th>
+                                <th>Exactitud (Accuracy)</th>
+                                <th>Precisión</th>
+                                <th>Exhaustividad (Recall)</th>
+                                <th>F1-Score</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyModelsTable">
+                            <!-- Cargado desde tabla modelos_ml -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="model-explanation-card">
+                    <h3>💡 ¿Por qué Gradient Boosting fue el modelo seleccionado?</h3>
+                    <p>
+                        El modelo <strong>Gradient Boosting</strong> obtuvo un <strong>Accuracy del 98.65%</strong> y una <strong>Precisión del 98.29%</strong> en el dataset balanceado de Yape, superando a las redes neuronales densas (TensorFlow y PyTorch) en minimización de falsos positivos, garantizando que usuarios legítimos no sufran bloqueos innecesarios mientras se capturan eficazmente los patrones anómalos de fraude.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ======================================================== -->
+    <!-- MODAL DE AUDITORÍA FORENSE DE TRANSACCIÓN                -->
+    <!-- ======================================================== -->
+    <div class="modal-backdrop" id="modalForensic">
+        <div class="modal-dialog-large">
+            <div class="modal-dialog-header">
+                <div class="header-modal-title">
+                    <span class="icon-forensic">🔍</span>
+                    <div>
+                        <h3>Radiografía Forense de Transacción #<span id="forensicTxId">0</span></h3>
+                        <span class="modal-sub">Diagnóstico explicativo del modelo de Inteligencia Artificial</span>
+                    </div>
+                </div>
+                <button class="btn-close-dialog" id="btnCloseForensic">✕</button>
+            </div>
+
+            <div class="modal-dialog-body" id="forensicContent">
+                <!-- Se llena con JS -->
+                <div class="loading-state">Cargando diagnóstico...</div>
+            </div>
+
+            <div class="modal-dialog-footer">
+                <button class="btn-dialog-close" id="btnCloseForensicFooter">Cerrar Diagnóstico</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/admin/app.js"></script>
+</body>
+</html>

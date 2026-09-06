@@ -1,0 +1,10 @@
+MODELO: Gradient Boosting
+
+              precision    recall  f1-score   support
+
+      Normal       0.99      1.00      0.99      9356
+      Fraude       0.98      0.80      0.88       644
+
+    accuracy                           0.99     10000
+   macro avg       0.98      0.90      0.94     10000
+weighted avg       0.99      0.99      0.99     10000

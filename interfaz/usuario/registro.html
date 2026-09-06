@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regístrate en Yape | BCP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --yape-purple: #742284;
+            --yape-purple-dark: #50155C;
+            --yape-purple-light: #9B30B5;
+            --yape-cyan: #00D2C4;
+            --bg-dark: #0B0F19;
+            --danger-red: #EF4444;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--yape-purple-light);
+        }
+
+        ::-webkit-scrollbar-button {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(116, 34, 132, 0.45) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(0, 210, 196, 0.22) 0%, transparent 45%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .registro-card {
+            background: #FFFFFF;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 32px;
+            padding: 2.2rem 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 35px rgba(116, 34, 132, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .top-stripe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--yape-purple), var(--yape-cyan));
+        }
+
+        .brand-logo-wrap {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--yape-purple), var(--yape-purple-light));
+            border-radius: 20px;
+            margin: 0.2rem auto 0.8rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(116, 34, 132, 0.35);
+            color: white;
+            font-weight: 800;
+            font-size: 1.8rem;
+        }
+
+        h1 {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: #1E293B;
+            margin-bottom: 0.25rem;
+        }
+
+        p.subtext {
+            font-size: 0.85rem;
+            color: #64748B;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Config status badge */
+        .config-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 0.32rem 0.75rem;
+            border-radius: 20px;
+            cursor: pointer;
+            border: 1px solid #E2E8F0;
+            background: #F8FAFC;
+            color: #475569;
+            margin-bottom: 1.2rem;
+            transition: 0.2s;
+        }
+
+        .config-status-badge:hover {
+            background: #F1F5F9;
+            border-color: #CBD5E1;
+            transform: translateY(-1px);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #94A3B8;
+        }
+
+        .status-dot.active {
+            background: var(--success-green);
+            box-shadow: 0 0 8px var(--success-green);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .step-pill {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: #F1F5F9;
+            color: #64748B;
+            transition: 0.2s;
+        }
+
+        .step-pill.active {
+            background: var(--yape-purple);
+            color: white;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 0.4rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 14px;
+            border: 1.5px solid #CBD5E1;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #1E293B;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--yape-purple);
+            box-shadow: 0 0 0 3px rgba(116, 34, 132, 0.15);
+        }
+
+        .row-names {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .btn-submit-action {
+            width: 100%;
+            background: linear-gradient(135deg, var(--yape-purple), var(--yape-purple-light));
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 16px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(116, 34, 132, 0.35);
+            margin-top: 0.6rem;
+            margin-bottom: 1.25rem;
+            transition: 0.2s;
+        }
+
+        .btn-submit-action:hover {
+            filter: brightness(1.08);
+            transform: translateY(-2px);
+        }
+
+        .btn-submit-action:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Paso 2: Validación OTP desde Celular */
+        .step-otp-container {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .phone-badge-tip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(116, 34, 132, 0.08);
+            border: 1px solid rgba(116, 34, 132, 0.2);
+            color: var(--yape-purple);
+            padding: 0.4rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 1.1rem;
+        }
+
+        .phone-instructions-box {
+            background: #F8FAFC;
+            border: 1.5px dashed #CBD5E1;
+            border-radius: 18px;
+            padding: 1rem 1.1rem;
+            margin-bottom: 1.3rem;
+            text-align: left;
+        }
+
+        .guide-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.7rem;
+            font-size: 0.82rem;
+            color: #334155;
+            line-height: 1.4;
+        }
+
+        .guide-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-num-badge {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border-radius: 50%;
+            background: var(--yape-purple);
+            color: white;
+            font-weight: 800;
+            font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+
+        .display-email-tag {
+            color: var(--yape-purple);
+            font-weight: 800;
+            word-break: break-all;
+        }
+
+        .otp-input-wrap {
+            margin: 1.3rem 0;
+        }
+
+        .otp-input-large {
+            text-align: center;
+            letter-spacing: 14px;
+            font-size: 2.2rem;
+            font-weight: 800;
+            font-family: monospace;
+            padding: 0.85rem;
+            background: #F8FAFC;
+            border: 2px solid var(--yape-purple);
+            border-radius: 16px;
+            color: var(--yape-purple);
+        }
+
+        .otp-input-large::placeholder {
+            color: #CBD5E1;
+            letter-spacing: 10px;
+        }
+
+        /* Alertas */
+        .alert-message {
+            padding: 0.85rem 1rem;
+            border-radius: 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            display: none;
+            text-align: left;
+            line-height: 1.45;
+        }
+
+        .alert-error {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: var(--danger-red);
+        }
+
+        .alert-success {
+            background: #ECFDF5;
+            border: 1px solid #A7F3D0;
+            color: var(--success-green);
+        }
+
+        .alert-config-callout {
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            border-radius: 14px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 1.2rem;
+            text-align: left;
+            display: none;
+        }
+
+        .btn-open-config-alert {
+            display: inline-block;
+            background: var(--yape-purple);
+            color: white;
+            border: none;
+            padding: 0.45rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-open-config-alert:hover {
+            filter: brightness(1.1);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            font-size: 0.82rem;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 1.25rem;
+        }
+
+        .footer-links a {
+            color: #64748B;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--yape-purple);
+        }
+
+        .btn-link-subtle {
+            background: none;
+            border: none;
+            color: var(--yape-purple);
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.82rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .btn-link-subtle:disabled {
+            color: #94A3B8;
+            cursor: not-allowed;
+        }
+
+        /* ==================================================== */
+        /* MODAL CONFIGURACIÓN REMITENTE GMAIL                  */
+        /* ==================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(11, 15, 25, 0.75);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s ease;
+            padding: 1.2rem;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: #FFFFFF;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 28px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            position: relative;
+            transform: scale(0.95);
+            transition: 0.2s ease;
+            text-align: left;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: #F1F5F9;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 800;
+            color: #64748B;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: #E2E8F0;
+            color: #0F172A;
+        }
+
+        .instruction-box-gmail {
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            border-radius: 14px;
+            padding: 0.9rem;
+            margin: 1rem 0;
+            font-size: 0.78rem;
+            color: #1E40AF;
+            line-height: 1.5;
+        }
+
+        .instruction-box-gmail ol {
+            padding-left: 1.2rem;
+            margin-top: 0.35rem;
+        }
+
+        .instruction-box-gmail li {
+            margin-bottom: 0.3rem;
+        }
+
+        .instruction-box-gmail a {
+            color: #1D4ED8;
+            font-weight: 700;
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="registro-card">
+        <div class="top-stripe"></div>
+        
+        <div class="brand-logo-wrap">Y</div>
+
+        <!-- Botón de estado de configuración Gmail -->
+        <button type="button" class="config-status-badge" id="btnConfigEstado" title="Configurar correo emisor de Gmail">
+            <span class="status-dot" id="dotConfig"></span>
+            <span id="textConfigEstado">Verificando conexión Gmail...</span>
+            <span>⚙️</span>
+        </button>
+
+        <!-- Indicador de Pasos -->
+        <div class="step-indicator">
+            <span class="step-pill active" id="stepPill1">1. Tus Datos</span>
+            <span class="step-pill" id="stepPill2">2. Revisa tu Celular</span>
+        </div>
+
+        <!-- Alertas generales -->
+        <div class="alert-message alert-error" id="msgError"></div>
+        <div class="alert-message alert-success" id="msgSuccess"></div>
+
+        <!-- Alerta especial si falta configuración de remitente Gmail -->
+        <div class="alert-config-callout" id="alertConfigPrompt">
+            <div style="font-weight: 800; font-size: 0.85rem; color: #92400E; margin-bottom: 4px;">
+                ⚙️ Se requiere configurar el remitente Gmail
+            </div>
+            <p style="font-size: 0.78rem; color: #B45309; line-height: 1.4;" id="textConfigPromptMsg">
+                Para que el código de verificación llegue directo al aplicativo de Gmail en tu celular, conecta una cuenta emisora con su Contraseña de Aplicación de Google.
+            </p>
+            <button type="button" class="btn-open-config-alert" id="btnAbrirModalConfig">
+                Configurar Remitente Gmail Ahora ➔
+            </button>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- PASO 1: FORMULARIO DE DATOS PERSONALES               -->
+        <!-- ==================================================== -->
+        <div id="step1Container">
+            <h1>Crea tu cuenta Yape</h1>
+            <p class="subtext">El código de seguridad llegará a tu celular por Gmail</p>
+
+            <form id="formRegistro">
+                <div class="row-names">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="inputNombre" placeholder="Ej: Ana" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Apellido</label>
+                        <input type="text" id="inputApellido" placeholder="Ej: Torres" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Número de Celular</label>
+                    <input type="tel" id="inputCelular" placeholder="Ej: 981234567" maxlength="9" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Tu Correo Gmail (donde recibirás el código)</label>
+                    <input type="email" id="inputCorreo" placeholder="tu_correo@gmail.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Crea tu Contraseña / Clave (mínimo 4 dígitos)</label>
+                    <input type="password" id="inputPassword" placeholder="••••••" required>
+                </div>
+
+                <button type="submit" class="btn-submit-action" id="btnEnviarCodigo">
+                    Continuar y Enviar Código ➔
+                </button>
+            </form>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- PASO 2: VALIDACIÓN DE CÓDIGO OTP DESDE EL CELULAR   -->
+        <!-- ==================================================== -->
+        <div id="step2Container" class="step-otp-container">
+            <div class="phone-badge-tip">
+                📱 Revisa el aplicativo Gmail en tu celular
+            </div>
+
+            <h1>Ingresa el código</h1>
+            <p class="subtext">
+                Enviamos un código de seguridad de 6 dígitos a:<br>
+                <strong class="display-email-tag" id="displayCorreo">tu_correo@gmail.com</strong>
+            </p>
+
+            <!-- Instrucciones paso a paso en el celular -->
+            <div class="phone-instructions-box">
+                <div class="guide-step">
+                    <div class="step-num-badge">1</div>
+                    <div>Abre la app <strong>Gmail</strong> en tu celular.</div>
+                </div>
+                <div class="guide-step">
+                    <div class="step-num-badge">2</div>
+                    <div>Busca el correo de <strong>Yape BCP</strong> (revisa también Spam/No deseados).</div>
+                </div>
+                <div class="guide-step">
+                    <div class="step-num-badge">3</div>
+                    <div>Escribe manualmente el código de 6 dígitos en la casilla:</div>
+                </div>
+            </div>
+
+            <!-- Formulario de ingreso manual: NUNCA se rellena solo -->
+            <form id="formValidarOtp">
+                <div class="otp-input-wrap">
+                    <input type="text" id="inputCodigoOtp" class="otp-input-large" placeholder="------" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </div>
+
+                <button type="submit" class="btn-submit-action" id="btnCompletarRegistro">
+                    ✓ Verificar Código y Activar Cuenta
+                </button>
+            </form>
+
+            <button type="button" class="btn-link-subtle" id="btnReenviarCodigo">
+                🔄 ¿No te llegó el correo? Reenviar código
+            </button>
+            <br>
+            <button type="button" class="btn-link-subtle" id="btnCambiarCorreo" style="color: #64748B;">
+                ← Modificar correo o datos
+            </button>
+        </div>
+
+        <div class="footer-links">
+            <a href="/usuario/login">¿Ya tienes una cuenta? <strong>Inicia sesión aquí</strong></a>
+            <a href="javascript:void(0)" id="btnFooterConfig">⚙️ Configurar servidor de correo Gmail</a>
+            <a href="/">← Volver al Portal Principal</a>
+        </div>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- MODAL DE CONFIGURACIÓN DE REMITENTE GMAIL            -->
+    <!-- ==================================================== -->
+    <div class="modal-overlay" id="modalConfig">
+        <div class="modal-card">
+            <button type="button" class="modal-close-btn" id="btnCerrarModal">✕</button>
+            
+            <h2 style="font-size: 1.3rem; font-weight: 800; color: #1E293B; margin-bottom: 0.3rem;">
+                ⚙️ Remitente Gmail para Envíos
+            </h2>
+            <p style="font-size: 0.82rem; color: #64748B; margin-bottom: 1rem;">
+                Configura la cuenta de Gmail desde la cual el sistema enviará los códigos reales a los celulares de los usuarios.
+            </p>
+
+            <div class="alert-message alert-error" id="modalMsgError"></div>
+            <div class="alert-message alert-success" id="modalMsgSuccess"></div>
+
+            <form id="formConfigCorreo">
+                <div class="form-group">
+                    <label>Correo Gmail Emisor</label>
+                    <input type="email" id="cfgEmisor" placeholder="ejemplo.yape@gmail.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Contraseña de Aplicación de Google (16 letras)</label>
+                    <input type="password" id="cfgPassword" placeholder="abcd efgh ijkl mnop" required autocomplete="new-password">
+                </div>
+
+                <div class="instruction-box-gmail">
+                    <strong>💡 ¿Cómo obtener tu contraseña de aplicación de 16 caracteres?</strong>
+                    <ol>
+                        <li>Ingresa a tu cuenta de Google en: <a href="https://myaccount.google.com/security" target="_blank" rel="noopener">myaccount.google.com/security</a></li>
+                        <li>Asegúrate de tener activa la <strong>Verificación en 2 pasos</strong>.</li>
+                        <li>Entra a <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">myaccount.google.com/apppasswords</a></li>
+                        <li>En "Nombre de la app", escribe <strong>Yape</strong> y haz clic en <strong>Crear</strong>.</li>
+                        <li>Copia los 16 caracteres generados y pégalos aquí arriba.</li>
+                    </ol>
+                </div>
+
+                <button type="submit" class="btn-submit-action" id="btnGuardarConfig" style="margin-bottom: 0.5rem;">
+                    💾 Guardar y Probar Conexión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Elementos DOM principales
+        const step1 = document.getElementById("step1Container");
+        const step2 = document.getElementById("step2Container");
+        const stepPill1 = document.getElementById("stepPill1");
+        const stepPill2 = document.getElementById("stepPill2");
+
+        const formRegistro = document.getElementById("formRegistro");
+        const formValidarOtp = document.getElementById("formValidarOtp");
+        const inputCodigoOtp = document.getElementById("inputCodigoOtp");
+        const btnEnviarCodigo = document.getElementById("btnEnviarCodigo");
+        const btnCompletarRegistro = document.getElementById("btnCompletarRegistro");
+        const btnReenviarCodigo = document.getElementById("btnReenviarCodigo");
+        const btnCambiarCorreo = document.getElementById("btnCambiarCorreo");
+
+        const msgError = document.getElementById("msgError");
+        const msgSuccess = document.getElementById("msgSuccess");
+        const alertConfigPrompt = document.getElementById("alertConfigPrompt");
+        const textConfigPromptMsg = document.getElementById("textConfigPromptMsg");
+        const btnAbrirModalConfig = document.getElementById("btnAbrirModalConfig");
+        const displayCorreo = document.getElementById("displayCorreo");
+
+        // Elementos de Configuración de Gmail
+        const btnConfigEstado = document.getElementById("btnConfigEstado");
+        const btnFooterConfig = document.getElementById("btnFooterConfig");
+        const dotConfig = document.getElementById("dotConfig");
+        const textConfigEstado = document.getElementById("textConfigEstado");
+        const modalConfig = document.getElementById("modalConfig");
+        const btnCerrarModal = document.getElementById("btnCerrarModal");
+        const formConfigCorreo = document.getElementById("formConfigCorreo");
+        const cfgEmisor = document.getElementById("cfgEmisor");
+        const cfgPassword = document.getElementById("cfgPassword");
+        const btnGuardarConfig = document.getElementById("btnGuardarConfig");
+        const modalMsgError = document.getElementById("modalMsgError");
+        const modalMsgSuccess = document.getElementById("modalMsgSuccess");
+
+        let cachedUserData = null;
+        let cooldownSeconds = 0;
+        let cooldownTimer = null;
+
+        function ocultarMensajes() {
+            msgError.style.display = "none";
+            msgSuccess.style.display = "none";
+            alertConfigPrompt.style.display = "none";
+        }
+
+        function mostrarError(msg) {
+            ocultarMensajes();
+            msgError.textContent = msg;
+            msgError.style.display = "block";
+        }
+
+        function mostrarExito(msg) {
+            ocultarMensajes();
+            msgSuccess.textContent = msg;
+            msgSuccess.style.display = "block";
+        }
+
+        // Abrir y Cerrar Modal de Configuración
+        function abrirModal() {
+            modalMsgError.style.display = "none";
+            modalMsgSuccess.style.display = "none";
+            modalConfig.classList.add("active");
+        }
+
+        function cerrarModal() {
+            modalConfig.classList.remove("active");
+        }
+
+        btnConfigEstado.addEventListener("click", abrirModal);
+        btnFooterConfig.addEventListener("click", abrirModal);
+        btnAbrirModalConfig.addEventListener("click", abrirModal);
+        btnCerrarModal.addEventListener("click", cerrarModal);
+
+        modalConfig.addEventListener("click", (e) => {
+            if (e.target === modalConfig) {
+                cerrarModal();
+            }
+        });
+
+        // Consultar estado de configuración de Gmail al cargar
+        async function verificarEstadoGmail() {
+            try {
+                const res = await fetch("/api/auth/config-correo");
+                const data = await res.json();
+                if (data.configurado) {
+                    dotConfig.classList.add("active");
+                    textConfigEstado.textContent = "Gmail Remitente: " + data.gmail_emisor;
+                    cfgEmisor.value = data.gmail_emisor || "";
+                } else {
+                    dotConfig.classList.remove("active");
+                    textConfigEstado.textContent = "Gmail Remitente: No configurado";
+                }
+            } catch (e) {
+                textConfigEstado.textContent = "Error al verificar remitente";
+            }
+        }
+        verificarEstadoGmail();
+
+        // Guardar configuración de Gmail
+        formConfigCorreo.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            modalMsgError.style.display = "none";
+            modalMsgSuccess.style.display = "none";
+
+            btnGuardarConfig.disabled = true;
+            btnGuardarConfig.textContent = "Probando conexión con smtp.gmail.com...";
+
+            try {
+                const res = await fetch("/api/auth/config-correo", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        gmail_emisor: cfgEmisor.value.trim(),
+                        gmail_password_app: cfgPassword.value.trim()
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.status === "success") {
+                    modalMsgSuccess.textContent = data.mensaje;
+                    modalMsgSuccess.style.display = "block";
+                    verificarEstadoGmail();
+
+                    setTimeout(() => {
+                        cerrarModal();
+                        // Si el usuario ya había intentado enviar código, reintentarlo automáticamente
+                        if (cachedUserData && step1.style.display !== "none") {
+                            formRegistro.dispatchEvent(new Event("submit"));
+                        }
+                    }, 1200);
+                } else {
+                    modalMsgError.textContent = data.mensaje || "Error al autenticar con Gmail.";
+                    modalMsgError.style.display = "block";
+                }
+            } catch (err) {
+                modalMsgError.textContent = "Error de conexión con el servidor.";
+                modalMsgError.style.display = "block";
+            } finally {
+                btnGuardarConfig.disabled = false;
+                btnGuardarConfig.textContent = "💾 Guardar y Probar Conexión";
+            }
+        });
+
+        // 1. Envío de datos y solicitud de código al celular por Gmail
+        formRegistro.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            ocultarMensajes();
+
+            const nombre = document.getElementById("inputNombre").value.trim();
+            const apellido = document.getElementById("inputApellido").value.trim();
+            const celular = document.getElementById("inputCelular").value.trim();
+            const correo = document.getElementById("inputCorreo").value.trim().toLowerCase();
+            const password = document.getElementById("inputPassword").value.trim();
+
+            btnEnviarCodigo.disabled = true;
+            btnEnviarCodigo.textContent = "Enviando código a tu celular por Gmail...";
+
+            cachedUserData = { nombre, apellido, celular, correo, password };
+
+            try {
+                const res = await fetch("/api/auth/registro/enviar-codigo", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(cachedUserData)
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.status === "success") {
+                    // Pasar al Paso 2
+                    step1.style.display = "none";
+                    step2.style.display = "block";
+                    stepPill1.classList.remove("active");
+                    stepPill2.classList.add("active");
+
+                    displayCorreo.textContent = correo;
+
+                    // STRICT: El código NUNCA se rellena automáticamente.
+                    // Debe quedar vacío para que el usuario revise su celular y lo ingrese manualmente.
+                    inputCodigoOtp.value = "";
+                    setTimeout(() => inputCodigoOtp.focus(), 150);
+
+                    iniciarCooldownReenvio(30);
+                    mostrarExito("¡Código enviado a tu Gmail! Abre el aplicativo en tu celular para verlo.");
+                } else if (data.status === "need_config") {
+                    // Remitente Gmail no configurado
+                    textConfigPromptMsg.textContent = data.mensaje || "Configura el correo Gmail remitente para enviar el código a tu celular.";
+                    alertConfigPrompt.style.display = "block";
+                } else {
+                    mostrarError(data.mensaje || "Error al procesar el registro.");
+                }
+            } catch (err) {
+                mostrarError("No se pudo conectar con el servidor.");
+            } finally {
+                btnEnviarCodigo.disabled = false;
+                btnEnviarCodigo.textContent = "Continuar y Enviar Código ➔";
+            }
+        });
+
+        // 2. Validación manual de Código OTP ingresado por el usuario
+        formValidarOtp.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            ocultarMensajes();
+
+            const codigo = inputCodigoOtp.value.trim();
+            if (codigo.length !== 6 || !/^\d{6}$/.test(codigo)) {
+                mostrarError("Por favor ingresa los 6 dígitos que llegaron a tu celular.");
+                inputCodigoOtp.focus();
+                return;
+            }
+
+            btnCompletarRegistro.disabled = true;
+            btnCompletarRegistro.textContent = "Verificando código...";
+
+            try {
+                const res = await fetch("/api/auth/registro/completar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        correo: cachedUserData.correo,
+                        codigo: codigo
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.status === "success") {
+                    mostrarExito("¡Código correcto! Bienvenido a Yape. Entrando a tu cuenta...");
+                    setTimeout(() => {
+                        window.location.href = data.redirect || "/usuario";
+                    }, 1200);
+                } else {
+                    mostrarError(data.mensaje || "Código incorrecto o vencido. Revisa tu celular.");
+                    inputCodigoOtp.select();
+                }
+            } catch (err) {
+                mostrarError("Error al verificar código con el servidor.");
+            } finally {
+                btnCompletarRegistro.disabled = false;
+                btnCompletarRegistro.textContent = "✓ Verificar Código y Activar Cuenta";
+            }
+        });
+
+        // Temporizador de reenvío de código para no saturar SMTP
+        function iniciarCooldownReenvio(segundos) {
+            cooldownSeconds = segundos;
+            btnReenviarCodigo.disabled = true;
+            
+            if (cooldownTimer) clearInterval(cooldownTimer);
+            cooldownTimer = setInterval(() => {
+                cooldownSeconds--;
+                if (cooldownSeconds <= 0) {
+                    clearInterval(cooldownTimer);
+                    btnReenviarCodigo.disabled = false;
+                    btnReenviarCodigo.textContent = "🔄 ¿No te llegó el correo? Reenviar código";
+                } else {
+                    btnReenviarCodigo.textContent = `🔄 Reenviar código en ${cooldownSeconds}s...`;
+                }
+            }, 1000);
+        }
+
+        // Reenviar código
+        btnReenviarCodigo.addEventListener("click", () => {
+            if (cachedUserData && cooldownSeconds <= 0) {
+                inputCodigoOtp.value = "";
+                formRegistro.dispatchEvent(new Event("submit"));
+            }
+        });
+
+        // Cambiar correo / Volver a paso 1
+        btnCambiarCorreo.addEventListener("click", () => {
+            step2.style.display = "none";
+            step1.style.display = "block";
+            stepPill2.classList.remove("active");
+            stepPill1.classList.add("active");
+            ocultarMensajes();
+        });
+    </script>
+</body>
+</html>

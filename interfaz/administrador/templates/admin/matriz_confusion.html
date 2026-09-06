@@ -1,0 +1,195 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Matriz de Confusión - Antifraude Yape{% endblock %}
+{% block breadcrumb %}Matriz de Confusión{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header-title">Matrices de Confusión</h1>
+    <p class="page-header-desc">Evaluación del rendimiento diagnóstico y balance entre fraudes capturados y falsas alarmas.</p>
+  </div>
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <label for="selectModeloCM" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Seleccionar Modelo:</label>
+      <select id="selectModeloCM" class="form-control" style="min-height: 40px; min-width: 250px;">
+        {% for nombre in matrices.keys() %}
+          <option value="{{ nombre }}" {% if 'Gradient Boosting' in nombre %}selected{% endif %}>{{ nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- MATRIZ VISUAL 2X2 Y EXPLICACIÓN DIDÁCTICA -->
+<div class="panel-grid">
+  <!-- Grid 2x2 de la Matriz -->
+  <div class="panel-col-7">
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h2 class="panel-title" id="cmTitulo">Gradient Boosting (Mejor Modelo)</h2>
+        <span class="badge badge-success" id="cmAccuracyBadge">Accuracy: 98.65%</span>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 1rem; color: var(--text-dim); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em;">
+        Predicción del Modelo
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600;">
+        <div style="width: 200px; text-align: center; color: var(--color-safe);">Predicho Normal</div>
+        <div style="width: 200px; text-align: center; color: var(--color-danger);">Predicho Fraude</div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+        <div style="writing-mode: vertical-rl; transform: rotate(180deg); font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-align: center; text-transform: uppercase;">
+          Realidad (Clase Real)
+        </div>
+
+        <div style="display: grid; grid-template-columns: 200px 200px; gap: 1rem;">
+          <!-- TN -->
+          <div class="cm-cell cm-cell-tn">
+            <div class="cm-cell-label">Verdaderos Negativos (TN)</div>
+            <div class="cm-cell-value" id="cmValTN" style="color: var(--color-safe);">9,347</div>
+            <div class="cm-cell-pct" id="cmPctTN">93.47% del set de prueba</div>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">Transacciones legítimas aprobadas</span>
+          </div>
+
+          <!-- FP -->
+          <div class="cm-cell cm-cell-fp">
+            <div class="cm-cell-label">Falsos Positivos (FP)</div>
+            <div class="cm-cell-value" id="cmValFP" style="color: var(--color-warning);">9</div>
+            <div class="cm-cell-pct" id="cmPctFP">0.09% del set de prueba</div>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">Falsa alarma (bloqueo erróneo)</span>
+          </div>
+
+          <!-- FN -->
+          <div class="cm-cell cm-cell-fn">
+            <div class="cm-cell-label">Falsos Negativos (FN)</div>
+            <div class="cm-cell-value" id="cmValFN" style="color: var(--color-danger);">126</div>
+            <div class="cm-cell-pct" id="cmPctFN">1.26% del set de prueba</div>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">Fraude no detectado (Riesgo)</span>
+          </div>
+
+          <!-- TP -->
+          <div class="cm-cell cm-cell-tp">
+            <div class="cm-cell-label">Verdaderos Positivos (TP)</div>
+            <div class="cm-cell-value" id="cmValTP" style="color: var(--yape-cyan);">518</div>
+            <div class="cm-cell-pct" id="cmPctTP">5.18% del set de prueba</div>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">Fraudes detectados con éxito</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Explicación Educativa de Conceptos -->
+  <div class="panel-col-5">
+    <div class="panel-card" style="height: 100%;">
+      <div class="panel-card-header">
+        <h2 class="panel-title">Guía de Interpretación Antifraude</h2>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.88rem; line-height: 1.5;">
+        <div style="padding: 0.85rem; background: var(--bg-input); border-left: 3px solid var(--yape-cyan); border-radius: var(--radius-sm);">
+          <strong style="color: var(--yape-cyan);">Verdaderos Positivos (TP):</strong>
+          <p style="color: var(--text-muted); margin-top: 0.2rem;">Operaciones fraudulentas que el modelo identificó correctamente, evitando pérdidas financieras al banco y al cliente.</p>
+        </div>
+
+        <div style="padding: 0.85rem; background: var(--bg-input); border-left: 3px solid var(--color-safe); border-radius: var(--radius-sm);">
+          <strong style="color: var(--color-safe);">Verdaderos Negativos (TN):</strong>
+          <p style="color: var(--text-muted); margin-top: 0.2rem;">Transacciones normales que fueron autorizadas de forma instantánea sin fricción para el usuario de Yape.</p>
+        </div>
+
+        <div style="padding: 0.85rem; background: var(--bg-input); border-left: 3px solid var(--color-warning); border-radius: var(--radius-sm);">
+          <strong style="color: var(--color-warning);">Falsos Positivos (FP):</strong>
+          <p style="color: var(--text-muted); margin-top: 0.2rem;">Clientes legítimos cuya operación fue marcada como sospechosa por error. En Gradient Boosting es de tan solo <strong>9 casos</strong>, minimizando fricciones.</p>
+        </div>
+
+        <div style="padding: 0.85rem; background: var(--bg-input); border-left: 3px solid var(--color-danger); border-radius: var(--radius-sm);">
+          <strong style="color: var(--color-danger);">Falsos Negativos (FN):</strong>
+          <p style="color: var(--text-muted); margin-top: 0.2rem;">El riesgo más crítico: fraudes que lograron evadir el filtro. El sistema cuenta con reglas secundarias para reducir este margen.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABLA COMPARATIVA DE MATRICES ENTRE MODELOS -->
+<div class="panel-card">
+  <div class="panel-card-header">
+    <h2 class="panel-title">Comparación de Matrices de Confusión entre Modelos</h2>
+    <span class="badge badge-primary">Resultados de Evaluación</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Modelo</th>
+          <th>Verdaderos Negativos (TN)</th>
+          <th>Falsos Positivos (FP)</th>
+          <th>Falsos Negativos (FN)</th>
+          <th>Verdaderos Positivos (TP)</th>
+          <th>Precision (%)</th>
+          <th>Recall (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for nombre, m in matrices.items() %}
+          <tr {% if 'Gradient Boosting' in nombre %}style="background: rgba(115, 34, 130, 0.15); font-weight: 600;"{% endif %}>
+            <td><strong style="color: #FFF;">{{ nombre }}</strong></td>
+            <td style="color: var(--color-safe);">{{ "{:,}".format(m.tn) }}</td>
+            <td style="color: var(--color-warning);">{{ m.fp }}</td>
+            <td style="color: var(--color-danger);">{{ m.fn }}</td>
+            <td style="color: var(--yape-cyan); font-weight: 700;">{{ m.tp }}</td>
+            <td>{{ m.precision }}%</td>
+            <td>{{ m.recall }}%</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const matricesData = {{ matrices|tojson }};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const select = document.getElementById('selectModeloCM');
+  const titulo = document.getElementById('cmTitulo');
+  const badgeAcc = document.getElementById('cmAccuracyBadge');
+  const valTN = document.getElementById('cmValTN');
+  const valFP = document.getElementById('cmValFP');
+  const valFN = document.getElementById('cmValFN');
+  const valTP = document.getElementById('cmValTP');
+  const pctTN = document.getElementById('cmPctTN');
+  const pctFP = document.getElementById('cmPctFP');
+  const pctFN = document.getElementById('cmPctFN');
+  const pctTP = document.getElementById('cmPctTP');
+
+  function renderizarMatriz(modeloNombre) {
+    const data = matricesData[modeloNombre];
+    if (!data) return;
+
+    titulo.textContent = modeloNombre;
+    badgeAcc.textContent = `Accuracy: ${data.accuracy}%`;
+
+    valTN.textContent = data.tn.toLocaleString();
+    valFP.textContent = data.fp.toLocaleString();
+    valFN.textContent = data.fn.toLocaleString();
+    valTP.textContent = data.tp.toLocaleString();
+
+    pctTN.textContent = `${data.tn_pct}% del set de prueba`;
+    pctFP.textContent = `${data.fp_pct}% del set de prueba`;
+    pctFN.textContent = `${data.fn_pct}% del set de prueba`;
+    pctTP.textContent = `${data.tp_pct}% del set de prueba`;
+  }
+
+  select.addEventListener('change', (e) => {
+    renderizarMatriz(e.target.value);
+  });
+});
+</script>
+{% endblock %}

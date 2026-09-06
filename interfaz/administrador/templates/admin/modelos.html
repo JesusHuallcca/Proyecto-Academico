@@ -1,0 +1,194 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Modelos de Machine Learning - Antifraude Yape{% endblock %}
+{% block breadcrumb %}Modelos de Machine Learning{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header-title">Comparación de Modelos de Machine Learning</h1>
+    <p class="page-header-desc">Evaluación rigurosa de algoritmos supervisados y redes neuronales profundas para la detección de fraude.</p>
+  </div>
+  <div>
+    <span class="badge badge-success" style="font-size: 0.85rem; padding: 0.4rem 1rem;">
+      🏆 Modelo en Producción: Gradient Boosting
+    </span>
+  </div>
+</div>
+
+<!-- TARJETA DEL MEJOR MODELO (REQUISITO 11) -->
+<div class="panel-card" style="background: linear-gradient(135deg, rgba(115, 34, 130, 0.25) 0%, rgba(20, 27, 45, 0.95) 100%); border: 1.5px solid var(--yape-primary); margin-bottom: 2rem;">
+  <div class="panel-card-header">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--yape-primary); color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+        🥇
+      </div>
+      <div>
+        <h2 class="panel-title" style="font-size: 1.35rem; color: #FFF;">Mejor Modelo Seleccionado: Gradient Boosting</h2>
+        <span class="panel-subtitle" style="color: var(--yape-cyan);">Certificado oficialmente en resultados/mejor_modelo.txt</span>
+      </div>
+    </div>
+    <span class="badge badge-success">Activo en Inferencia</span>
+  </div>
+
+  <div class="kpi-grid" style="margin-bottom: 0;">
+    <div class="kpi-card" style="background: rgba(0, 0, 0, 0.3);">
+      <div class="kpi-header"><span class="kpi-title">Accuracy (Exactitud)</span></div>
+      <div class="kpi-value" style="color: var(--color-safe);">98.65%</div>
+      <div class="kpi-meta">Eficacia global</div>
+    </div>
+
+    <div class="kpi-card" style="background: rgba(0, 0, 0, 0.3);">
+      <div class="kpi-header"><span class="kpi-title">Precision (Precisión)</span></div>
+      <div class="kpi-value" style="color: var(--yape-cyan);">98.29%</div>
+      <div class="kpi-meta">Mínimos falsos positivos</div>
+    </div>
+
+    <div class="kpi-card" style="background: rgba(0, 0, 0, 0.3);">
+      <div class="kpi-header"><span class="kpi-title">Recall (Sensibilidad)</span></div>
+      <div class="kpi-value" style="color: #FFF;">80.43%</div>
+      <div class="kpi-meta">Detección de fraudes reales</div>
+    </div>
+
+    <div class="kpi-card" style="background: rgba(0, 0, 0, 0.3);">
+      <div class="kpi-header"><span class="kpi-title">F1-Score</span></div>
+      <div class="kpi-value" style="color: var(--accent-purple);">88.47%</div>
+      <div class="kpi-meta">Media armónica balanceada</div>
+    </div>
+  </div>
+</div>
+
+<!-- GRÁFICO COMPARATIVO DE MÉTRICAS -->
+<div class="panel-grid">
+  <div class="panel-col-12">
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h2 class="panel-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          Comparativa de Desempeño Multimétrica (Accuracy, Precision, Recall, F1-Score)
+        </h2>
+      </div>
+      <div class="chart-container" style="height: 340px;">
+        <canvas id="chartComparativaModelos"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABLA COMPARATIVA COMPLETA DE COMPARACION_FINAL_MODELOS.CSV -->
+<div class="panel-card">
+  <div class="panel-card-header">
+    <h2 class="panel-title">Tabla Comparativa de Modelos Evaluados (resultados/comparacion_final_modelos.csv)</h2>
+    <span class="badge badge-primary">Métricas Reales del Proyecto</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Modelo / Arquitectura</th>
+          <th>Accuracy</th>
+          <th>Precision</th>
+          <th>Recall</th>
+          <th>F1-Score</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in comparativa.modelos %}
+          <tr {% if m.es_ganador %}style="background: rgba(115, 34, 130, 0.15); font-weight: 600;"{% endif %}>
+            <td>
+              <strong style="color: #FFF; font-size: 0.95rem;">
+                {% if m.es_ganador %}🏆 {% endif %}{{ m.modelo }}
+              </strong>
+            </td>
+            <td style="font-family: var(--font-heading); font-weight: 700; color: var(--color-safe);">{{ m.accuracy }}%</td>
+            <td style="font-family: var(--font-heading); font-weight: 700; color: var(--yape-cyan);">{{ m.precision }}%</td>
+            <td style="font-family: var(--font-heading); font-weight: 700; color: #FFF;">{{ m.recall }}%</td>
+            <td style="font-family: var(--font-heading); font-weight: 700; color: var(--accent-purple);">{{ m.f1_score }}%</td>
+            <td>
+              {% if m.es_ganador %}
+                <span class="badge badge-success">SELECCIONADO</span>
+              {% else %}
+                <span class="badge badge-primary">EVALUADO</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const modelosData = {{ comparativa.modelos|tojson }};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const ctx = document.getElementById('chartComparativaModelos');
+  if (ctx) {
+    const labels = modelosData.map(m => m.modelo);
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Accuracy (%)',
+            data: modelosData.map(m => m.accuracy),
+            backgroundColor: '#10B981',
+            borderRadius: 4
+          },
+          {
+            label: 'Precision (%)',
+            data: modelosData.map(m => m.precision),
+            backgroundColor: '#00D2B5',
+            borderRadius: 4
+          },
+          {
+            label: 'Recall (%)',
+            data: modelosData.map(m => m.recall),
+            backgroundColor: '#F59E0B',
+            borderRadius: 4
+          },
+          {
+            label: 'F1-Score (%)',
+            data: modelosData.map(m => m.f1_score),
+            backgroundColor: '#9d4edd',
+            borderRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { color: '#94A3B8', font: { size: 12 } }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#94A3B8', font: { size: 11 } }
+          },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#94A3B8' },
+            min: 30,
+            max: 100
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

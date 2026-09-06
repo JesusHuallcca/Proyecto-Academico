@@ -1,0 +1,108 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Reportes Ejecutivos - Antifraude Yape{% endblock %}
+{% block breadcrumb %}Reportes Ejecutivos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header-title">Reporte Ejecutivo Antifraude</h1>
+    <p class="page-header-desc">Informe técnico y operativo sobre el rendimiento del sistema de detección en transacciones tipo Yape.</p>
+  </div>
+  <div>
+    <button type="button" class="btn btn-cyan" onclick="window.print();">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+      Imprimir / Exportar Reporte
+    </button>
+  </div>
+</div>
+
+<div class="panel-card" style="margin-bottom: 2rem;">
+  <div style="border-bottom: 2px solid var(--border-subtle); padding-bottom: 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 1.5rem; font-weight: 800; font-family: var(--font-heading); color: var(--yape-cyan);">YAPE</span>
+        <span style="font-size: 1.1rem; color: var(--text-muted);">&bull; Banco de Crédito del Perú (BCP)</span>
+      </div>
+      <h2 style="font-size: 1.3rem; color: #FFF; margin-top: 0.5rem;">Informe de Monitoreo de Riesgo y Eficacia de Modelos de ML</h2>
+    </div>
+    <div style="text-align: right; font-size: 0.85rem; color: var(--text-muted);">
+      <div>Fecha de Emisión: <strong>Septiembre 2026</strong></div>
+      <div>Estado del Sistema: <span class="badge badge-success">Operacional</span></div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 1: RESUMEN EJECUTIVO -->
+  <div style="margin-bottom: 2rem;">
+    <h3 style="font-family: var(--font-heading); color: var(--yape-cyan); font-size: 1.15rem; margin-bottom: 0.75rem;">
+      1. Resumen Ejecutivo del Proyecto
+    </h3>
+    <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.7; margin-bottom: 1rem;">
+      El presente informe sintetiza el comportamiento y la capacidad de detección de fraudes sobre un universo de 
+      <strong style="color: #FFF;">{{ "{:,}".format(kpis.total_transacciones) }} operaciones analizadas</strong>. 
+      Se ha determinado una tasa global de fraude del <strong style="color: var(--color-danger);">{{ "%.2f"|format(kpis.porcentaje_fraude) }}%</strong>, 
+      con un ticket promedio de operación situado en <strong style="color: #FFF;">S/ {{ "%.2f"|format(kpis.monto_promedio) }}</strong> y una mediana de 
+      <strong style="color: var(--yape-cyan);">S/ {{ "%.2f"|format(kpis.monto_mediana) }}</strong>.
+    </p>
+
+    <div class="kpi-grid" style="margin-bottom: 0;">
+      <div class="kpi-card" style="background: var(--bg-input);">
+        <div class="kpi-title">Volumen Total</div>
+        <div class="kpi-value" style="font-size: 1.6rem;">{{ "{:,}".format(kpis.total_transacciones) }}</div>
+      </div>
+      <div class="kpi-card" style="background: var(--bg-input);">
+        <div class="kpi-title">Operaciones Normales</div>
+        <div class="kpi-value" style="font-size: 1.6rem; color: var(--color-safe);">{{ "{:,}".format(kpis.transacciones_legitimas) }}</div>
+      </div>
+      <div class="kpi-card" style="background: var(--bg-input);">
+        <div class="kpi-title">Fraudes Bloqueados</div>
+        <div class="kpi-value" style="font-size: 1.6rem; color: var(--color-danger);">{{ "{:,}".format(kpis.fraudes_detectados) }}</div>
+      </div>
+      <div class="kpi-card" style="background: var(--bg-input);">
+        <div class="kpi-title">Tasa de Fraude</div>
+        <div class="kpi-value" style="font-size: 1.6rem; color: var(--color-warning);">{{ "%.2f"|format(kpis.porcentaje_fraude) }}%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: DESEMPEÑO DEL MEJOR MODELO -->
+  <div style="margin-bottom: 2rem;">
+    <h3 style="font-family: var(--font-heading); color: var(--yape-cyan); font-size: 1.15rem; margin-bottom: 0.75rem;">
+      2. Modelo Ganador y Certificación de Calidad
+    </h3>
+    <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.7; margin-bottom: 1rem;">
+      Tras comparar algoritmos de ensamble (Random Forest, Gradient Boosting), árboles de decisión, regresión logística 
+      y arquitecturas neuronales con PyTorch y TensorFlow / Keras, el modelo <strong style="color: #FFF;">Gradient Boosting</strong> 
+      obtuvo el mejor desempeño global, maximizando la precisión para evitar falsas alarmas que afecten a los clientes reales.
+    </p>
+
+    <div style="padding: 1.25rem; background: var(--bg-input); border-radius: var(--radius-md); border-left: 4px solid var(--yape-primary);">
+      <div style="font-family: var(--font-heading); font-size: 1.1rem; color: #FFF; font-weight: 700;">
+        Gradient Boosting (resultados/mejor_modelo.txt)
+      </div>
+      <div style="display: flex; gap: 2rem; margin-top: 0.75rem; flex-wrap: wrap;">
+        <div>Accuracy: <strong style="color: var(--color-safe);">98.65%</strong></div>
+        <div>Precision: <strong style="color: var(--yape-cyan);">98.29%</strong></div>
+        <div>Recall: <strong style="color: #FFF;">80.43%</strong></div>
+        <div>F1-Score: <strong style="color: var(--accent-purple);">88.47%</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3: RECOMENDACIONES DE MITIGACIÓN -->
+  <div>
+    <h3 style="font-family: var(--font-heading); color: var(--yape-cyan); font-size: 1.15rem; margin-bottom: 0.75rem;">
+      3. Recomendaciones Operativas para Seguridad BCP
+    </h3>
+    <ul style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.8; margin-left: 1.5rem;">
+      <li><strong>Monitoreo en Cambio de Dispositivo:</strong> Las operaciones con cambio repentino de dispositivo celular representan la mayor correlación con incidentes de suplantación.</li>
+      <li><strong>Control de Horario Inusual:</strong> Mantener un doble factor de autenticación (OTP biométrico) en transferencias realizadas entre las 00:00 y las 05:00 horas.</li>
+      <li><strong>Destinatarios No Habituales:</strong> Aplicar una ventana de retención preventiva de 60 segundos ante transferencias altas dirigidas a destinatarios no registrados previamente.</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

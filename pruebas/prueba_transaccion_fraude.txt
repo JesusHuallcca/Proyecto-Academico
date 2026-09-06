@@ -1,0 +1,45 @@
+==============================================
+      PRUEBA 02 - TRANSACCIÓN SOSPECHOSA
+==============================================
+
+DATOS DE LA TRANSACCIÓN
+
+Monto: S/ 2500
+Monto promedio del usuario: S/ 300
+Saldo anterior: S/ 5000
+
+Destinatario nuevo: 1
+Hora inusual: 1
+Velocidad de operación: 10
+Llamada reciente: 1
+Cambio de dispositivo: 1
+
+Edad: 35
+Usuario nuevo: 0
+Días desde registro: 500
+
+Operaciones del día: 12
+Operaciones última hora: 5
+
+Alertas ignoradas: 2
+Distancia entre operaciones: 15 km
+Ubicación inusual: 1
+
+Hora: 3
+Día de la semana: 2
+Producto: Yape
+
+
+==============================================
+                RESULTADO
+==============================================
+
+Predicción: POSIBLE FRAUDE
+
+Probabilidad de fraude: 100.00%
+Probabilidad de operación normal: 0.00%
+
+Recomendación:
+Revisar la transacción antes de autorizarla.
+
+==============================================

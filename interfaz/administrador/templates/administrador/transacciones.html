@@ -1,0 +1,118 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Transacciones &mdash; yape.ia Administrador{% endblock %}
+{% block admin_title %}Auditoria de Transacciones{% endblock %}
+{% block admin_subtitle %}Historial completo de operaciones evaluadas por el modelo ML{% endblock %}
+
+{% block admin_content %}
+
+<!-- Filtros -->
+<div class="filter-card">
+  <form method="GET" action="{{ url_for('admin_transacciones') }}" class="filter-form">
+    <div class="filter-group">
+      <label class="form-label">Filtrar por Producto</label>
+      <select name="producto" class="form-control">
+        <option value="">Todos los productos</option>
+        {% for p in ['Yape', 'Compra', 'Recarga', 'Pago de servicios', 'Transferencia'] %}
+          <option value="{{ p }}" {% if filtro_producto == p %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="form-label">Filtrar por Resultado ML</label>
+      <select name="resultado" class="form-control">
+        <option value="">Todos los resultados</option>
+        <option value="NORMAL" {% if filtro_resultado == 'NORMAL' %}selected{% endif %}>&#10003; NORMAL (Segura)</option>
+        <option value="SOSPECHOSA" {% if filtro_resultado == 'SOSPECHOSA' %}selected{% endif %}>&#9888; SOSPECHOSA (Fraude)</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:.6rem;align-items:flex-end">
+      <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+      <a href="{{ url_for('admin_transacciones') }}" class="btn btn-outline">Limpiar</a>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fa-solid fa-list-check" style="color:var(--color-primary);margin-right:8px"></i> Listado de Operaciones ({{ transacciones|length }})</h3>
+    <div style="display:flex;gap:.6rem">
+      <span class="badge badge-success">
+        <i class="fa-solid fa-circle-check" style="margin-right:4px"></i> {{ transacciones | selectattr('resultado', 'equalto', 'NORMAL') | list | length }} normales
+      </span>
+      <span class="badge badge-danger">
+        <i class="fa-solid fa-triangle-exclamation" style="margin-right:4px"></i> {{ transacciones | selectattr('resultado', 'equalto', 'SOSPECHOSA') | list | length }} sospechosas
+      </span>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha y Hora</th>
+          <th>Usuario</th>
+          <th>Producto</th>
+          <th>Destinatario</th>
+          <th>Monto</th>
+          <th>Prob. Fraude</th>
+          <th>Resultado</th>
+          <th>Riesgo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tx in transacciones %}
+        <tr>
+          <td><code style="font-size:.82rem;color:var(--text-muted)">#{{ tx.id_transaccion }}</code></td>
+          <td style="font-size:.83rem">{{ tx.fecha_hora[:16] }}</td>
+          <td>
+            <div class="user-cell">
+              <div class="user-avatar-sm">{{ tx.nombre[0] | upper }}</div>
+              <div class="user-cell-info">
+                <strong>{{ tx.nombre }} {{ tx.apellido }}</strong>
+                <small>{{ tx.correo }}</small>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge badge-primary">{{ tx.producto }}</span></td>
+          <td style="color:var(--text-muted);font-size:.85rem">{{ tx.destinatario or '—' }}</td>
+          <td><strong>S/ {{ "%.2f"|format(tx.monto) }}</strong></td>
+          <td>
+            <span class="fraud-pct {% if (tx.probabilidad_fraude or 0) > 50 %}high{% else %}low{% endif %}">
+              {{ "%.1f"|format(tx.probabilidad_fraude or 0.0) }}%
+            </span>
+          </td>
+          <td>
+            <span class="badge {% if tx.resultado == 'NORMAL' %}badge-success{% else %}badge-danger{% endif %}">
+              {% if tx.resultado == 'NORMAL' %}
+                <i class="fa-solid fa-check" style="margin-right:3px"></i>
+              {% else %}
+                <i class="fa-solid fa-triangle-exclamation" style="margin-right:3px"></i>
+              {% endif %}
+              {{ tx.resultado }}
+            </span>
+          </td>
+          <td>
+            <small style="color:var(--text-muted);font-size:.78rem">
+              {% if tx.cambio_dispositivo %}<span style="color:var(--color-danger)"><i class="fa-solid fa-mobile-screen"></i> Dispositivo<br></span>{% endif %}
+              {{ tx.distancia_ubicacion or '2.5' }} km
+            </small>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9">
+            <div class="empty-state">
+              <div class="empty-state-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+              <strong>Sin transacciones con estos filtros</strong>
+              <p>Intenta limpiar los filtros para ver todas las operaciones.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

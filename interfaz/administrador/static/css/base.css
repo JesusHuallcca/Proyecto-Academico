@@ -1,0 +1,432 @@
+/* ==========================================================================
+   SISTEMA ANTIFRAUDE YAPE.IA - BASE DESIGN SYSTEM
+   Variables, Temas Claro / Oscuro, Tipografía, Utilidades y Componentes
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap');
+
+:root {
+  /* Paleta Yape & Seguridad Financiera - MODO CLARO (Default) */
+  --bg-primary: #f7f6fc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f0edf9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #faf9fd;
+  
+  --color-primary: #742284;
+  --color-primary-hover: #5d1a6b;
+  --color-primary-light: #f0edf9;
+  --color-primary-glow: rgba(116, 34, 132, 0.18);
+  
+  --color-accent: #00d2c4;
+  --color-accent-dark: #00a89d;
+  --color-accent-light: #e6faf8;
+  
+  --color-success: #10b981;
+  --color-success-bg: #ecfdf5;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fffbeb;
+  --color-danger: #ef4444;
+  --color-danger-bg: #fef2f2;
+  --color-info: #3b82f6;
+  --color-info-bg: #eff6ff;
+
+  --text-primary: #1e132b;
+  --text-secondary: #645a73;
+  --text-muted: #968c9f;
+  --text-inverse: #ffffff;
+
+  --border-color: #e5e0f0;
+  --border-color-light: #f1ecf9;
+  --border-focus: #742284;
+
+  --sidebar-bg: #1c1328;
+  --sidebar-text: #e9e4f2;
+  --sidebar-active: #742284;
+  --sidebar-hover: #2a1e3b;
+  --sidebar-border: #2e2340;
+
+  --shadow-sm: 0 2px 6px rgba(116, 34, 132, 0.04);
+  --shadow-md: 0 4px 16px rgba(116, 34, 132, 0.08);
+  --shadow-lg: 0 10px 30px rgba(116, 34, 132, 0.12);
+  --shadow-glow: 0 0 20px rgba(116, 34, 132, 0.25);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ==========================================================================
+   MODO OSCURO (DARK MODE)
+   ========================================================================== */
+[data-theme="dark"] {
+  --bg-primary: #0b0814;
+  --bg-secondary: #130f21;
+  --bg-tertiary: #1b162d;
+  --bg-card: #161126;
+  --bg-card-hover: #1e1834;
+
+  --color-primary: #9b3ab0;
+  --color-primary-hover: #b34ec9;
+  --color-primary-light: #2c163a;
+  --color-primary-glow: rgba(155, 58, 176, 0.35);
+
+  --color-accent: #00d2c4;
+  --color-accent-dark: #00b8ab;
+  --color-accent-light: #062e2c;
+
+  --color-success: #34d399;
+  --color-success-bg: #062f22;
+  --color-warning: #fbbf24;
+  --color-warning-bg: #352304;
+  --color-danger: #f87171;
+  --color-danger-bg: #381216;
+  --color-info: #60a5fa;
+  --color-info-bg: #102444;
+
+  --text-primary: #f5f2fa;
+  --text-secondary: #aba1bd;
+  --text-muted: #726883;
+  --text-inverse: #0b0814;
+
+  --border-color: #2b233e;
+  --border-color-light: #201a30;
+  --border-focus: #9b3ab0;
+
+  --sidebar-bg: #0e0a1a;
+  --sidebar-text: #e2dcee;
+  --sidebar-active: #9b3ab0;
+  --sidebar-hover: #1b142d;
+  --sidebar-border: #231b34;
+
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 18px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 24px rgba(155, 58, 176, 0.4);
+}
+
+/* ==========================================================================
+   RESET & REGLAS GENERALES
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:hover {
+  opacity: 0.85;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* ==========================================================================
+   SISTEMA DE BOTONES
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: var(--transition);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #8b299e 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px var(--color-primary-glow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--color-primary-glow);
+  opacity: 0.96;
+  color: #ffffff;
+}
+
+.btn-accent {
+  background: linear-gradient(135deg, var(--color-accent) 0%, #00bcae 100%);
+  color: #0d2826;
+  box-shadow: 0 4px 14px rgba(0, 210, 196, 0.3);
+}
+
+.btn-accent:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 210, 196, 0.4);
+}
+
+.btn-outline {
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.btn-outline:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-lg {
+  padding: 0.95rem 1.6rem;
+  font-size: 1.05rem;
+  border-radius: var(--radius-lg);
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+}
+
+/* ==========================================================================
+   BOTÓN DE TEMA (☀️ / 🌙)
+   ========================================================================== */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  transition: var(--transition);
+}
+
+.theme-toggle-btn:hover {
+  transform: rotate(15deg) scale(1.05);
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ==========================================================================
+   TARJETAS Y SURFACES
+   ========================================================================== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   BADGES Y STATUS CHIPS
+   ========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.badge-success {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.badge-warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.badge-danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.badge-primary {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary-glow);
+}
+
+.badge-accent {
+  background: var(--color-accent-light);
+  color: var(--color-accent-dark);
+  border: 1px solid rgba(0, 210, 196, 0.3);
+}
+
+/* ==========================================================================
+   INPUTS Y FORMULARIOS
+   ========================================================================== */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.45rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.98rem;
+  transition: var(--transition);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+  background: var(--bg-card);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   MENSAJES FLASH / NOTIFICACIONES
+   ========================================================================== */
+.flash-container {
+  position: fixed;
+  top: 1.2rem;
+  right: 1.2rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 420px;
+}
+
+.flash-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.92rem;
+  font-weight: 500;
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.flash-success {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border-left: 4px solid var(--color-success);
+}
+
+.flash-error, .flash-danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-left: 4px solid var(--color-danger);
+}
+
+.flash-info {
+  background: var(--color-info-bg);
+  color: var(--color-info);
+  border-left: 4px solid var(--color-info);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

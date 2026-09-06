@@ -1,0 +1,250 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Dashboard Ejecutivo &mdash; yape.ia Administrador{% endblock %}
+{% block admin_title %}Dashboard General Antifraude{% endblock %}
+{% block admin_subtitle %}Monitoreo en tiempo real &mdash; {{ kpis.total_transacciones | default(0) | int }} transacciones analizadas{% endblock %}
+
+{% block admin_content %}
+
+<!-- Hero Banner -->
+<div class="dashboard-hero">
+  <div class="hero-content">
+    <h2><i class="fa-solid fa-shield-halved" style="color:var(--color-accent);margin-right:8px;"></i> Centro de Mando Antifraude</h2>
+    <p>Sistema Gradient Boosting activo &mdash; Análisis en tiempo real de transacciones Yape</p>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val">98.65%</div>
+      <div class="hero-stat-lbl">Accuracy ML</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">{{ kpis.porcentaje_fraude }}%</div>
+      <div class="hero-stat-lbl">Tasa Fraude</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">24/7</div>
+      <div class="hero-stat-lbl">Monitoreo</div>
+    </div>
+  </div>
+</div>
+
+<!-- Grid de KPIs -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-body">
+      <div class="kpi-title">Total Transacciones</div>
+      <div class="kpi-value">{{ "{:,}".format(kpis.total_transacciones) }}</div>
+      <div class="kpi-subtext">Histórico consolidado</div>
+      <div class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> Histórico completo</div>
+    </div>
+    <div class="kpi-icon primary"><i class="fa-solid fa-money-bill-transfer"></i></div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-body">
+      <div class="kpi-title">Transacciones Legítimas</div>
+      <div class="kpi-value" style="color:var(--color-success)">{{ "{:,}".format(kpis.transacciones_legitimas) }}</div>
+      <div class="kpi-subtext">93.56% del volumen total</div>
+      <div class="kpi-trend up"><i class="fa-solid fa-circle-check"></i> Transacciones seguras</div>
+    </div>
+    <div class="kpi-icon success"><i class="fa-solid fa-circle-check"></i></div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-body">
+      <div class="kpi-title">Fraudes Detectados</div>
+      <div class="kpi-value" style="color:var(--color-danger)">{{ "{:,}".format(kpis.fraudes_detectados) }}</div>
+      <div class="kpi-subtext">Bloqueados por modelo ML</div>
+      <div class="kpi-trend down"><i class="fa-solid fa-triangle-exclamation"></i> 6.44% del total</div>
+    </div>
+    <div class="kpi-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-body">
+      <div class="kpi-title">Tasa de Fraude</div>
+      <div class="kpi-value">{{ kpis.porcentaje_fraude }}%</div>
+      <div class="kpi-subtext">Índice general de riesgo</div>
+    </div>
+    <div class="kpi-icon accent"><i class="fa-solid fa-bolt-lightning"></i></div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-body">
+      <div class="kpi-title">Monto Promedio</div>
+      <div class="kpi-value">S/ {{ "%.0f"|format(kpis.monto_promedio) }}</div>
+      <div class="kpi-subtext">Media aritmética transaccional</div>
+    </div>
+    <div class="kpi-icon primary"><i class="fa-solid fa-coins"></i></div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-body">
+      <div class="kpi-title">Mediana de Monto</div>
+      <div class="kpi-value">S/ {{ "%.0f"|format(kpis.monto_mediana) }}</div>
+      <div class="kpi-subtext">Percentil 50 de operaciones</div>
+    </div>
+    <div class="kpi-icon success"><i class="fa-solid fa-scale-balanced"></i></div>
+  </div>
+</div>
+
+<!-- SECCIÓN 1 DE GRÁFICOS: Distribución General y Tipos de Operaciones -->
+<div class="charts-grid-2">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title"><i class="fa-solid fa-chart-pie" style="color:var(--color-primary);margin-right:6px"></i> Proporción de Fraude vs. Legítimas</h3>
+        <p class="chart-card-desc">Dataset completo &mdash; 50,000 registros clasificados</p>
+      </div>
+      <span class="badge badge-accent">Dataset 50k</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-distribucion-fraude"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title"><i class="fa-solid fa-chart-column" style="color:var(--color-accent);margin-right:6px"></i> Volumen por Tipo de Producto</h3>
+        <p class="chart-card-desc">Operaciones agrupadas por categoría transaccional</p>
+      </div>
+      <span class="badge badge-primary">5 Productos</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-productos-ops"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- SECCIÓN 2 DE GRÁFICOS (NUEVA): Tendencia Horaria 24h & Radar de Modelos ML -->
+<div class="charts-grid-2" style="margin-top:1.5rem">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title"><i class="fa-solid fa-clock" style="color:var(--color-accent);margin-right:6px"></i> Distribución Horaria y Alertas 24h</h3>
+        <p class="chart-card-desc">Curva de volumen diurno vs. picos nocturnos de fraude sospechoso</p>
+      </div>
+      <span class="badge badge-accent"><i class="fa-solid fa-bolt"></i> Tiempo Real</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-tendencia-horaria"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title"><i class="fa-solid fa-brain" style="color:var(--color-primary);margin-right:6px"></i> Radar de Rendimiento Modelos ML</h3>
+        <p class="chart-card-desc">Accuracy, Precision, Recall y F1-Score (Gradient Boosting vs Redes Neuronales)</p>
+      </div>
+      <span class="badge badge-success"><i class="fa-solid fa-award"></i> GB Top 1</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-radar-modelos"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- SECCIÓN 3 DE GRÁFICOS (NUEVA): Tasa de Fraude por Producto & Montos Promedio -->
+<div class="charts-grid-2" style="margin-top:1.5rem">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--color-danger);margin-right:6px"></i> Tasa de Fraude por Tipo de Producto</h3>
+        <p class="chart-card-desc">% de operaciones fraudulentas según el tipo de servicio</p>
+      </div>
+      <span class="badge badge-danger">Riesgo Relativo</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-pct-fraude-producto"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title"><i class="fa-solid fa-coins" style="color:var(--color-primary);margin-right:6px"></i> Monto Promedio vs. Mediana por Producto</h3>
+        <p class="chart-card-desc">Análisis de dispersión monetaria en soles peruanos (S/)</p>
+      </div>
+      <span class="badge badge-primary">Financiero</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-monto-producto"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla de Últimas Operaciones -->
+<div class="card" style="margin-top:1.5rem">
+  <div class="card-header">
+    <div>
+      <h3 class="card-title"><i class="fa-solid fa-mobile-screen-button" style="color:var(--color-accent);margin-right:8px"></i> Monitoreo en Tiempo Real (Últimas Transacciones)</h3>
+      <p style="font-size:.85rem;color:var(--text-muted);margin-top:.25rem">
+        Transacciones ingresadas por usuarios y evaluadas por Gradient Boosting ML.
+      </p>
+    </div>
+    <a href="{{ url_for('admin_transacciones') }}" class="btn btn-outline btn-sm">Ver todas <i class="fa-solid fa-arrow-right" style="margin-left:4px"></i></a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha y Hora</th>
+          <th>Usuario</th>
+          <th>Producto</th>
+          <th>Monto</th>
+          <th>Prob. Fraude</th>
+          <th>Resultado ML</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tx in transacciones_recientes %}
+        <tr>
+          <td><code style="font-size:.82rem;color:var(--text-muted)">#{{ tx.id_transaccion }}</code></td>
+          <td>{{ tx.fecha_hora[:16] }}</td>
+          <td>
+            <div class="user-cell">
+              <div class="user-avatar-sm">{{ tx.nombre[0] | upper }}</div>
+              <div class="user-cell-info">
+                <strong>{{ tx.nombre }} {{ tx.apellido }}</strong>
+                <small>{{ tx.correo }}</small>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge badge-primary">{{ tx.producto }}</span></td>
+          <td><strong>S/ {{ "%.2f"|format(tx.monto) }}</strong></td>
+          <td>
+            <span class="fraud-pct {% if (tx.probabilidad_fraude or 0) > 50 %}high{% else %}low{% endif %}">
+              {{ "%.1f"|format(tx.probabilidad_fraude or 0.0) }}%
+            </span>
+          </td>
+          <td>
+            <span class="badge {% if tx.resultado == 'NORMAL' %}badge-success{% else %}badge-danger{% endif %}">
+              {% if tx.resultado == 'NORMAL' %}
+                <i class="fa-solid fa-check" style="margin-right:3px"></i> NORMAL
+              {% else %}
+                <i class="fa-solid fa-triangle-exclamation" style="margin-right:3px"></i> SOSPECHOSA
+              {% endif %}
+            </span>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7">
+            <div class="empty-state">
+              <div class="empty-state-icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
+              <strong>Sin transacciones registradas aún</strong>
+              <p>Las transacciones ingresadas por los usuarios aparecerán aquí.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

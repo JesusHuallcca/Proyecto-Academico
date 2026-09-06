@@ -1,0 +1,195 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Perfil de Administrador &mdash; yape.ia{% endblock %}
+{% block admin_title %}Perfil del Administrador{% endblock %}
+{% block admin_subtitle %}Gestión de credenciales, seguridad y privilegios de la Consola Antifraude BCP SOC{% endblock %}
+
+{% block admin_content %}
+
+<!-- Mensajes Flash -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div style="margin-bottom: 1.5rem;">
+      {% for category, message in messages %}
+        <div style="padding: 1rem 1.25rem; border-radius: 14px; margin-bottom: 0.75rem; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.75rem;
+          {% if category == 'success' %}
+            background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3);
+          {% elif category == 'danger' %}
+            background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3);
+          {% else %}
+            background: rgba(0, 210, 196, 0.15); color: #00D2C4; border: 1px solid rgba(0, 210, 196, 0.3);
+          {% endif %}
+        ">
+          <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- Hero Banner del Administrador -->
+<div class="dashboard-hero" style="padding: 2.2rem 2.5rem; margin-bottom: 2rem;">
+  <div style="display: flex; align-items: center; gap: 1.8rem; z-index: 2; flex-wrap: wrap;">
+    <div style="width: 80px; height: 80px; border-radius: 24px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); color: #FFFFFF; font-size: 2.2rem; font-weight: 900; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(116, 34, 132, 0.4); border: 2px solid rgba(255, 255, 255, 0.2);">
+      {{ (perfil.nombre or 'A')[0] | upper }}
+    </div>
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+        <h2 style="font-size: 1.75rem; font-weight: 800; color: #FFFFFF; margin: 0;">{{ perfil.nombre }} {{ perfil.apellido }}</h2>
+        <span class="badge badge-accent" style="font-size: 0.75rem; padding: 0.3rem 0.75rem;"><i class="fa-solid fa-shield-halved" style="margin-right: 5px;"></i> SUPER ADMINISTRADOR</span>
+        <span class="badge badge-primary" style="font-size: 0.75rem; padding: 0.3rem 0.75rem;">SOC ACTIVO</span>
+      </div>
+      <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.95rem; margin: 0 0 0.5rem 0;">
+        <i class="fa-solid fa-envelope" style="margin-right: 6px; color: var(--color-accent);"></i> {{ perfil.correo }}
+      </p>
+      <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.65); display: flex; gap: 1.5rem; flex-wrap: wrap;">
+        <span><i class="fa-solid fa-fingerprint" style="margin-right: 4px;"></i> ID Operador: #{{ perfil.id_usuario }}</span>
+        <span><i class="fa-solid fa-calendar" style="margin-right: 4px;"></i> Registrado: {{ perfil.fecha_registro[:10] if perfil.fecha_registro else '2026-09-04' }}</span>
+        <span><i class="fa-solid fa-network-wired" style="margin-right: 4px;"></i> Acceso: Consola Local SOC BCP</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="z-index: 2; display: flex; gap: 1rem; align-items: center; margin-top: 1rem;">
+    <a href="/admin/logout" class="btn" style="background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.75rem 1.4rem; font-weight: 700; border-radius: 12px; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.35)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.2)'">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      Cerrar Sesión
+    </a>
+  </div>
+</div>
+
+<!-- Grid Principal de Perfil -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.8rem;">
+
+  <!-- Tarjeta 1: Editar Datos Personales y Clave -->
+  <div class="chart-card" style="padding: 1.8rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+      <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(116, 34, 132, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+        <i class="fa-solid fa-user-gear"></i>
+      </div>
+      <div>
+        <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">Editar Información de Acceso</h3>
+        <span style="font-size: 0.8rem; color: var(--text-secondary);">Actualiza tu nombre visible o tu contraseña de administrador</span>
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin_perfil') }}">
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.4rem;">
+          Nombre
+        </label>
+        <input type="text" name="nombre" value="{{ perfil.nombre }}" required style="width: 100%; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 0.95rem; font-weight: 600; outline: none; transition: 0.2s;">
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.4rem;">
+          Apellido
+        </label>
+        <input type="text" name="apellido" value="{{ perfil.apellido }}" required style="width: 100%; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 0.95rem; font-weight: 600; outline: none; transition: 0.2s;">
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.4rem;">
+          Correo Electrónico Oficial
+        </label>
+        <input type="email" name="correo" value="{{ perfil.correo }}" required style="width: 100%; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 0.95rem; font-weight: 600; outline: none; transition: 0.2s;">
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.4rem;">
+          Nueva Contraseña <span style="font-weight: 400; font-size: 0.75rem; color: var(--text-muted);">(dejar en blanco para mantener la actual)</span>
+        </label>
+        <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 0.95rem; font-weight: 600; outline: none; transition: 0.2s;">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; border-radius: 12px; font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; border: none; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: white; box-shadow: 0 4px 15px rgba(116, 34, 132, 0.3);">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Guardar Cambios
+      </button>
+    </form>
+  </div>
+
+  <!-- Tarjeta 2: Privilegios y Seguridad SOC -->
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    
+    <!-- Privilegios -->
+    <div class="chart-card" style="padding: 1.8rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+        <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(0, 210, 196, 0.15); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">Privilegios de Seguridad</h3>
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">Permisos habilitados para esta cuenta en la consola</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.9rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; border-radius: 10px; background: var(--bg-tertiary);">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <i class="fa-solid fa-circle-check" style="color: #10B981;"></i>
+            <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Gestión del Modelo Gradient Boosting</span>
+          </div>
+          <span class="badge badge-accent">Total</span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; border-radius: 10px; background: var(--bg-tertiary);">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <i class="fa-solid fa-circle-check" style="color: #10B981;"></i>
+            <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Auditoría de Transacciones en Vivo</span>
+          </div>
+          <span class="badge badge-accent">Tiempo Real</span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; border-radius: 10px; background: var(--bg-tertiary);">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <i class="fa-solid fa-circle-check" style="color: #10B981;"></i>
+            <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Bloqueo y Desbloqueo de Cuentas</span>
+          </div>
+          <span class="badge badge-accent">Inmediato</span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; border-radius: 10px; background: var(--bg-tertiary);">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <i class="fa-solid fa-circle-check" style="color: #10B981;"></i>
+            <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Resolución de Alertas Preventivas y Críticas</span>
+          </div>
+          <span class="badge badge-accent">Nivel 1</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado de la Sesión -->
+    <div class="chart-card" style="padding: 1.8rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Estado de la Sesión</span>
+        <span class="live-indicator"><span class="live-dot"></span> Autenticado</span>
+      </div>
+
+      <div style="background: var(--bg-tertiary); border-radius: 12px; padding: 1rem; margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem;">
+          <span style="color: var(--text-secondary);">Rol de Sesión:</span>
+          <strong style="color: var(--color-accent);">ADMIN (Centro de Ciberseguridad)</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem;">
+          <span style="color: var(--text-secondary);">Alertas Pendientes en Sistema:</span>
+          <strong style="color: #F59E0B;">{{ alertas_pendientes_count or 0 }} pendientes</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+          <span style="color: var(--text-secondary);">Aislamiento de Sesión:</span>
+          <strong style="color: #10B981;">Multisesión Activa (Sin colisión con Yape)</strong>
+        </div>
+      </div>
+
+      <a href="/admin/logout" style="width: 100%; padding: 0.85rem; border-radius: 12px; font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.35); transition: 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        Cerrar Sesión de Administrador
+      </a>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

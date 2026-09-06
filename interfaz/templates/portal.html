@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCP Yape | Plataforma Antifraude Inteligente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-yape: #742284;
+            --primary-yape-light: #9B30B5;
+            --accent-cyan: #00D2C4;
+            --bg-dark: #0B0F19;
+            --card-bg: rgba(22, 27, 46, 0.75);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(116, 34, 132, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(0, 210, 196, 0.15) 0%, transparent 45%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2.5rem 1.5rem;
+        }
+
+        header {
+            text-align: center;
+            max-width: 780px;
+            margin-bottom: 2.5rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .badge-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            background: rgba(0, 210, 196, 0.12);
+            border: 1px solid rgba(0, 210, 196, 0.3);
+            color: var(--accent-cyan);
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .dot-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-cyan);
+            animation: pulse 1.8s infinite;
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 5vw, 3.4rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #FFFFFF 30%, #D8B4E2 70%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.lead {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 460px));
+            gap: 2rem;
+            width: 100%;
+            max-width: 980px;
+            margin-bottom: 2.5rem;
+            perspective: 1000px;
+        }
+
+        .portal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        }
+
+        .portal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            transition: 0.3s;
+        }
+
+        .portal-card.card-yape:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(155, 48, 181, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(116, 34, 132, 0.4);
+        }
+        .portal-card.card-yape::before {
+            background: linear-gradient(90deg, #742284, #00D2C4);
+        }
+
+        .portal-card.card-admin:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(0, 210, 196, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 210, 196, 0.25);
+        }
+        .portal-card.card-admin::before {
+            background: linear-gradient(90deg, #00D2C4, #3B82F6);
+        }
+
+        .card-icon-wrapper {
+            width: 68px;
+            height: 68px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .card-yape .card-icon-wrapper {
+            background: linear-gradient(135deg, #742284, #9B30B5);
+            box-shadow: 0 10px 20px rgba(116, 34, 132, 0.4);
+            color: white;
+        }
+
+        .card-admin .card-icon-wrapper {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            border: 1px solid rgba(0, 210, 196, 0.4);
+            color: var(--accent-cyan);
+            box-shadow: 0 10px 20px rgba(0, 210, 196, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.98rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .card-features li {
+            font-size: 0.88rem;
+            color: #CBD5E1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-features li span {
+            color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .card-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .card-yape .card-btn {
+            background: linear-gradient(135deg, #742284, #9B30B5);
+            color: white;
+        }
+        .card-yape .card-btn:hover {
+            filter: brightness(1.15);
+        }
+
+        .card-admin .card-btn {
+            background: rgba(0, 210, 196, 0.15);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+        .card-admin .card-btn:hover {
+            background: var(--accent-cyan);
+            color: #0B0F19;
+        }
+
+        .system-bar {
+            width: 100%;
+            max-width: 980px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 1rem 1.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 1.5rem;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .system-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .system-item strong {
+            color: white;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 1.5rem 1rem; }
+            .portal-card { padding: 1.75rem 1.25rem; }
+            .system-bar { flex-direction: column; gap: 0.75rem; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="badge-live">
+            <span class="dot-pulse"></span>
+            Sistema Antifraude BCP Activo
+        </div>
+        <h1>Detección de Fraude en Tiempo Real</h1>
+        <p class="lead">
+            Ecosistema interconectado con Inteligencia Artificial. Realiza transferencias en Yape con evaluación instantánea y monitorea eventos sospechosos desde la consola de control.
+        </p>
+    </header>
+
+    <main class="cards-container">
+        <!-- Tarjeta Usuario Yape -->
+        <a href="/usuario" class="portal-card card-yape">
+            <div>
+                <div class="card-icon-wrapper">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                    </svg>
+                </div>
+                <h2 class="card-title">App de Usuario (Yape)</h2>
+                <p class="card-desc">
+                    Experiencia visual de la billetera digital Yape para enviar dinero, consultar saldo disponible, revisar historial y recibir alertas de seguridad en vivo.
+                </p>
+                <ul class="card-features">
+                    <li><span>✓</span> Envío de dinero ("Yapear") con feedback inmediato</li>
+                    <li><span>✓</span> Evaluación antifraude invisible por transacción</li>
+                    <li><span>✓</span> Comprobante digital y bloqueo preventivo</li>
+                    <li><span>✓</span> Simulador de conductas de riesgo y habituales</li>
+                </ul>
+            </div>
+            <div class="card-btn">
+                <span>Ingresar a mi Yape</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+
+        <!-- Tarjeta Administrador Antifraude -->
+        <a href="/admin" class="portal-card card-admin">
+            <div>
+                <div class="card-icon-wrapper">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <h2 class="card-title">Dashboard Administrador</h2>
+                <p class="card-desc">
+                    Centro de comando de analistas de ciberseguridad. Monitoreo en vivo, métricas de riesgo, gráficos analíticos y gestión de alertas de Machine Learning.
+                </p>
+                <ul class="card-features">
+                    <li><span>✓</span> Gráficos interactivos de tendencias y riesgos</li>
+                    <li><span>✓</span> Feeds de transacciones en tiempo real</li>
+                    <li><span>✓</span> Radiografía forense explicativa de la IA</li>
+                    <li><span>✓</span> Acciones: Aprobar, Confirmar fraude o Bloquear</li>
+                </ul>
+            </div>
+            <div class="card-btn">
+                <span>Abrir Centro Antifraude</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+    </main>
+
+    <footer class="system-bar">
+        <div class="system-item">
+            <span>⚡ Modelo ML:</span>
+            <strong>Gradient Boosting (98.65% Acc)</strong>
+        </div>
+        <div class="system-item">
+            <span>💾 Base de Datos:</span>
+            <strong>SQLite fraude_yape.db Sincronizada</strong>
+        </div>
+        <div class="system-item">
+            <span>🛡️ Estado:</span>
+            <strong style="color: var(--accent-cyan);">Protección Activa 24/7</strong>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Usuarios - Antifraude Yape{% endblock %}
+{% block breadcrumb %}Usuarios{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header-title">Gestión de Usuarios y Accesos</h1>
+    <p class="page-header-desc">Control de cuentas de clientes, operadores del sistema y privilegios de administración.</p>
+  </div>
+  <div>
+    <button type="button" class="btn btn-cyan" data-modal-target="modalNuevoUsuario">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Nuevo Usuario
+    </button>
+  </div>
+</div>
+
+<!-- TABLA DE USUARIOS REGISTRADOS -->
+<div class="panel-card">
+  <div class="table-responsive">
+    <table class="data-table table-cards-mobile">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre y Apellido</th>
+          <th>Usuario / Correo</th>
+          <th>Rol de Sistema</th>
+          <th>Estado</th>
+          <th>Operaciones</th>
+          <th>Fecha Registro</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in usuarios %}
+          <tr>
+            <td data-label="ID">#{{ u.id_usuario }}</td>
+            <td data-label="Nombre">
+              <strong style="color: #FFF;">{{ u.nombre }} {{ u.apellido }}</strong>
+            </td>
+            <td data-label="Correo">{{ u.correo }}</td>
+            <td data-label="Rol">
+              {% if u.tipo_usuario == 'ADMIN' %}
+                <span class="badge badge-primary" style="border-color: var(--yape-primary);">🛡️ ADMINISTRADOR</span>
+              {% else %}
+                <span class="badge badge-cyan">👤 USUARIO</span>
+              {% endif %}
+            </td>
+            <td data-label="Estado">
+              {% if u.estado == 'ACTIVO' %}
+                <span class="badge badge-success">ACTIVO</span>
+              {% else %}
+                <span class="badge badge-danger">INACTIVO</span>
+              {% endif %}
+            </td>
+            <td data-label="Operaciones" style="font-family: var(--font-heading); font-weight: 700;">
+              {{ u.total_transacciones or 0 }}
+            </td>
+            <td data-label="Fecha Registro">{{ u.fecha_registro[:10] if u.fecha_registro else '-' }}</td>
+            <td data-label="Acción">
+              {% if u.id_usuario != session.get('id_usuario') %}
+                <form action="{{ url_for('admin.admin_cambiar_estado_usuario') }}" method="POST" style="display: inline;">
+                  <input type="hidden" name="id_usuario" value="{{ u.id_usuario }}">
+                  {% if u.estado == 'ACTIVO' %}
+                    <button type="submit" name="nuevo_estado" value="INACTIVO" class="btn btn-secondary btn-sm" style="color: var(--color-danger);" title="Desactivar usuario">
+                      Desactivar
+                    </button>
+                  {% else %}
+                    <button type="submit" name="nuevo_estado" value="ACTIVO" class="btn btn-secondary btn-sm" style="color: var(--color-safe);" title="Activar usuario">
+                      Activar
+                    </button>
+                  {% endif %}
+                </form>
+              {% else %}
+                <span style="font-size: 0.75rem; color: var(--yape-cyan); font-weight: 600;">(Tu cuenta)</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL PARA CREAR NUEVO USUARIO -->
+<div class="modal-overlay" id="modalNuevoUsuario">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h3 class="modal-title">Registrar Nuevo Usuario</h3>
+      <button type="button" class="modal-close" data-modal-close>&times;</button>
+    </div>
+    <form action="{{ url_for('admin.admin_crear_usuario') }}" method="POST">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="nombre">Nombre</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ej: Carlos" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="apellido">Apellido</label>
+            <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ej: Quispe" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="correo">Correo Electrónico</label>
+          <input type="email" class="form-control" id="correo" name="correo" placeholder="ejemplo@bcp.com" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="password">Contraseña (Se guardará hasheada)</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Mínimo 6 caracteres" minlength="6" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="tipo_usuario">Rol de Sistema</label>
+            <select class="form-control" id="tipo_usuario" name="tipo_usuario" required>
+              <option value="USUARIO" selected>Usuario Normal</option>
+              <option value="ADMIN">Administrador</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-modal-close>Cancelar</button>
+        <button type="submit" class="btn btn-cyan">Crear Usuario</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

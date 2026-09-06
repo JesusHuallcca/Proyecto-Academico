@@ -1,0 +1,39 @@
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Bytecode y caches de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+
+# Archivos con credenciales sensibles (Gmail App Password, tokens, claves privadas)
+interfaz/config_correo.json
+config_correo.json
+*.env
+.env.*
+
+# Logs y bases de datos temporales
+*.log
+*.sqlite3-journal
+*.db-wal
+*.db-shm
+
+# Archivos del sistema y del editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de pruebas temporales / scratch
+scratch/
+temp/
+tmp/

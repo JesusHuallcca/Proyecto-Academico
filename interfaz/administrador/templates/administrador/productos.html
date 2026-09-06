@@ -1,0 +1,83 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Análisis por Producto — yape.ia Administrador{% endblock %}
+{% block admin_title %}Comparación Analítica de Productos{% endblock %}
+
+{% block admin_content %}
+<!-- Gráficos de Comparación de Productos -->
+<div class="charts-grid-2">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <h3 class="chart-card-title">Monto Promedio vs. Mediana por Producto</h3>
+      <span class="badge badge-primary">Soles (PEN)</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-monto-producto"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <h3 class="chart-card-title">Tasa de Fraude Detectada por Producto (%)</h3>
+      <span class="badge badge-danger">Riesgo Relativo</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-pct-fraude-producto"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla Detallada por Producto -->
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h3 class="card-title">Métricas Consolidadas por Producto Financiero</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">
+        Datos extraídos de <code>resultados/analisis_por_producto.csv</code>.
+      </p>
+    </div>
+    <span class="badge badge-accent">5 Productos Analizados</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad de Operaciones</th>
+          <th>Monto Promedio (S/)</th>
+          <th>Mediana Monto (S/)</th>
+          <th>Fraudes Confirmados</th>
+          <th>Tasa de Fraude (%)</th>
+          <th>Nivel de Riesgo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in productos %}
+        <tr>
+          <td><strong>{{ p.producto }}</strong></td>
+          <td>{{ "{:,}".format(p.operaciones|int) }}</td>
+          <td>S/ {{ "%.2f"|format(p.monto_promedio|float) }}</td>
+          <td>S/ {{ "%.2f"|format(p.monto_mediana|float) }}</td>
+          <td><strong style="color: var(--color-danger);">{{ "{:,}".format(p.fraudes|int) }}</strong></td>
+          <td>
+            <span style="font-weight: 800; color: var(--color-primary);">
+              {{ "%.2f"|format(p.porcentaje_fraude|float) }}%
+            </span>
+          </td>
+          <td>
+            {% if (p.porcentaje_fraude|float) > 6.6 %}
+              <span class="badge badge-danger">ALTO</span>
+            {% elif (p.porcentaje_fraude|float) > 6.3 %}
+              <span class="badge badge-warning">MEDIO</span>
+            {% else %}
+              <span class="badge badge-success">CONTROLADO</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

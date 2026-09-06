@@ -1,0 +1,100 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Reportes Ejecutivos — yape.ia Administrador{% endblock %}
+{% block admin_title %}Reportes Ejecutivos de Seguridad Antifraude{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; justify-content: flex-end; margin-bottom: 1.2rem;">
+  <button type="button" class="btn btn-primary" onclick="window.print()" id="btn-imprimir-reporte">
+    <i class="fa-solid fa-print" style="margin-right:6px"></i> Imprimir / Guardar como PDF
+  </button>
+</div>
+
+<div class="card" style="margin-bottom: 1.5rem; padding: 2rem;">
+  <div style="border-bottom: 2px solid var(--border-color); padding-bottom: 1.2rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--color-primary);">
+        yape<span style="color: var(--color-accent);">.ia</span>
+      </div>
+      <h2 style="font-size: 1.2rem; font-weight: 700; margin-top: 0.2rem;">Informe Ejecutivo de Mitigación de Fraude</h2>
+    </div>
+    <div style="text-align: right; font-size: 0.85rem; color: var(--text-muted);">
+      Fecha de emisión: <strong>2026-09-05</strong><br>
+      Estado del Sistema: <strong style="color: var(--color-success);">Activo y Operacional</strong>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 1.8rem;">
+    <h3 style="font-size: 1.05rem; margin-bottom: 0.6rem; color: var(--text-primary);">1. Resumen de Hallazgos</h3>
+    <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
+      Sobre un universo de <strong>50,000 transacciones</strong> auditadas en el ecosistema Yape, el sistema antifraude identificó una tasa basal de fraude del <strong>6.44%</strong> (3,222 transacciones anómalas). El monto transaccional promedio se situó en <strong>S/ 403.39</strong> con una mediana de <strong>S/ 246.68</strong>.
+    </p>
+  </div>
+
+  <div style="margin-bottom: 1.8rem;">
+    <h3 style="font-size: 1.05rem; margin-bottom: 0.6rem; color: var(--text-primary);">2. Análisis de Vulnerabilidad por Producto</h3>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Transacciones Totales</th>
+            <th>Fraudes</th>
+            <th>Tasa de Fraude</th>
+            <th>Nivel de Severidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Compra</strong></td>
+            <td>9,945</td>
+            <td>666</td>
+            <td><strong>6.70%</strong></td>
+            <td><span class="badge badge-danger">Mayor Riesgo</span></td>
+          </tr>
+          <tr>
+            <td><strong>Recarga</strong></td>
+            <td>5,024</td>
+            <td>336</td>
+            <td><strong>6.69%</strong></td>
+            <td><span class="badge badge-danger">Alto Riesgo</span></td>
+          </tr>
+          <tr>
+            <td><strong>Pago de servicios</strong></td>
+            <td>7,491</td>
+            <td>485</td>
+            <td><strong>6.47%</strong></td>
+            <td><span class="badge badge-warning">Riesgo Medio</span></td>
+          </tr>
+          <tr>
+            <td><strong>Yape</strong></td>
+            <td>20,083</td>
+            <td>1,272</td>
+            <td><strong>6.33%</strong></td>
+            <td><span class="badge badge-primary">Mayor Volumen</span></td>
+          </tr>
+          <tr>
+            <td><strong>Transferencia</strong></td>
+            <td>7,457</td>
+            <td>463</td>
+            <td><strong>6.21%</strong></td>
+            <td><span class="badge badge-success">Bajo Riesgo</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 1.8rem;">
+    <h3 style="font-size: 1.05rem; margin-bottom: 0.6rem; color: var(--text-primary);">3. Desempeño del Modelo en Producción</h3>
+    <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
+      El algoritmo <strong>Gradient Boosting</strong> mantiene una tasa de <strong>Accuracy del 98.65%</strong> y una <strong>Precision del 98.29%</strong>, registrando únicamente 9 falsos positivos frente a 9,347 transacciones legítimas. Esto asegura la mínima fricción operativa en los pagos cotidianos de los usuarios mientras detecta el 80.43% de los intentos fraudulentos antes de su liquidación.
+    </p>
+  </div>
+
+  <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+    <span>Sistema Antifraude yape.ia — BCP</span>
+    <span>Documento de Confidencialidad Nivel 2</span>
+  </div>
+</div>
+{% endblock %}

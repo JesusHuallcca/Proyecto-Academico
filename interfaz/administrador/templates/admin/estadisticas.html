@@ -1,0 +1,228 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Estadísticas Descriptivas - Antifraude Yape{% endblock %}
+{% block breadcrumb %}Estadísticas Descriptivas{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header-title">Estadísticas Descriptivas del Proyecto</h1>
+    <p class="page-header-desc">Análisis cuantitativo de las variables clave del dataset oficial (50,000 transacciones analizadas).</p>
+  </div>
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <label for="filtroVariable" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Filtrar Variable:</label>
+      <select id="filtroVariable" class="form-control" style="min-height: 40px; min-width: 220px;">
+        <option value="TODAS">-- Ver Todas las Variables --</option>
+        {% for s in stats %}
+          <option value="{{ s.variable }}" {% if s.variable == 'monto' %}selected{% endif %}>{{ s.variable }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- TARJETAS DE LA VARIABLE DESTACADA / SELECCIONADA -->
+<div class="panel-card" style="margin-bottom: 2rem;">
+  <div class="panel-card-header">
+    <div>
+      <h2 class="panel-title" id="tituloVariable">Variable: monto (Monto de la Operación en Soles)</h2>
+      <span class="panel-subtitle">Métricas de dispersión y tendencia central</span>
+    </div>
+    <span class="badge badge-cyan" id="conteoRegistros">50,000 Registros</span>
+  </div>
+
+  <div class="kpi-grid" style="margin-bottom: 0;">
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-title">Promedio (Media)</span></div>
+      <div class="kpi-value" id="valPromedio">S/ 403.39</div>
+      <div class="kpi-meta">Media aritmética</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-title">Mediana (50%)</span></div>
+      <div class="kpi-value" id="valMediana" style="color: var(--yape-cyan);">S/ 246.68</div>
+      <div class="kpi-meta">Punto medio de distribución</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-title">Mínimo</span></div>
+      <div class="kpi-value" id="valMin" style="color: var(--color-safe);">S/ 5.00</div>
+      <div class="kpi-meta">Límite inferior</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-title">Máximo</span></div>
+      <div class="kpi-value" id="valMax" style="color: var(--color-danger);">S/ 5,000.00</div>
+      <div class="kpi-meta">Límite superior</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-title">Desviación Estándar</span></div>
+      <div class="kpi-value" id="valStd">494.97</div>
+      <div class="kpi-meta">Variabilidad &sigma;</div>
+    </div>
+  </div>
+</div>
+
+<!-- GRÁFICO COMPARATIVO DE RANGOS / CUARTILES -->
+<div class="panel-grid">
+  <div class="panel-col-12">
+    <div class="panel-card">
+      <div class="panel-card-header">
+        <h2 class="panel-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          Comparativa de Distribución: Media vs Mediana de Variables Clave
+        </h2>
+      </div>
+      <div class="chart-container">
+        <canvas id="chartVariablesClave"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABLA COMPLETA CON TODAS LAS VARIABLES DE ESTADISTICAS_DESCRIPTIVAS.CSV -->
+<div class="panel-card">
+  <div class="panel-card-header">
+    <h2 class="panel-title">Tabla Completa de Estadísticas Descriptivas (Resultados Oficiales)</h2>
+    <span class="badge badge-primary">resultados/estadisticas_descriptivas.csv</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table" id="tablaStats">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Total Registros</th>
+          <th>Promedio (Media)</th>
+          <th>Mediana (50%)</th>
+          <th>Mínimo</th>
+          <th>Máximo</th>
+          <th>Desv. Estándar</th>
+          <th>Q1 (25%)</th>
+          <th>Q3 (75%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in stats %}
+          <tr data-variable="{{ s.variable }}">
+            <td><strong>{{ s.variable }}</strong></td>
+            <td>{{ "{:,}".format(s.count) }}</td>
+            <td style="font-weight: 700; color: #FFF;">{{ s.mean }}</td>
+            <td style="font-weight: 700; color: var(--yape-cyan);">{{ s.median }}</td>
+            <td style="color: var(--color-safe);">{{ s.min }}</td>
+            <td style="color: var(--color-danger);">{{ s.max }}</td>
+            <td>{{ s.std }}</td>
+            <td>{{ s.q25 }}</td>
+            <td>{{ s.q75 }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const statsData = {{ stats|tojson }};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const selectVar = document.getElementById('filtroVariable');
+  const tituloVar = document.getElementById('tituloVariable');
+  const valPromedio = document.getElementById('valPromedio');
+  const valMediana = document.getElementById('valMediana');
+  const valMin = document.getElementById('valMin');
+  const valMax = document.getElementById('valMax');
+  const valStd = document.getElementById('valStd');
+  const filas = document.querySelectorAll('#tablaStats tbody tr');
+
+  function actualizarFicha(nombreVar) {
+    const item = statsData.find(s => s.variable === nombreVar);
+    if (!item) return;
+
+    tituloVar.textContent = `Variable: ${item.variable}`;
+    valPromedio.textContent = item.mean;
+    valMediana.textContent = item.median;
+    valMin.textContent = item.min;
+    valMax.textContent = item.max;
+    valStd.textContent = item.std;
+
+    // Resaltar o filtrar filas
+    filas.forEach(tr => {
+      if (nombreVar === 'TODAS' || tr.getAttribute('data-variable') === nombreVar) {
+        tr.style.display = '';
+        if (tr.getAttribute('data-variable') === nombreVar) {
+          tr.style.backgroundColor = 'rgba(0, 210, 181, 0.1)';
+        } else {
+          tr.style.backgroundColor = '';
+        }
+      } else {
+        tr.style.display = '';
+        tr.style.backgroundColor = '';
+      }
+    });
+  }
+
+  selectVar.addEventListener('change', (e) => {
+    actualizarFicha(e.target.value);
+  });
+
+  // Inicializar con 'monto'
+  actualizarFicha('monto');
+
+  // Gráfico de Variables Clave (Monto, Saldos, Operaciones, Distancia)
+  const ctxVars = document.getElementById('chartVariablesClave');
+  if (ctxVars) {
+    const varsFiltro = ['monto', 'saldo_anterior', 'saldo_posterior', 'monto_promedio_usuario', 'cantidad_operaciones_dia', 'distancia_operaciones'];
+    const datosFiltrados = statsData.filter(s => varsFiltro.includes(s.variable));
+
+    new Chart(ctxVars, {
+      type: 'bar',
+      data: {
+        labels: datosFiltrados.map(s => s.variable),
+        datasets: [
+          {
+            label: 'Promedio (Media)',
+            data: datosFiltrados.map(s => s.mean),
+            backgroundColor: '#732282',
+            borderRadius: 6
+          },
+          {
+            label: 'Mediana (Percentil 50)',
+            data: datosFiltrados.map(s => s.median),
+            backgroundColor: '#00D2B5',
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { color: '#94A3B8' }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#94A3B8' }
+          },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#94A3B8' }
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

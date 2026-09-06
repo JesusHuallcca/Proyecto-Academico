@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% block admin_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+  <!-- Overlay para cierre en moviles/tablets -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Sidebar Lateral Premium -->
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        yape<span class="ia-badge">.ia</span>
+      </div>
+      <div class="sidebar-admin-tag">ADMIN</div>
+    </div>
+
+    <!-- Mini-Perfil -->
+    <a href="{{ url_for('admin_perfil') }}" class="sidebar-profile" style="text-decoration: none; color: inherit;" title="Ver mi Perfil de Administrador">
+      <div class="sidebar-profile-avatar">
+        {{ (admin_nombre or 'A')[0] | upper }}
+      </div>
+      <div class="sidebar-profile-info">
+        <div class="sidebar-profile-name">{{ admin_nombre or 'Administrador' }}</div>
+        <div class="sidebar-profile-role">Consola Antifraude SOC</div>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Monitoreo Principal</div>
+
+      <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" id="link-dashboard">
+        <span class="link-icon"><i class="fa-solid fa-chart-line"></i></span>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="{{ url_for('admin_transacciones') }}" class="sidebar-link {% if request.endpoint == 'admin_transacciones' %}active{% endif %}" id="link-transacciones">
+        <span class="link-icon"><i class="fa-solid fa-money-bill-transfer"></i></span>
+        <span>Transacciones</span>
+      </a>
+
+      <a href="{{ url_for('admin_usuarios') }}" class="sidebar-link {% if request.endpoint == 'admin_usuarios' %}active{% endif %}" id="link-usuarios">
+        <span class="link-icon"><i class="fa-solid fa-users-gear"></i></span>
+        <span>Usuarios</span>
+      </a>
+
+      <div class="nav-section-title">Inteligencia & Modelos</div>
+
+      <a href="{{ url_for('admin_estadisticas') }}" class="sidebar-link {% if request.endpoint == 'admin_estadisticas' %}active{% endif %}" id="link-estadisticas">
+        <span class="link-icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <span>Estadísticas</span>
+      </a>
+
+      <a href="{{ url_for('admin_productos') }}" class="sidebar-link {% if request.endpoint == 'admin_productos' %}active{% endif %}" id="link-productos">
+        <span class="link-icon"><i class="fa-solid fa-layer-group"></i></span>
+        <span>Productos</span>
+      </a>
+
+      <a href="{{ url_for('admin_modelos') }}" class="sidebar-link {% if request.endpoint == 'admin_modelos' %}active{% endif %}" id="link-modelos">
+        <span class="link-icon"><i class="fa-solid fa-brain"></i></span>
+        <span>Modelos ML</span>
+      </a>
+
+      <a href="{{ url_for('admin_metricas') }}" class="sidebar-link {% if request.endpoint == 'admin_metricas' %}active{% endif %}" id="link-metricas">
+        <span class="link-icon"><i class="fa-solid fa-sliders"></i></span>
+        <span>Métricas</span>
+      </a>
+
+      <a href="{{ url_for('admin_matrices') }}" class="sidebar-link {% if request.endpoint == 'admin_matrices' %}active{% endif %}" id="link-matrices">
+        <span class="link-icon"><i class="fa-solid fa-table-cells-large"></i></span>
+        <span>Matriz de Confusión</span>
+      </a>
+
+      <div class="nav-section-title">Auditoría & Cuenta</div>
+
+      <a href="{{ url_for('admin_reportes') }}" class="sidebar-link {% if request.endpoint == 'admin_reportes' %}active{% endif %}" id="link-reportes">
+        <span class="link-icon"><i class="fa-solid fa-file-shield"></i></span>
+        <span>Reportes</span>
+      </a>
+
+      <a href="{{ url_for('admin_perfil') }}" class="sidebar-link {% if request.endpoint == 'admin_perfil' or active_page == 'admin_perfil' %}active{% endif %}" id="link-sidebar-perfil">
+        <span class="link-icon"><i class="fa-solid fa-user-shield"></i></span>
+        <span>Mi Perfil</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/admin/logout" class="sidebar-link logout" id="link-logout" title="Cerrar sesión administrativa">
+        <span class="link-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+        <span>Cerrar sesión</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Area de Contenido Principal -->
+  <div class="admin-main">
+    <!-- Navbar Superior -->
+    <header class="admin-navbar">
+      <div class="navbar-left">
+        <button type="button" class="hamburger-btn" id="admin-hamburger" aria-label="Abrir menu lateral">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="page-title-wrapper">
+          <h1 class="page-title">{% block admin_title %}Panel Antifraude{% endblock %}</h1>
+          <span class="page-subtitle">{% block admin_subtitle %}yape.ia &mdash; Sistema de Deteccion de Fraude{% endblock %}</span>
+        </div>
+      </div>
+
+      <div class="navbar-right">
+        <!-- Indicador de Estado en Vivo -->
+        <div class="live-indicator">
+          <span class="live-dot"></span>
+          <span>Sistema Activo</span>
+        </div>
+
+        <!-- Toggle de Tema -->
+        <button type="button" class="theme-toggle-btn" aria-label="Cambiar tema">
+          <span class="theme-icon"><i class="fa-solid fa-moon"></i></span>
+        </button>
+
+        <!-- Identificador de Administrador con enlace al Perfil -->
+        <a href="{{ url_for('admin_perfil') }}" class="admin-badge" id="admin-badge-profile" title="Ver mi Perfil de Administrador" style="text-decoration: none; color: inherit;">
+          <div class="admin-badge-avatar">{{ (admin_nombre or 'A')[0] | upper }}</div>
+          <span style="font-weight: 700;">{{ admin_nombre or 'Administrador BCP' }}</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Contenido Inyectado -->
+    <main class="admin-content">
+      {% block admin_content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin_charts.js') }}?v=2.0"></script>
+{% block admin_extra_js %}{% endblock %}
+{% endblock %}

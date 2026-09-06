@@ -1,0 +1,81 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Estadísticas Descriptivas — yape.ia Administrador{% endblock %}
+{% block admin_title %}Estadísticas Descriptivas del Dataset{% endblock %}
+
+{% block admin_content %}
+
+<!-- Gráficos de Estadísticas Descriptivas -->
+<div class="charts-grid-2" style="margin-bottom: 1.5rem;">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title"><i class="fa-solid fa-chart-column" style="color:var(--color-primary);margin-right:6px"></i> Medias y Desviación Estándar</h3>
+        <p class="chart-card-desc">Comparativa paramétrica de variables clave del dataset</p>
+      </div>
+      <span class="badge badge-primary">Media vs Std</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-stats-medias"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title"><i class="fa-solid fa-chart-line" style="color:var(--color-accent);margin-right:6px"></i> Dispersión de Percentiles (Q1, Mediana, Q3)</h3>
+        <p class="chart-card-desc">Distribución cuartílica de montos, tiempos y edades</p>
+      </div>
+      <span class="badge badge-accent">Percentiles</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-stats-percentiles"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom: 1.5rem;">
+  <div class="card-header">
+    <div>
+      <h3 class="card-title"><i class="fa-solid fa-table-list" style="color:var(--color-primary);margin-right:8px"></i> Resumen Estadístico Paramétrico (50,000 Transacciones)</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">
+        Valores extraídos fielmente de <code>resultados/estadisticas_descriptivas.csv</code> sin alterar ni inventar datos.
+      </p>
+    </div>
+    <span class="badge badge-accent">Fuente Oficial CSV</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Variable Técnica</th>
+          <th>Total (Count)</th>
+          <th>Promedio (Mean)</th>
+          <th>Desv. Estándar (Std)</th>
+          <th>Mínimo (Min)</th>
+          <th>25% (Q1)</th>
+          <th>Mediana (50%)</th>
+          <th>75% (Q3)</th>
+          <th>Máximo (Max)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in stats %}
+        <tr>
+          <td><strong>{{ s.Variable or s['Unnamed: 0'] }}</strong></td>
+          <td>{{ "{:,.0f}".format(s.count|float) if s.count != '' else '—' }}</td>
+          <td>{{ "%.4f"|format(s.mean|float) if s.mean != '' else '—' }}</td>
+          <td>{{ "%.4f"|format(s.std|float) if s.std != '' else '—' }}</td>
+          <td>{{ "%.2f"|format(s.min|float) if s.min != '' else '—' }}</td>
+          <td>{{ "%.2f"|format(s['25%']|float) if s['25%'] != '' else '—' }}</td>
+          <td><strong style="color: var(--color-primary);">{{ "%.2f"|format(s['50%']|float) if s['50%'] != '' else '—' }}</strong></td>
+          <td>{{ "%.2f"|format(s['75%']|float) if s['75%'] != '' else '—' }}</td>
+          <td>{{ "%.2f"|format(s.max|float) if s.max != '' else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="{{ session.get('tema', 'light') }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Sistema Antifraude Yape.ia - Plataforma inteligente de detección y prevención de fraude en transacciones financieras en tiempo real.">
+  <title>{% block title %}yape.ia — Sistema Antifraude{% endblock %}</title>
+  
+  <!-- Favicon SVG con escudo e identidad Yape -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23742284'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z'/></svg>">
+  
+  <!-- CSS Base & Design System -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=5.0">
+  
+  <!-- Iconos Vectoriales Profesionales (Font Awesome 6) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Chart.js para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- Script preventivo de parpadeo de tema -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('yape_antifraude_theme') || '{{ session.get("tema", "light") }}';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Contenedor global de mensajes flash -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container" id="flash-container">
+        {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <script>
+        setTimeout(() => {
+          const container = document.getElementById('flash-container');
+          if (container) {
+            container.style.opacity = '0';
+            container.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => container.remove(), 500);
+          }
+        }, 4500);
+      </script>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <!-- Script global de gestión de temas -->
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

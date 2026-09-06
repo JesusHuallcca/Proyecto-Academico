@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Yape BCP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --yape-purple: #742284;
+            --yape-purple-dark: #50155C;
+            --yape-purple-light: #9B30B5;
+            --yape-cyan: #00D2C4;
+            --bg-dark: #0B0F19;
+            --danger-red: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--yape-purple-light);
+        }
+
+        ::-webkit-scrollbar-button {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(116, 34, 132, 0.45) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(0, 210, 196, 0.2) 0%, transparent 45%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .login-card {
+            background: #FFFFFF;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 32px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 35px rgba(116, 34, 132, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .top-stripe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--yape-purple), var(--yape-cyan));
+        }
+
+        .brand-logo-wrap {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--yape-purple), var(--yape-purple-light));
+            border-radius: 22px;
+            margin: 0.5rem auto 1.25rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(116, 34, 132, 0.35);
+            color: white;
+            font-weight: 800;
+            font-size: 2rem;
+            letter-spacing: -0.05em;
+        }
+
+        h1 {
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: #1E293B;
+            margin-bottom: 0.35rem;
+        }
+
+        p.subtext {
+            font-size: 0.88rem;
+            color: #64748B;
+            margin-bottom: 1.8rem;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 0.45rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border-radius: 14px;
+            border: 1.5px solid #CBD5E1;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1E293B;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--yape-purple);
+            box-shadow: 0 0 0 3px rgba(116, 34, 132, 0.15);
+        }
+
+        .btn-submit-login {
+            width: 100%;
+            background: linear-gradient(135deg, var(--yape-purple), var(--yape-purple-light));
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 16px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(116, 34, 132, 0.35);
+            margin-top: 0.5rem;
+            margin-bottom: 1.25rem;
+            transition: 0.2s;
+        }
+
+        .btn-submit-login:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-demo-quick {
+            width: 100%;
+            background: #F8FAFC;
+            border: 1.5px dashed #CBD5E1;
+            color: var(--yape-purple);
+            padding: 0.75rem;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .btn-demo-quick:hover {
+            background: rgba(116, 34, 132, 0.08);
+            border-color: var(--yape-purple);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            font-size: 0.82rem;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 1.25rem;
+        }
+
+        .footer-links a {
+            color: #64748B;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--yape-purple);
+        }
+
+        .alert-error {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: var(--danger-red);
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.7rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.2rem;
+            display: none;
+            text-align: left;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="top-stripe"></div>
+        
+        <div class="brand-logo-wrap">Y</div>
+        <h1>Ingresa a tu Yape</h1>
+        <p class="subtext">Billetera digital protegida por IA Antifraude BCP</p>
+
+        <div class="alert-error" id="loginError"></div>
+
+        <form id="formLogin">
+            <div class="form-group">
+                <label>Correo o Celular</label>
+                <input type="text" id="inputCorreo" placeholder="juan@correo.com" value="juan@correo.com" required>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña / PIN</label>
+                <input type="password" id="inputPassword" placeholder="••••••" value="123456" required>
+            </div>
+
+            <button type="submit" class="btn-submit-login" id="btnSubmit">
+                Iniciar Sesión
+            </button>
+        </form>
+
+        <button type="button" class="btn-demo-quick" id="btnQuickDemo">
+            ⚡ Ingreso Rápido Demo (Juan Pérez)
+        </button>
+
+        <div style="margin-bottom: 1.25rem; padding: 0.9rem; background: #F8FAFC; border-radius: 14px; border: 1px solid #E2E8F0;">
+            <span style="font-size: 0.85rem; color: #64748B;">¿Aún no tienes cuenta en Yape?</span><br>
+            <a href="/usuario/registro" style="font-size: 0.95rem; color: var(--yape-purple); font-weight: 800; text-decoration: none; display: inline-block; margin-top: 4px;">
+                ✨ Crear cuenta nueva con Gmail ➔
+            </a>
+        </div>
+
+        <div class="footer-links">
+            <a href="/admin/login">🛡️ Acceso para Analistas (Consola Admin) ↗</a>
+            <a href="/">← Volver al Portal Principal</a>
+        </div>
+    </div>
+
+    <script>
+        const formLogin = document.getElementById("formLogin");
+        const inputCorreo = document.getElementById("inputCorreo");
+        const inputPassword = document.getElementById("inputPassword");
+        const btnSubmit = document.getElementById("btnSubmit");
+        const btnQuickDemo = document.getElementById("btnQuickDemo");
+        const loginError = document.getElementById("loginError");
+
+        function mostrarError(msg) {
+            loginError.textContent = msg;
+            loginError.style.display = "block";
+        }
+
+        formLogin.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            loginError.style.display = "none";
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = "Verificando...";
+
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        correo: inputCorreo.value.trim(),
+                        password: inputPassword.value.trim(),
+                        portal: "USUARIO"
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok && data.status === "success") {
+                    window.location.href = data.redirect || "/usuario";
+                } else {
+                    mostrarError(data.mensaje || "Error al iniciar sesión.");
+                }
+            } catch (err) {
+                mostrarError("No se pudo conectar con el servidor.");
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = "Iniciar Sesión";
+            }
+        });
+
+        // Botón Demo Rápido
+        btnQuickDemo.addEventListener("click", () => {
+            inputCorreo.value = "juan@correo.com";
+            inputPassword.value = "123456";
+            formLogin.dispatchEvent(new Event("submit"));
+        });
+    </script>
+</body>
+</html>

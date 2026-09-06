@@ -1,0 +1,124 @@
+{% extends "administrador/layout_admin.html" %}
+
+{% block title %}Modelos ML &mdash; yape.ia Administrador{% endblock %}
+{% block admin_title %}Modelos de Machine Learning{% endblock %}
+{% block admin_subtitle %}Comparacion de arquitecturas evaluadas &mdash; Gradient Boosting seleccionado en produccion{% endblock %}
+
+{% block admin_content %}
+
+<!-- Banner Mejor Modelo -->
+<div class="best-model-banner">
+  <div class="best-model-info">
+    <span class="badge"><i class="fa-solid fa-award" style="margin-right:5px"></i> MODELO SELECCIONADO EN PRODUCCIÓN</span>
+    <h2>{{ mejor_modelo.nombre }}</h2>
+    <p>
+      Elegido como el mejor predictor antifraude en <code>resultados/mejor_modelo.txt</code>
+      debido a su óptimo equilibrio entre precisión y recall en el dataset de 50,000 transacciones.
+    </p>
+  </div>
+  <div class="best-model-metrics">
+    <div class="best-metric-item">
+      <span class="best-metric-val">{{ "%.2f"|format(mejor_modelo.accuracy * 100) }}%</span>
+      <span class="best-metric-lbl">Accuracy</span>
+    </div>
+    <div class="best-metric-item">
+      <span class="best-metric-val">{{ "%.2f"|format(mejor_modelo.precision * 100) }}%</span>
+      <span class="best-metric-lbl">Precision</span>
+    </div>
+    <div class="best-metric-item">
+      <span class="best-metric-val">{{ "%.2f"|format(mejor_modelo.recall * 100) }}%</span>
+      <span class="best-metric-lbl">Recall</span>
+    </div>
+    <div class="best-metric-item">
+      <span class="best-metric-val">{{ "%.4f"|format(mejor_modelo.f1) }}</span>
+      <span class="best-metric-lbl">F1-Score</span>
+    </div>
+  </div>
+</div>
+
+<!-- Graficos de Comparacion -->
+<div class="charts-grid-2">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title">Comparación: Accuracy vs F1 vs Recall</h3>
+        <p class="chart-card-desc">Todos los modelos evaluados en el dataset</p>
+      </div>
+      <span class="badge badge-primary">Bar Chart</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-comparacion-modelos"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <h3 class="chart-card-title">Radar de Rendimiento &mdash; Top 3 Modelos</h3>
+        <p class="chart-card-desc">Gradient Boosting vs PyTorch vs TensorFlow</p>
+      </div>
+      <span class="badge badge-accent">Radar</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-radar-modelos"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla Comparativa de Modelos -->
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h3 class="card-title"><i class="fa-solid fa-brain" style="color:var(--color-primary);margin-right:8px"></i> Matriz Comparativa de Arquitecturas Evaluadas</h3>
+      <p style="font-size:.85rem;color:var(--text-muted);margin-top:.25rem">
+        Extraído de <code>resultados/comparacion_final_modelos.csv</code> &mdash; 6 algoritmos evaluados.
+      </p>
+    </div>
+    <span class="badge badge-accent">6 Algoritmos</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Modelo / Arquitectura</th>
+          <th>Accuracy</th>
+          <th>Precision</th>
+          <th>Recall</th>
+          <th>F1-Score</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in modelos %}
+        <tr>
+          <td>
+            <strong>{{ m.Modelo }}</strong>
+            {% if m.Modelo == mejor_modelo.nombre %}
+              <span class="badge" style="margin-left:8px;background:rgba(116,34,132,.15);color:var(--color-primary);border-color:var(--color-primary-glow)"><i class="fa-solid fa-bolt" style="margin-right:3px"></i> EN PRODUCCIÓN</span>
+            {% endif %}
+          </td>
+          <td>
+            <strong style="font-family:var(--font-heading)">{{ "%.2f"|format(m.Accuracy|float * 100) }}%</strong>
+          </td>
+          <td>{{ "%.4f"|format(m.Precision|float) }}</td>
+          <td>{{ "%.4f"|format(m.Recall|float) }}</td>
+          <td>
+            <strong style="color:var(--color-primary);font-family:var(--font-heading)">
+              {{ "%.4f"|format(m['F1-Score']|float) }}
+            </strong>
+          </td>
+          <td>
+            {% if m.Modelo == mejor_modelo.nombre %}
+              <span class="badge badge-success"><i class="fa-solid fa-check" style="margin-right:3px"></i> Activo en API</span>
+            {% else %}
+              <span class="badge badge-primary">Evaluado</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

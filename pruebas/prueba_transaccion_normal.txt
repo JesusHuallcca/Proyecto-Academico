@@ -1,0 +1,45 @@
+==============================================
+       PRUEBA 01 - TRANSACCIÓN NORMAL
+==============================================
+
+DATOS DE LA TRANSACCIÓN
+
+Monto: S/ 50
+Monto promedio del usuario: S/ 250
+Saldo anterior: S/ 1000
+
+Destinatario nuevo: 0
+Hora inusual: 0
+Velocidad de operación: 80
+Llamada reciente: 0
+Cambio de dispositivo: 0
+
+Edad: 35
+Usuario nuevo: 0
+Días desde registro: 800
+
+Operaciones del día: 3
+Operaciones última hora: 1
+
+Alertas ignoradas: 0
+Distancia entre operaciones: 2 km
+Ubicación inusual: 0
+
+Hora: 14
+Día de la semana: 2
+Producto: Yape
+
+
+==============================================
+                RESULTADO
+==============================================
+
+Predicción: NORMAL
+
+Probabilidad de operación normal: 99.95%
+Probabilidad de fraude: 0.05%
+
+Recomendación:
+La transacción puede continuar.
+
+==============================================
