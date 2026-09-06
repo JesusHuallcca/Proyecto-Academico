@@ -433,8 +433,8 @@ class SQLiteAdminDataProvider(BaseAdminDataProvider):
         try:
             con = self._conectar()
             row_tot = con.execute("SELECT COUNT(*) AS c FROM transacciones").fetchone()
-            row_leg = con.execute("SELECT COUNT(*) AS c FROM transacciones WHERE resultado = 'NORMAL'").fetchone()
-            row_fra = con.execute("SELECT COUNT(*) AS c FROM transacciones WHERE resultado IN ('SOSPECHOSA', 'BLOQUEADA')").fetchone()
+            row_leg = con.execute("SELECT COUNT(*) AS c FROM transacciones WHERE resultado IN ('NORMAL', 'APROBADA')").fetchone()
+            row_fra = con.execute("SELECT COUNT(*) AS c FROM transacciones WHERE resultado IN ('SOSPECHOSA', 'BLOQUEADA', 'FRAUDE')").fetchone()
             row_alt = con.execute("SELECT COUNT(*) AS c FROM alertas WHERE estado = 'PENDIENTE'").fetchone()
             row_crit = con.execute("SELECT COUNT(*) AS c FROM alertas WHERE nivel = 'CRITICO' AND estado = 'PENDIENTE'").fetchone()
             row_monto = con.execute("SELECT AVG(monto) AS prom, SUM(monto) AS total FROM transacciones").fetchone()
@@ -637,7 +637,62 @@ class SQLiteAdminDataProvider(BaseAdminDataProvider):
         return self._mock_fallback.get_descriptive_stats()
 
     def get_product_analysis(self) -> List[Dict[str, Any]]:
-        return self._mock_fallback.get_product_analysis()
+        # Base histórica consolidada del dataset 50k
+        base_stats = {
+            "Compra": {"operaciones": 9945, "fraudes": 666, "monto_sum": 9945 * 402.32, "monto_mediana": 240.73},
+            "Recarga": {"operaciones": 5024, "fraudes": 336, "monto_sum": 5024 * 404.61, "monto_mediana": 243.20},
+            "Pago de servicios": {"operaciones": 7491, "fraudes": 485, "monto_sum": 7491 * 406.10, "monto_mediana": 252.01},
+            "Yape": {"operaciones": 20083, "fraudes": 1272, "monto_sum": 20083 * 402.82, "monto_mediana": 248.03},
+            "Transferencia": {"operaciones": 7457, "fraudes": 463, "monto_sum": 7457 * 402.81, "monto_mediana": 249.40}
+        }
+        try:
+            con = self._conectar()
+            rows = con.execute("""
+                SELECT producto,
+                       COUNT(*) as ops,
+                       SUM(CASE WHEN resultado IN ('SOSPECHOSA', 'BLOQUEADA', 'FRAUDE') THEN 1 ELSE 0 END) as f,
+                       COALESCE(SUM(monto), 0) as total_monto
+                FROM transacciones
+                GROUP BY producto
+            """).fetchall()
+            con.close()
+
+            for r in rows:
+                p = str(r["producto"]).strip()
+                if p in ("Pago servicios", "Servicios", "Pago de servicios"):
+                    target = "Pago de servicios"
+                elif p in ("Transferencia", "Transferencias"):
+                    target = "Transferencia"
+                elif p in ("Recarga", "Recargas"):
+                    target = "Recarga"
+                elif p in ("Compra", "Compras"):
+                    target = "Compra"
+                else:
+                    target = "Yape"
+
+                if target in base_stats:
+                    base_stats[target]["operaciones"] += int(r["ops"] or 0)
+                    base_stats[target]["fraudes"] += int(r["f"] or 0)
+                    base_stats[target]["monto_sum"] += float(r["total_monto"] or 0.0)
+        except Exception:
+            pass
+
+        result = []
+        for prod_name, data in base_stats.items():
+            ops = data["operaciones"]
+            fraudes = data["fraudes"]
+            monto_sum = data["monto_sum"]
+            prom = round(monto_sum / ops, 2) if ops > 0 else 400.0
+            pct_fraude = round((fraudes / ops) * 100, 2) if ops > 0 else 0.0
+            result.append({
+                "producto": prod_name,
+                "operaciones": ops,
+                "monto_promedio": prom,
+                "monto_mediana": data.get("monto_mediana", 245.0),
+                "fraudes": fraudes,
+                "porcentaje_fraude": pct_fraude
+            })
+        return result
 
     def get_model_comparison(self) -> Dict[str, Any]:
         return self._mock_fallback.get_model_comparison()

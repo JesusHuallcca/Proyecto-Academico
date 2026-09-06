@@ -445,4 +445,140 @@ document.addEventListener("DOMContentLoaded", () => {
       chart.update();
     });
   });
+
+  /* ==========================================================================
+     SINCRONIZACIÓN EN TIEMPO REAL: ACTUALIZACIÓN DINÁMICA DE GRÁFICOS Y KPIS
+     ========================================================================== */
+  async function actualizarDashboardLive() {
+    try {
+      let res = await fetch("/admin/api/dashboard-live");
+      if (!res.ok) {
+        res = await fetch("/api/admin/dashboard-live");
+      }
+      if (!res.ok) return;
+
+      const data = await res.json();
+      if (!data || data.status !== "success") return;
+
+      const { kpis, charts, transacciones_recientes } = data;
+
+      // 1. Gráfico Volumen por Tipo de Producto (chart-productos-ops)
+      if (chartInstances.productos && charts && charts.productos) {
+        chartInstances.productos.data.datasets[0].data = charts.productos.counts;
+        chartInstances.productos.update("none");
+      }
+
+      // 2. Gráfico Proporción Fraude vs Legítimas (chart-distribucion-fraude)
+      if (chartInstances.fraude && charts && charts.distribucion) {
+        chartInstances.fraude.data.datasets[0].data = charts.distribucion.data;
+        if (kpis && kpis.total_transacciones) {
+          const tot = kpis.total_transacciones;
+          const legP = ((kpis.transacciones_legitimas / tot) * 100).toFixed(2);
+          const fraP = ((kpis.fraudes_detectados / tot) * 100).toFixed(2);
+          chartInstances.fraude.data.labels = [
+            `Transacciones Legítimas (${legP}%)`,
+            `Fraudes Detectados (${fraP}%)`
+          ];
+        }
+        chartInstances.fraude.update("none");
+      }
+
+      // 3. Gráfico % Fraude por Producto (chart-pct-fraude-producto)
+      if (chartInstances.pctFraude && charts && charts.pct_fraude) {
+        chartInstances.pctFraude.data.datasets[0].data = charts.pct_fraude.data;
+        chartInstances.pctFraude.update("none");
+      }
+
+      // 4. Gráfico Monto Promedio por Producto (chart-monto-producto)
+      if (chartInstances.montoProd && charts && charts.monto_producto) {
+        chartInstances.montoProd.data.datasets[0].data = charts.monto_producto.data;
+        chartInstances.montoProd.update("none");
+      }
+
+      // 5. Actualizar Tarjetas de KPIs en el DOM
+      if (kpis) {
+        const setTxt = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = val;
+        };
+        if (kpis.total_transacciones !== undefined) {
+          setTxt("kpi-val-total", Number(kpis.total_transacciones).toLocaleString());
+        }
+        if (kpis.transacciones_legitimas !== undefined) {
+          setTxt("kpi-val-legitimas", Number(kpis.transacciones_legitimas).toLocaleString());
+        }
+        if (kpis.fraudes_detectados !== undefined) {
+          setTxt("kpi-val-fraudes", Number(kpis.fraudes_detectados).toLocaleString());
+        }
+        if (kpis.porcentaje_fraude !== undefined) {
+          setTxt("kpi-val-tasa", `${kpis.porcentaje_fraude}%`);
+          setTxt("hero-stat-tasa", `${kpis.porcentaje_fraude}%`);
+        }
+        if (kpis.monto_promedio !== undefined) {
+          setTxt("kpi-val-promedio", `S/ ${Math.round(kpis.monto_promedio)}`);
+        }
+        if (kpis.monto_mediana !== undefined) {
+          setTxt("kpi-val-mediana", `S/ ${Math.round(kpis.monto_mediana)}`);
+        }
+      }
+
+      // 6. Actualizar Tabla de Monitoreo en Tiempo Real (Últimas Transacciones)
+      if (transacciones_recientes && transacciones_recientes.length > 0) {
+        const tbody = document.getElementById("tabla-transacciones-recientes");
+        if (tbody) {
+          let html = "";
+          transacciones_recientes.slice(0, 10).forEach(tx => {
+            const isNormal = (tx.resultado === "NORMAL" || tx.resultado === "APROBADA");
+            const badgeClass = isNormal ? "badge-success" : "badge-danger";
+            const icon = isNormal
+              ? '<i class="fa-solid fa-check" style="margin-right:3px"></i> NORMAL'
+              : '<i class="fa-solid fa-triangle-exclamation" style="margin-right:3px"></i> SOSPECHOSA';
+            const prob = parseFloat(tx.probabilidad_fraude || 0);
+            const probClass = prob > 50 ? "high" : "low";
+            const initial = (tx.nombre && tx.nombre[0]) ? tx.nombre[0].toUpperCase() : "U";
+            const fecha = tx.fecha_hora ? tx.fecha_hora.substring(0, 16) : "Reciente";
+            const monto = parseFloat(tx.monto || 0).toFixed(2);
+
+            html += `
+              <tr>
+                <td><code style="font-size:.82rem;color:var(--text-muted)">#${tx.id_transaccion}</code></td>
+                <td>${fecha}</td>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-sm">${initial}</div>
+                    <div class="user-cell-info">
+                      <strong>${tx.nombre || "Usuario"} ${tx.apellido || ""}</strong>
+                      <small>${tx.correo || "usuario@yape.pe"}</small>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge badge-primary">${tx.producto || "Yape"}</span></td>
+                <td><strong>S/ ${monto}</strong></td>
+                <td>
+                  <span class="fraud-pct ${probClass}">
+                    ${prob.toFixed(1)}%
+                  </span>
+                </td>
+                <td>
+                  <span class="badge ${badgeClass}">
+                    ${icon}
+                  </span>
+                </td>
+              </tr>
+            `;
+          });
+          tbody.innerHTML = html;
+        }
+      }
+
+    } catch (err) {
+      // Ignorar excepciones de red en polling silencioso
+    }
+  }
+
+  // Ejecutar primera sincronización tras instanciar gráficos
+  setTimeout(actualizarDashboardLive, 400);
+
+  // Polling automático cada 3 segundos
+  setInterval(actualizarDashboardLive, 3000);
 });

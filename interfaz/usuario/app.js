@@ -16,6 +16,8 @@ try {
 
 let listaTransaccionesUsuario = [];
 let filtroHistorialActual = "TODOS";
+let entidadTransferenciaActual = "Plin";
+let operadorRecargaActual = "Claro";
 
 function getAuthHeaders(extra = {}) {
     const headers = { ...extra };
@@ -390,7 +392,7 @@ function inicializarEventos() {
         });
     }
 
-    let entidadTransferenciaActual = "Plin";
+    entidadTransferenciaActual = "Plin";
     const bankPills = document.querySelectorAll(".bank-pill");
     bankPills.forEach(pill => {
         pill.addEventListener("click", () => {
@@ -510,7 +512,7 @@ function inicializarEventos() {
         });
     }
 
-    let operadorRecargaActual = "Claro";
+    operadorRecargaActual = "Claro";
     const telcoPills = document.querySelectorAll(".telco-pill");
     telcoPills.forEach(pill => {
         pill.addEventListener("click", () => {
@@ -1356,11 +1358,12 @@ async function procesarTransferencia(e) {
     const chkDestNuevo = document.getElementById("chkTransferDestNuevo");
     const chkMadrugada = document.getElementById("chkTransferMadrugada");
 
+    const entidad = document.querySelector(".bank-pill.active")?.getAttribute("data-bank") || entidadTransferenciaActual || "Plin";
     const monto = parseFloat(inputMonto?.value);
     const destinoNum = inputDest?.value.trim() || "";
     const titular = inputNombre?.value.trim() || "Contacto";
-    const nota = inputNota?.value.trim() || `Transferencia a ${entidadTransferenciaActual}`;
-    const destinatario = `[${entidadTransferenciaActual}] ${titular} (${destinoNum})`;
+    const nota = inputNota?.value.trim() || `Transferencia a ${entidad}`;
+    const destinatario = `[${entidad}] ${titular} (${destinoNum})`;
 
     if (isNaN(monto) || monto <= 0) {
         alert("Por favor ingresa un monto válido a transferir.");
@@ -1369,7 +1372,7 @@ async function procesarTransferencia(e) {
 
     btnSubmit.disabled = true;
     btnText.textContent = "Evaluando transferencia con IA...";
-    spinner.style.display = "inline-block";
+    if (spinner) spinner.style.display = "inline-block";
 
     const payload = {
         user_id: usuarioActivo ? usuarioActivo.id_usuario : undefined,
@@ -1390,7 +1393,8 @@ async function procesarTransferencia(e) {
             body: JSON.stringify(payload)
         });
         const data = await res.json();
-        document.getElementById("modalTransferencia").style.display = "none";
+        const modalTransfer = document.getElementById("modalTransferencia");
+        if (modalTransfer) modalTransfer.style.display = "none";
 
         if (res.status === 403 || data.status === "blocked") {
             alert(data.mensaje || "Tu cuenta está bloqueada por seguridad. Contacta con soporte BCP.");
@@ -1408,7 +1412,7 @@ async function procesarTransferencia(e) {
             renderizarSaldo();
 
             mostrarVoucherExitoso({
-                titulo: `¡Transferencia Exitosa a ${entidadTransferenciaActual}!`,
+                titulo: `¡Transferencia Exitosa a ${entidad}!`,
                 producto: "Transferencia",
                 destinatarioLabel: "Destinatario / Entidad:",
                 destinatario: destinatario,
@@ -1427,11 +1431,12 @@ async function procesarTransferencia(e) {
         cargarNotificaciones();
 
     } catch (err) {
+        console.error("Error en procesarTransferencia:", err);
         alert("Error de conexión con el servidor antifraude.");
     } finally {
         btnSubmit.disabled = false;
-        btnText.textContent = `¡Transferir a ${entidadTransferenciaActual} S/ ${monto.toFixed(2)}!`;
-        spinner.style.display = "none";
+        btnText.textContent = `¡Transferir a ${entidad} S/ ${monto.toFixed(2)}!`;
+        if (spinner) spinner.style.display = "none";
     }
 }
 
@@ -1553,8 +1558,9 @@ async function procesarRecarga(e) {
 
     const monto = parseFloat(inputMonto?.value);
     const numero = inputNumero?.value.trim() || "Celular";
-    const destinatario = `[Recarga ${operadorRecargaActual}] +51 ${numero}`;
-    const nota = `Recarga prepago ${operadorRecargaActual}`;
+    const op = document.querySelector(".telco-pill.active")?.getAttribute("data-operator") || operadorRecargaActual || "Claro";
+    const destinatario = `[Recarga ${op}] +51 ${numero}`;
+    const nota = `Recarga prepago ${op}`;
 
     if (isNaN(monto) || monto <= 0) {
         alert("Por favor ingresa un monto válido de recarga.");
@@ -1563,7 +1569,7 @@ async function procesarRecarga(e) {
 
     btnSubmit.disabled = true;
     btnText.textContent = "Procesando recarga con IA...";
-    spinner.style.display = "inline-block";
+    if (spinner) spinner.style.display = "inline-block";
 
     const payload = {
         user_id: usuarioActivo ? usuarioActivo.id_usuario : undefined,
@@ -1584,7 +1590,8 @@ async function procesarRecarga(e) {
             body: JSON.stringify(payload)
         });
         const data = await res.json();
-        document.getElementById("modalRecargas").style.display = "none";
+        const modalRecarga = document.getElementById("modalRecargas");
+        if (modalRecarga) modalRecarga.style.display = "none";
 
         if (res.status === 403 || data.status === "blocked") {
             alert(data.mensaje || "Tu cuenta está bloqueada por seguridad. Contacta con soporte BCP.");
@@ -1621,10 +1628,11 @@ async function procesarRecarga(e) {
         cargarNotificaciones();
 
     } catch (err) {
+        console.error("Error en procesarRecarga:", err);
         alert("Error de conexión con el servidor antifraude.");
     } finally {
         btnSubmit.disabled = false;
-        btnText.textContent = `¡Recargar ${operadorRecargaActual} S/ ${monto.toFixed(2)}!`;
-        spinner.style.display = "none";
+        btnText.textContent = `¡Recargar ${op} S/ ${monto.toFixed(2)}!`;
+        if (spinner) spinner.style.display = "none";
     }
 }

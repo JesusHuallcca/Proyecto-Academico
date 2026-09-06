@@ -462,4 +462,48 @@ def create_admin_blueprint(
         filtro = request.args.get("estado", "TODOS")
         return jsonify(data_provider.get_alerts(filtro_estado=filtro))
 
+    @bp.route("/api/dashboard-live")
+    def api_dashboard_live():
+        kpis = data_provider.get_kpis()
+        productos = data_provider.get_product_analysis()
+        transacciones_recientes = data_provider.get_transactions(limit=10)
+
+        prod_map = {p["producto"]: p for p in productos}
+        def get_p(name):
+            return prod_map.get(name) or prod_map.get("Pago de servicios" if name == "Pago servicios" else name) or {"operaciones": 0, "porcentaje_fraude": 0.0, "monto_promedio": 0.0}
+
+        prod_labels = ["Yape", "Compra", "Pago servicios", "Transferencia", "Recarga"]
+        prod_counts = [get_p(k)["operaciones"] for k in prod_labels]
+
+        pct_labels = ["Compra", "Recarga", "Pago servicios", "Yape", "Transferencia"]
+        pct_fraude = [get_p(k)["porcentaje_fraude"] for k in pct_labels]
+
+        distribucion = [kpis.get("transacciones_legitimas", 46778), kpis.get("fraudes_detectados", 3222)]
+
+        monto_labels = ["Compra", "Recarga", "Pago servicios", "Yape", "Transferencia"]
+        monto_prom = [get_p(k)["monto_promedio"] for k in monto_labels]
+
+        return jsonify({
+            "status": "success",
+            "kpis": kpis,
+            "charts": {
+                "productos": {
+                    "labels": prod_labels,
+                    "counts": prod_counts
+                },
+                "distribucion": {
+                    "data": distribucion
+                },
+                "pct_fraude": {
+                    "labels": pct_labels,
+                    "data": pct_fraude
+                },
+                "monto_producto": {
+                    "labels": monto_labels,
+                    "data": monto_prom
+                }
+            },
+            "transacciones_recientes": transacciones_recientes
+        })
+
     return bp

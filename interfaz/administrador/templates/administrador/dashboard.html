@@ -18,7 +18,7 @@
       <div class="hero-stat-lbl">Accuracy ML</div>
     </div>
     <div class="hero-stat">
-      <div class="hero-stat-val">{{ kpis.porcentaje_fraude }}%</div>
+      <div class="hero-stat-val" id="hero-stat-tasa">{{ kpis.porcentaje_fraude }}%</div>
       <div class="hero-stat-lbl">Tasa Fraude</div>
     </div>
     <div class="hero-stat">
@@ -33,7 +33,7 @@
   <div class="kpi-card">
     <div class="kpi-body">
       <div class="kpi-title">Total Transacciones</div>
-      <div class="kpi-value">{{ "{:,}".format(kpis.total_transacciones) }}</div>
+      <div class="kpi-value" id="kpi-val-total">{{ "{:,}".format(kpis.total_transacciones) }}</div>
       <div class="kpi-subtext">Histórico consolidado</div>
       <div class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> Histórico completo</div>
     </div>
@@ -43,7 +43,7 @@
   <div class="kpi-card">
     <div class="kpi-body">
       <div class="kpi-title">Transacciones Legítimas</div>
-      <div class="kpi-value" style="color:var(--color-success)">{{ "{:,}".format(kpis.transacciones_legitimas) }}</div>
+      <div class="kpi-value" id="kpi-val-legitimas" style="color:var(--color-success)">{{ "{:,}".format(kpis.transacciones_legitimas) }}</div>
       <div class="kpi-subtext">93.56% del volumen total</div>
       <div class="kpi-trend up"><i class="fa-solid fa-circle-check"></i> Transacciones seguras</div>
     </div>
@@ -53,7 +53,7 @@
   <div class="kpi-card">
     <div class="kpi-body">
       <div class="kpi-title">Fraudes Detectados</div>
-      <div class="kpi-value" style="color:var(--color-danger)">{{ "{:,}".format(kpis.fraudes_detectados) }}</div>
+      <div class="kpi-value" id="kpi-val-fraudes" style="color:var(--color-danger)">{{ "{:,}".format(kpis.fraudes_detectados) }}</div>
       <div class="kpi-subtext">Bloqueados por modelo ML</div>
       <div class="kpi-trend down"><i class="fa-solid fa-triangle-exclamation"></i> 6.44% del total</div>
     </div>
@@ -63,7 +63,7 @@
   <div class="kpi-card">
     <div class="kpi-body">
       <div class="kpi-title">Tasa de Fraude</div>
-      <div class="kpi-value">{{ kpis.porcentaje_fraude }}%</div>
+      <div class="kpi-value" id="kpi-val-tasa">{{ kpis.porcentaje_fraude }}%</div>
       <div class="kpi-subtext">Índice general de riesgo</div>
     </div>
     <div class="kpi-icon accent"><i class="fa-solid fa-bolt-lightning"></i></div>
@@ -72,7 +72,7 @@
   <div class="kpi-card">
     <div class="kpi-body">
       <div class="kpi-title">Monto Promedio</div>
-      <div class="kpi-value">S/ {{ "%.0f"|format(kpis.monto_promedio) }}</div>
+      <div class="kpi-value" id="kpi-val-promedio">S/ {{ "%.0f"|format(kpis.monto_promedio) }}</div>
       <div class="kpi-subtext">Media aritmética transaccional</div>
     </div>
     <div class="kpi-icon primary"><i class="fa-solid fa-coins"></i></div>
@@ -81,7 +81,7 @@
   <div class="kpi-card">
     <div class="kpi-body">
       <div class="kpi-title">Mediana de Monto</div>
-      <div class="kpi-value">S/ {{ "%.0f"|format(kpis.monto_mediana) }}</div>
+      <div class="kpi-value" id="kpi-val-mediana">S/ {{ "%.0f"|format(kpis.monto_mediana) }}</div>
       <div class="kpi-subtext">Percentil 50 de operaciones</div>
     </div>
     <div class="kpi-icon success"><i class="fa-solid fa-scale-balanced"></i></div>
@@ -200,7 +200,7 @@
           <th>Resultado ML</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="tabla-transacciones-recientes">
         {% for tx in transacciones_recientes %}
         <tr>
           <td><code style="font-size:.82rem;color:var(--text-muted)">#{{ tx.id_transaccion }}</code></td>
@@ -222,8 +222,8 @@
             </span>
           </td>
           <td>
-            <span class="badge {% if tx.resultado == 'NORMAL' %}badge-success{% else %}badge-danger{% endif %}">
-              {% if tx.resultado == 'NORMAL' %}
+            <span class="badge {% if tx.resultado in ('NORMAL', 'APROBADA') %}badge-success{% else %}badge-danger{% endif %}">
+              {% if tx.resultado in ('NORMAL', 'APROBADA') %}
                 <i class="fa-solid fa-check" style="margin-right:3px"></i> NORMAL
               {% else %}
                 <i class="fa-solid fa-triangle-exclamation" style="margin-right:3px"></i> SOSPECHOSA
