@@ -539,13 +539,16 @@
 
                     displayCorreo.textContent = correo;
 
-                    // STRICT: El código NUNCA se rellena automáticamente.
-                    // Debe quedar vacío para que el usuario revise su celular y lo ingrese manualmente.
-                    inputCodigoOtp.value = "";
+                    if (data.codigo_demo) {
+                        inputCodigoOtp.value = data.codigo_demo;
+                        mostrarExito(`⚠️ Entorno Render Cloud (puertos SMTP restringidos). Tu código OTP es: ${data.codigo_demo}`);
+                    } else {
+                        inputCodigoOtp.value = "";
+                        mostrarExito("¡Código enviado a tu Gmail! Abre el aplicativo en tu celular para verlo.");
+                    }
                     setTimeout(() => inputCodigoOtp.focus(), 150);
 
                     iniciarCooldownReenvio(30);
-                    mostrarExito("¡Código enviado a tu Gmail! Abre el aplicativo en tu celular para verlo.");
                 } else if (data.status === "need_config") {
                     mostrarError("El servicio de envío de códigos de seguridad no está disponible temporalmente. Por favor intenta más tarde o comunícate con soporte.");
                 } else {

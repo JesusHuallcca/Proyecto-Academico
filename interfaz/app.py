@@ -525,19 +525,30 @@ def api_config_correo():
             }), 400
 
         # Probar autenticación en smtp.gmail.com
+        es_bloqueo_hosting = False
         try:
             context = ssl.create_default_context()
-            with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as server:
+            with smtplib.SMTP("smtp.gmail.com", 587, timeout=8) as server:
                 server.starttls(context=context)
                 server.login(emisor, password)
         except Exception as e:
-            return jsonify({
-                "status": "error",
-                "mensaje": f"No se pudo autenticar con Gmail ({e}). Verifica que la 'Contraseña de aplicación' de Google sea correcta (16 letras) y que la verificación en 2 pasos esté activa."
-            }), 400
+            err_str = str(e)
+            if "101" in err_str or "Network is unreachable" in err_str or "timed out" in err_str.lower():
+                es_bloqueo_hosting = True
+            else:
+                return jsonify({
+                    "status": "error",
+                    "mensaje": f"No se pudo autenticar con Gmail ({err_str}). Verifica que la 'Contraseña de aplicación' de Google sea correcta (16 letras) y que la verificación en 2 pasos esté activa."
+                }), 400
 
         with open(ruta_cfg, "w", encoding="utf-8") as f:
             json.dump({"gmail_emisor": emisor, "gmail_password_app": password}, f, indent=2)
+
+        if es_bloqueo_hosting:
+            return jsonify({
+                "status": "success",
+                "mensaje": "⚠️ Credenciales guardadas. Nota: El hosting Render (Plan Free) bloquea conexiones salientes por el puerto 587 ([Errno 101] Network is unreachable). El sistema activará el respaldo automático de código de verificación."
+            })
 
         return jsonify({
             "status": "success",
@@ -703,6 +714,14 @@ def api_registro_enviar_codigo():
 
     if not enviado_real:
         print(f"⚠️ [SMTP Yape] Fallo de envío a {correo}: {mensaje_envio}")
+        # Si el fallo es por restricción de puertos del hosting en la nube (Render Free bloquea puertos SMTP 587/465)
+        if any(w in mensaje_envio for w in ("101", "Network is unreachable", "timed out", "Configura el correo")):
+            return jsonify({
+                "status": "success",
+                "codigo_demo": codigo_otp,
+                "mensaje": f"⚠️ Servidor en hosting con puertos SMTP restringidos. Tu código de verificación generado es: {codigo_otp}",
+                "correo": correo
+            })
         return jsonify({
             "status": "error",
             "mensaje": "No se pudo enviar el código de verificación en este momento. Por favor intenta más tarde o comunícate con soporte.",

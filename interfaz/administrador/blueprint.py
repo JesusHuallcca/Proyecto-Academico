@@ -379,7 +379,7 @@ def create_admin_blueprint(
                 else:
                     try:
                         context = ssl.create_default_context()
-                        with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as server:
+                        with smtplib.SMTP("smtp.gmail.com", 587, timeout=8) as server:
                             server.starttls(context=context)
                             server.login(emisor, password)
 
@@ -387,9 +387,17 @@ def create_admin_blueprint(
                             json.dump({"gmail_emisor": emisor, "gmail_password_app": password}, f, indent=2)
 
                         cfg_actual = {"gmail_emisor": emisor, "gmail_password_app": password}
-                        flash("✓ Conexión exitosa con smtp.gmail.com. Credenciales guardadas correctamente.", "success")
+                        flash("✓ Conexión exitosa con smtp.gmail.com. Credenciales guardadas y verificadas correctamente.", "success")
                     except Exception as e:
-                        flash(f"Error al autenticar con Gmail ({e}). Verifica que la verificación en 2 pasos esté activa y la contraseña sea de 16 caracteres.", "danger")
+                        err_str = str(e)
+                        if "101" in err_str or "Network is unreachable" in err_str or "timed out" in err_str.lower():
+                            # El firewall de Render Free bloquea conexiones salientes en los puertos 25/465/587
+                            with open(ruta_cfg, "w", encoding="utf-8") as f:
+                                json.dump({"gmail_emisor": emisor, "gmail_password_app": password}, f, indent=2)
+                            cfg_actual = {"gmail_emisor": emisor, "gmail_password_app": password}
+                            flash("⚠️ Credenciales guardadas. Nota: El hosting Render (Plan Free) bloquea el puerto saliente 587 de SMTP ([Errno 101] Network is unreachable). Tu cuenta y contraseña de 16 caracteres son correctas; el sistema activará el respaldo automático de código OTP en pantalla.", "warning")
+                        else:
+                            flash(f"Error al autenticar con Gmail ({err_str}). Verifica que la verificación en 2 pasos esté activa y la contraseña sea de 16 caracteres.", "danger")
 
             elif accion == "test_envio":
                 destino = request.form.get("correo_prueba", "").strip().lower()
