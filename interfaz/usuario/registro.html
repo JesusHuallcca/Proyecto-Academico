@@ -539,13 +539,8 @@
 
                     displayCorreo.textContent = correo;
 
-                    if (data.codigo_demo) {
-                        inputCodigoOtp.value = data.codigo_demo;
-                        mostrarExito(`⚠️ Entorno Render Cloud (puertos SMTP restringidos). Tu código OTP es: ${data.codigo_demo}`);
-                    } else {
-                        inputCodigoOtp.value = "";
-                        mostrarExito("¡Código enviado a tu Gmail! Abre el aplicativo en tu celular para verlo.");
-                    }
+                    inputCodigoOtp.value = "";
+                    mostrarExito("¡Código enviado a tu Gmail! Abre el aplicativo en tu celular para verlo.");
                     setTimeout(() => inputCodigoOtp.focus(), 150);
 
                     iniciarCooldownReenvio(30);

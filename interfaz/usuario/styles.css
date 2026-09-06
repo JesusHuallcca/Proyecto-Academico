@@ -3009,3 +3009,170 @@ body.theme-dark .qr-svg {
     background: rgba(59, 130, 246, 0.18) !important;
     color: #3B82F6 !important;
 }
+
+/* ============================================================ */
+/* MODO NATIVO PARA DISPOSITIVOS MÓVILES (SOLO EN CELULARES)   */
+/* Elimina el marco del mockup, notch y barra simulada en cel   */
+/* En PC se mantiene intacto con su mockup y diseño original   */
+/* ============================================================ */
+
+@media screen and (max-width: 650px), (pointer: coarse) and (max-width: 850px) {
+    html, body {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        background: var(--bg-surface) !important;
+        background-image: none !important;
+    }
+
+    .device-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+
+    .smartphone-frame {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-height: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: var(--bg-surface) !important;
+    }
+
+    /* Ocultar el notch y la barra de estado simulada (el celular ya tiene los suyos nativos) */
+    .speaker-notch,
+    .phone-status-bar {
+        display: none !important;
+    }
+
+    .app-screen {
+        width: 100% !important;
+        height: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        border-radius: 0 !important;
+        padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    /* Encabezados adaptados al borde superior real de la pantalla del móvil */
+    .yape-header {
+        padding: 1.2rem 1.2rem 1.4rem 1.2rem !important;
+        padding-top: max(1.2rem, env(safe-area-inset-top, 0px)) !important;
+        border-top-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
+    }
+
+    .view-header-simple,
+    .yape-seguro-header {
+        padding-top: max(1.2rem, env(safe-area-inset-top, 0px)) !important;
+        border-top-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
+    }
+
+    /* Barra inferior pegada a la pantalla completa */
+    .bottom-nav-bar {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        padding-bottom: max(0.4rem, env(safe-area-inset-bottom, 0px)) !important;
+        height: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    /* Modales y hojas desplegables al 100% del ancho del móvil */
+    .modal-overlay {
+        border-radius: 0 !important;
+    }
+
+    .modal-sheet {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px)) !important;
+        max-height: 92% !important;
+    }
+}
+
+/* Soporte reforzado por clase JavaScript is-mobile-device */
+html.is-mobile-device,
+body.is-mobile-device {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    background: var(--bg-surface) !important;
+    background-image: none !important;
+}
+
+html.is-mobile-device .device-wrapper,
+body.is-mobile-device .device-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+}
+
+html.is-mobile-device .smartphone-frame,
+body.is-mobile-device .smartphone-frame {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: var(--bg-surface) !important;
+}
+
+html.is-mobile-device .speaker-notch,
+html.is-mobile-device .phone-status-bar,
+body.is-mobile-device .speaker-notch,
+body.is-mobile-device .phone-status-bar {
+    display: none !important;
+}
+
+html.is-mobile-device .app-screen,
+body.is-mobile-device .app-screen {
+    border-radius: 0 !important;
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+html.is-mobile-device .bottom-nav-bar,
+body.is-mobile-device .bottom-nav-bar {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+html.is-mobile-device .modal-overlay,
+body.is-mobile-device .modal-overlay {
+    border-radius: 0 !important;
+}
+
+html.is-mobile-device .modal-sheet,
+body.is-mobile-device .modal-sheet {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+

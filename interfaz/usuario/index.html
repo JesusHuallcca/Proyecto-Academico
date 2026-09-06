@@ -3,14 +3,23 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Yape | BCP - Billetera Digital & Protección IA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="/usuario/styles.css?v=2.5">
+    <link rel="stylesheet" href="/usuario/styles.css?v=2.6">
+    <script>
+        (function() {
+            var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                || (window.innerWidth <= 650 && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+            if (isMobile) {
+                document.documentElement.classList.add('is-mobile-device');
+            }
+        })();
+    </script>
 </head>
 
 <body class="theme-dark">

@@ -27,7 +27,25 @@ function getAuthHeaders(extra = {}) {
     return headers;
 }
 
+function inicializarDeteccionMovil() {
+    function aplicar() {
+        const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            || (window.innerWidth <= 650 && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+        if (esMovil) {
+            document.documentElement.classList.add("is-mobile-device");
+            document.body.classList.add("is-mobile-device");
+        } else {
+            document.documentElement.classList.remove("is-mobile-device");
+            document.body.classList.remove("is-mobile-device");
+        }
+    }
+    aplicar();
+    window.addEventListener("resize", aplicar);
+    window.addEventListener("orientationchange", aplicar);
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
+    inicializarDeteccionMovil();
     inicializarReloj();
     inicializarTemaUsuario();
     

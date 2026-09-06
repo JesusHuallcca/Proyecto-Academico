@@ -431,7 +431,11 @@ def create_admin_blueprint(
 
                             flash(f"✓ Correo de prueba despachado exitosamente a {destino}.", "success")
                         except Exception as e:
-                            flash(f"Error en envío de prueba: {e}", "danger")
+                            err_str = str(e)
+                            if "101" in err_str or "Network is unreachable" in err_str or "timed out" in err_str.lower():
+                                flash(f"⚠️ El correo de prueba no se pudo enviar porque el hosting Render (Plan Free) bloquea el puerto saliente 587 ([Errno 101]). Esto es esperado; tu app usará el código de respaldo en pantalla para los registros.", "warning")
+                            else:
+                                flash(f"Error en envío de prueba: {e}", "danger")
 
         kpis = data_provider.get_kpis()
         return render_template(
