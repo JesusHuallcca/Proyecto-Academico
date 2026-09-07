@@ -94,6 +94,36 @@ def conectar_bd():
 
 
 # ============================================================
+# LÍMITES DE NEGOCIO YAPE / BCP (REALES)
+# ============================================================
+
+# Límites por operación individual (según producto)
+LIMITE_YAPE = 500.00            # Yape y Recarga: máx S/ 500 por operación
+LIMITE_TRANSFERENCIA = 2000.00  # Transferencia, Pago de servicios, Compra: máx S/ 2,000
+LIMITE_DIARIO = 2000.00         # Total acumulado en el día (todos los productos)
+
+PRODUCTOS_LIMITE_YAPE = {"Yape", "Recarga"}
+PRODUCTOS_LIMITE_TRANSFERENCIA = {"Transferencia", "Pago de servicios", "Compra"}
+
+
+def obtener_acumulado_diario(cursor, id_usuario):
+    """
+    Calcula el monto total de transacciones APROBADAS del usuario en el día de hoy.
+    Se usa para verificar el límite diario acumulado.
+    """
+    hoy = datetime.now().strftime("%Y-%m-%d")
+    cursor.execute("""
+        SELECT COALESCE(SUM(monto), 0.0) AS acumulado
+        FROM transacciones
+        WHERE id_usuario = ?
+          AND resultado = 'APROBADA'
+          AND fecha_hora >= ?
+    """, (id_usuario, f"{hoy} 00:00:00"))
+    row = cursor.fetchone()
+    return float(row["acumulado"]) if row else 0.0
+
+
+# ============================================================
 # MOTOR DE DETECCIÓN Y EVALUACIÓN DE FRAUDE
 # ============================================================
 
@@ -1194,6 +1224,39 @@ def api_usuario_yapear():
             "mensaje": f"Saldo insuficiente. Tu saldo disponible es S/ {saldo_actual:.2f}"
         }), 400
 
+    # 1b. Validar límites de negocio Yape / BCP (REGLAS DURAS)
+    if producto in PRODUCTOS_LIMITE_YAPE and monto > LIMITE_YAPE:
+        conexion.close()
+        return jsonify({
+            "status": "limit_exceeded",
+            "mensaje": f"El monto supera el límite por operación de {producto} (S/ {LIMITE_YAPE:.0f}.00). "
+                       f"Para transferir montos mayores usa la opción 'Transferencia'.",
+            "limite": LIMITE_YAPE
+        }), 400
+
+    if producto in PRODUCTOS_LIMITE_TRANSFERENCIA and monto > LIMITE_TRANSFERENCIA:
+        conexion.close()
+        return jsonify({
+            "status": "limit_exceeded",
+            "mensaje": f"El monto supera el límite por operación de {producto} (S/ {LIMITE_TRANSFERENCIA:,.0f}.00). "
+                       f"Contacta con BCP para operaciones de mayor envergadura.",
+            "limite": LIMITE_TRANSFERENCIA
+        }), 400
+
+    # Verificar límite diario acumulado
+    acumulado_hoy = obtener_acumulado_diario(cursor, usuario["id_usuario"])
+    if acumulado_hoy + monto > LIMITE_DIARIO:
+        disponible = max(0.0, LIMITE_DIARIO - acumulado_hoy)
+        conexion.close()
+        return jsonify({
+            "status": "limit_exceeded",
+            "mensaje": f"Límite diario alcanzado. Ya enviaste S/ {acumulado_hoy:.2f} hoy. "
+                       f"Solo puedes enviar hasta S/ {disponible:.2f} más (límite diario: S/ {LIMITE_DIARIO:,.0f}).",
+            "limite_diario": LIMITE_DIARIO,
+            "acumulado": acumulado_hoy,
+            "disponible": disponible
+        }), 400
+
     # 2. Calcular variables de comportamiento
     now = datetime.now()
     hora_actual = now.hour
@@ -1240,6 +1303,14 @@ def api_usuario_yapear():
         "producto": producto
     }
 
+    # 2b. Refuerzo antifraude: montos inusualmente altos vs historial del usuario
+    # Si el monto supera 4× el promedio habitual del usuario y es > S/ 200,
+    # se elevan artificialmente los indicadores de riesgo para sensibilizar el modelo.
+    if monto > max(200.0, monto_promedio * 4):
+        tx_feature_data["destinatario_nuevo"] = max(tx_feature_data["destinatario_nuevo"], 1)
+        # Reducir velocidad para reflejar urgencia inducida
+        tx_feature_data["velocidad_operacion"] = min(tx_feature_data["velocidad_operacion"], 15.0)
+
     # 3. Evaluación de Machine Learning
     evaluacion = predecir_fraude(tx_feature_data)
     es_fraude = evaluacion["es_fraude"]
@@ -1247,6 +1318,12 @@ def api_usuario_yapear():
     prob_normal = evaluacion["probabilidad_normal"]
     nivel_riesgo = evaluacion["nivel_riesgo"]
     factores = evaluacion["factores"]
+
+    # Añadir factor explicativo si el monto es inusualmente elevado
+    if monto > max(200.0, monto_promedio * 4):
+        aviso_monto = f"Monto S/ {monto:.2f} es muy superior a tu promedio habitual (S/ {monto_promedio:.2f})."
+        if aviso_monto not in factores:
+            factores.insert(0, aviso_monto)
 
     fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
 

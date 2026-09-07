@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Yape | BCP - Billetera Digital & Protección IA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +13,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="/usuario/styles.css?v=2.6">
     <script>
-        (function() {
+        (function () {
             var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
                 || (window.innerWidth <= 650 && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
             if (isMobile) {
@@ -123,7 +124,8 @@
                             <span class="action-btn-text">Yapear</span>
                         </button>
 
-                        <button class="action-btn-sub" id="btnOpenTransfer" title="Transferir a Plin, Agora, BIM, Tunki y bancos">
+                        <button class="action-btn-sub" id="btnOpenTransfer"
+                            title="Transferir a Plin, Agora, BIM, Tunki y bancos">
                             <div class="action-icon-circle action-icon-transfer">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2.2">
@@ -158,7 +160,8 @@
                             <span class="action-btn-text">Compras</span>
                         </button>
 
-                        <button class="action-btn-sub" id="btnOpenRecargas" title="Recargas de saldo Claro, Movistar, Entel, Bitel">
+                        <button class="action-btn-sub" id="btnOpenRecargas"
+                            title="Recargas de saldo Claro, Movistar, Entel, Bitel">
                             <div class="action-icon-circle action-icon-recargas">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
@@ -196,11 +199,11 @@
                             </button>
                             <button class="test-chip chip-warning" id="btnTestWarning"
                                 title="Monto mayor a destinatario nuevo">
-                                🟡 Monto Atípico (S/ 750)
+                                🟡 Monto Atípico (S/ 350)
                             </button>
                             <button class="test-chip chip-danger" id="btnTestFraud"
                                 title="Simula ataque de madrugada, nuevo equipo y velocidad extrema">
-                                🔴 Ataque / Fraude (S/ 4,200)
+                                🔴 Ataque / Fraude (S/ 480)
                             </button>
                         </div>
                     </section>
@@ -587,7 +590,8 @@
                             <div class="settings-item-row" id="btnToggleThemeInSettings">
                                 <div class="settings-item-left">
                                     <div class="settings-icon-box" style="background: rgba(116,34,132,0.15);">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B30B5" stroke-width="2">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9B30B5"
+                                            stroke-width="2">
                                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                                         </svg>
                                     </div>
@@ -606,7 +610,8 @@
                             <div class="settings-item-row" id="btnSettingsPin">
                                 <div class="settings-item-left">
                                     <div class="settings-icon-box" style="background: rgba(16,185,129,0.15);">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981"
+                                            stroke-width="2">
                                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                         </svg>
@@ -621,7 +626,8 @@
                             <div class="settings-item-row">
                                 <div class="settings-item-left">
                                     <div class="settings-icon-box" style="background: rgba(59,130,246,0.15);">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6"
+                                            stroke-width="2">
                                             <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
                                             <path d="M12 18h.01"></path>
                                         </svg>
@@ -638,7 +644,8 @@
                         <!-- Acciones -->
                         <div class="settings-group">
                             <button class="btn-logout-full" id="btnLogoutFull">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
                                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                                     <polyline points="16 17 21 12 16 7"></polyline>
                                     <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -762,8 +769,9 @@
                             <div class="amount-input-wrap">
                                 <span class="amount-symbol">S/</span>
                                 <input type="number" id="inputMonto" class="yape-input-large" placeholder="0.00"
-                                    step="0.50" min="1" max="10000" value="25.00" required>
+                                    step="0.50" min="1" max="500" value="25.00" required>
                             </div>
+                            <div class="yape-limit-hint">⚡ Límite por operación: <strong>S/ 500.00</strong> &nbsp;|&nbsp; Límite diario: <strong>S/ 2,000.00</strong></div>
                             <div class="quick-amounts">
                                 <button type="button" class="btn-quick-amt" data-val="10">+ S/ 10</button>
                                 <button type="button" class="btn-quick-amt" data-val="20">+ S/ 20</button>
@@ -844,7 +852,7 @@
                         </div>
                         <div class="voucher-row security-verified">
                             <span>Seguridad:</span>
-                            <span class="verified-pill">✓ Validado por IA Antifraude (99.8% Legítimo)</span>
+                            <span class="verified-pill" id="voucherSeguridadPill">✓ Validado por IA Antifraude (99.8% Legítimo)</span>
                         </div>
                     </div>
 
@@ -1135,68 +1143,72 @@
                             <!-- QR generado con SVG paths para simular el patrón real -->
                             <svg class="qr-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                                 <!-- Esquinas de posición -->
-                                <rect x="10" y="10" width="60" height="60" rx="6" fill="none" stroke="currentColor" stroke-width="8"/>
-                                <rect x="22" y="22" width="36" height="36" rx="3" fill="currentColor"/>
-                                <rect x="130" y="10" width="60" height="60" rx="6" fill="none" stroke="currentColor" stroke-width="8"/>
-                                <rect x="142" y="22" width="36" height="36" rx="3" fill="currentColor"/>
-                                <rect x="10" y="130" width="60" height="60" rx="6" fill="none" stroke="currentColor" stroke-width="8"/>
-                                <rect x="22" y="142" width="36" height="36" rx="3" fill="currentColor"/>
+                                <rect x="10" y="10" width="60" height="60" rx="6" fill="none" stroke="currentColor"
+                                    stroke-width="8" />
+                                <rect x="22" y="22" width="36" height="36" rx="3" fill="currentColor" />
+                                <rect x="130" y="10" width="60" height="60" rx="6" fill="none" stroke="currentColor"
+                                    stroke-width="8" />
+                                <rect x="142" y="22" width="36" height="36" rx="3" fill="currentColor" />
+                                <rect x="10" y="130" width="60" height="60" rx="6" fill="none" stroke="currentColor"
+                                    stroke-width="8" />
+                                <rect x="22" y="142" width="36" height="36" rx="3" fill="currentColor" />
                                 <!-- Módulos del QR (patrón simulado) -->
-                                <rect x="82" y="10" width="8" height="8" fill="currentColor"/>
-                                <rect x="94" y="10" width="8" height="8" fill="currentColor"/>
-                                <rect x="106" y="10" width="8" height="8" fill="currentColor"/>
-                                <rect x="82" y="22" width="8" height="8" fill="currentColor"/>
-                                <rect x="106" y="22" width="8" height="8" fill="currentColor"/>
-                                <rect x="82" y="34" width="8" height="8" fill="currentColor"/>
-                                <rect x="94" y="34" width="8" height="8" fill="currentColor"/>
-                                <rect x="82" y="46" width="8" height="8" fill="currentColor"/>
-                                <rect x="94" y="58" width="8" height="8" fill="currentColor"/>
-                                <rect x="106" y="58" width="8" height="8" fill="currentColor"/>
-                                <rect x="118" y="10" width="8" height="8" fill="currentColor"/>
-                                <rect x="118" y="34" width="8" height="8" fill="currentColor"/>
-                                <rect x="118" y="58" width="8" height="8" fill="currentColor"/>
+                                <rect x="82" y="10" width="8" height="8" fill="currentColor" />
+                                <rect x="94" y="10" width="8" height="8" fill="currentColor" />
+                                <rect x="106" y="10" width="8" height="8" fill="currentColor" />
+                                <rect x="82" y="22" width="8" height="8" fill="currentColor" />
+                                <rect x="106" y="22" width="8" height="8" fill="currentColor" />
+                                <rect x="82" y="34" width="8" height="8" fill="currentColor" />
+                                <rect x="94" y="34" width="8" height="8" fill="currentColor" />
+                                <rect x="82" y="46" width="8" height="8" fill="currentColor" />
+                                <rect x="94" y="58" width="8" height="8" fill="currentColor" />
+                                <rect x="106" y="58" width="8" height="8" fill="currentColor" />
+                                <rect x="118" y="10" width="8" height="8" fill="currentColor" />
+                                <rect x="118" y="34" width="8" height="8" fill="currentColor" />
+                                <rect x="118" y="58" width="8" height="8" fill="currentColor" />
                                 <!-- Zona central -->
-                                <rect x="82" y="82" width="36" height="36" rx="4" fill="none" stroke="#742284" stroke-width="5"/>
-                                <rect x="93" y="93" width="14" height="14" rx="2" fill="#742284"/>
+                                <rect x="82" y="82" width="36" height="36" rx="4" fill="none" stroke="#742284"
+                                    stroke-width="5" />
+                                <rect x="93" y="93" width="14" height="14" rx="2" fill="#742284" />
                                 <!-- Módulos zona inferior -->
-                                <rect x="130" y="82" width="8" height="8" fill="currentColor"/>
-                                <rect x="142" y="82" width="8" height="8" fill="currentColor"/>
-                                <rect x="154" y="82" width="8" height="8" fill="currentColor"/>
-                                <rect x="166" y="82" width="8" height="8" fill="currentColor"/>
-                                <rect x="130" y="94" width="8" height="8" fill="currentColor"/>
-                                <rect x="154" y="94" width="8" height="8" fill="currentColor"/>
-                                <rect x="130" y="106" width="8" height="8" fill="currentColor"/>
-                                <rect x="142" y="106" width="8" height="8" fill="currentColor"/>
-                                <rect x="166" y="106" width="8" height="8" fill="currentColor"/>
-                                <rect x="130" y="118" width="8" height="8" fill="currentColor"/>
-                                <rect x="154" y="118" width="8" height="8" fill="currentColor"/>
-                                <rect x="166" y="118" width="8" height="8" fill="currentColor"/>
+                                <rect x="130" y="82" width="8" height="8" fill="currentColor" />
+                                <rect x="142" y="82" width="8" height="8" fill="currentColor" />
+                                <rect x="154" y="82" width="8" height="8" fill="currentColor" />
+                                <rect x="166" y="82" width="8" height="8" fill="currentColor" />
+                                <rect x="130" y="94" width="8" height="8" fill="currentColor" />
+                                <rect x="154" y="94" width="8" height="8" fill="currentColor" />
+                                <rect x="130" y="106" width="8" height="8" fill="currentColor" />
+                                <rect x="142" y="106" width="8" height="8" fill="currentColor" />
+                                <rect x="166" y="106" width="8" height="8" fill="currentColor" />
+                                <rect x="130" y="118" width="8" height="8" fill="currentColor" />
+                                <rect x="154" y="118" width="8" height="8" fill="currentColor" />
+                                <rect x="166" y="118" width="8" height="8" fill="currentColor" />
                                 <!-- Módulos zona inferior izquierda -->
-                                <rect x="82" y="130" width="8" height="8" fill="currentColor"/>
-                                <rect x="94" y="130" width="8" height="8" fill="currentColor"/>
-                                <rect x="106" y="130" width="8" height="8" fill="currentColor"/>
-                                <rect x="82" y="142" width="8" height="8" fill="currentColor"/>
-                                <rect x="106" y="142" width="8" height="8" fill="currentColor"/>
-                                <rect x="82" y="154" width="8" height="8" fill="currentColor"/>
-                                <rect x="94" y="154" width="8" height="8" fill="currentColor"/>
-                                <rect x="106" y="154" width="8" height="8" fill="currentColor"/>
-                                <rect x="82" y="166" width="8" height="8" fill="currentColor"/>
-                                <rect x="94" y="178" width="8" height="8" fill="currentColor"/>
-                                <rect x="106" y="166" width="8" height="8" fill="currentColor"/>
+                                <rect x="82" y="130" width="8" height="8" fill="currentColor" />
+                                <rect x="94" y="130" width="8" height="8" fill="currentColor" />
+                                <rect x="106" y="130" width="8" height="8" fill="currentColor" />
+                                <rect x="82" y="142" width="8" height="8" fill="currentColor" />
+                                <rect x="106" y="142" width="8" height="8" fill="currentColor" />
+                                <rect x="82" y="154" width="8" height="8" fill="currentColor" />
+                                <rect x="94" y="154" width="8" height="8" fill="currentColor" />
+                                <rect x="106" y="154" width="8" height="8" fill="currentColor" />
+                                <rect x="82" y="166" width="8" height="8" fill="currentColor" />
+                                <rect x="94" y="178" width="8" height="8" fill="currentColor" />
+                                <rect x="106" y="166" width="8" height="8" fill="currentColor" />
                                 <!-- Módulos zona inferior derecha adicional -->
-                                <rect x="130" y="130" width="8" height="8" fill="currentColor"/>
-                                <rect x="142" y="130" width="8" height="8" fill="currentColor"/>
-                                <rect x="166" y="130" width="8" height="8" fill="currentColor"/>
-                                <rect x="130" y="142" width="8" height="8" fill="currentColor"/>
-                                <rect x="154" y="142" width="8" height="8" fill="currentColor"/>
-                                <rect x="142" y="154" width="8" height="8" fill="currentColor"/>
-                                <rect x="154" y="154" width="8" height="8" fill="currentColor"/>
-                                <rect x="166" y="154" width="8" height="8" fill="currentColor"/>
-                                <rect x="130" y="166" width="8" height="8" fill="currentColor"/>
-                                <rect x="154" y="166" width="8" height="8" fill="currentColor"/>
-                                <rect x="130" y="178" width="8" height="8" fill="currentColor"/>
-                                <rect x="142" y="178" width="8" height="8" fill="currentColor"/>
-                                <rect x="166" y="178" width="8" height="8" fill="currentColor"/>
+                                <rect x="130" y="130" width="8" height="8" fill="currentColor" />
+                                <rect x="142" y="130" width="8" height="8" fill="currentColor" />
+                                <rect x="166" y="130" width="8" height="8" fill="currentColor" />
+                                <rect x="130" y="142" width="8" height="8" fill="currentColor" />
+                                <rect x="154" y="142" width="8" height="8" fill="currentColor" />
+                                <rect x="142" y="154" width="8" height="8" fill="currentColor" />
+                                <rect x="154" y="154" width="8" height="8" fill="currentColor" />
+                                <rect x="166" y="154" width="8" height="8" fill="currentColor" />
+                                <rect x="130" y="166" width="8" height="8" fill="currentColor" />
+                                <rect x="154" y="166" width="8" height="8" fill="currentColor" />
+                                <rect x="130" y="178" width="8" height="8" fill="currentColor" />
+                                <rect x="142" y="178" width="8" height="8" fill="currentColor" />
+                                <rect x="166" y="178" width="8" height="8" fill="currentColor" />
                             </svg>
                         </div>
                         <div class="qr-user-info">
@@ -1207,7 +1219,8 @@
                             </div>
                         </div>
                         <div class="qr-yape-badge">Yape BCP · Cuenta verificada ✓</div>
-                        <button class="btn-voucher-finish" id="btnShareQR" style="margin-top: 0.5rem;">Compartir QR</button>
+                        <button class="btn-voucher-finish" id="btnShareQR" style="margin-top: 0.5rem;">Compartir
+                            QR</button>
                     </div>
                 </div>
             </div>
@@ -1227,52 +1240,68 @@
                         <div id="serviciosGridWrap">
                             <p class="servicios-subtitle">Selecciona el servicio que deseas pagar con tu saldo BCP</p>
                             <div class="servicios-grid">
-                                <button class="servicio-card" id="svcLuz" data-service="Luz / Energía" data-companies="Luz del Sur,Enel Perú,Electrocentro,Hidrandina">
+                                <button class="servicio-card" id="svcLuz" data-service="Luz / Energía"
+                                    data-companies="Luz del Sur,Enel Perú,Electrocentro,Hidrandina">
                                     <div class="servicio-icon-wrap" style="background: rgba(245, 158, 11, 0.15);">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F59E0B"
+                                            stroke-width="2">
                                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                                         </svg>
                                     </div>
                                     <span>Luz / Energía</span>
                                 </button>
-                                <button class="servicio-card" id="svcAgua" data-service="Agua Potable" data-companies="Sedapal,Sedalib,EPS Grau,SedaCusco">
+                                <button class="servicio-card" id="svcAgua" data-service="Agua Potable"
+                                    data-companies="Sedapal,Sedalib,EPS Grau,SedaCusco">
                                     <div class="servicio-icon-wrap" style="background: rgba(59, 130, 246, 0.15);">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3B82F6"
+                                            stroke-width="2">
                                             <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
                                         </svg>
                                     </div>
                                     <span>Agua</span>
                                 </button>
-                                <button class="servicio-card" id="svcGas" data-service="Gas Natural" data-companies="Cálidda Gas,Quavii">
+                                <button class="servicio-card" id="svcGas" data-service="Gas Natural"
+                                    data-companies="Cálidda Gas,Quavii">
                                     <div class="servicio-icon-wrap" style="background: rgba(234, 88, 12, 0.15);">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="2">
-                                            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EA580C"
+                                            stroke-width="2">
+                                            <path
+                                                d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z">
+                                            </path>
                                         </svg>
                                     </div>
                                     <span>Gas Natural</span>
                                 </button>
-                                <button class="servicio-card" id="svcCable" data-service="TV / Cable" data-companies="DirecTV,Movistar TV,Claro TV">
+                                <button class="servicio-card" id="svcCable" data-service="TV / Cable"
+                                    data-companies="DirecTV,Movistar TV,Claro TV">
                                     <div class="servicio-icon-wrap" style="background: rgba(139, 92, 246, 0.15);">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6"
+                                            stroke-width="2">
                                             <rect x="2" y="7" width="20" height="15" rx="2"></rect>
                                             <polyline points="17 2 12 7 7 2"></polyline>
                                         </svg>
                                     </div>
                                     <span>TV / Cable</span>
                                 </button>
-                                <button class="servicio-card" id="svcInternet" data-service="Internet" data-companies="Win Fibra,Movistar Hogar,Claro Fibra,WOW">
+                                <button class="servicio-card" id="svcInternet" data-service="Internet"
+                                    data-companies="Win Fibra,Movistar Hogar,Claro Fibra,WOW">
                                     <div class="servicio-icon-wrap" style="background: rgba(0, 210, 196, 0.15);">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00D2C4" stroke-width="2">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00D2C4"
+                                            stroke-width="2">
                                             <circle cx="12" cy="12" r="10"></circle>
                                             <line x1="2" y1="12" x2="22" y2="12"></line>
-                                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                            <path
+                                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                                            </path>
                                         </svg>
                                     </div>
                                     <span>Internet</span>
                                 </button>
-                                <button class="servicio-card" id="svcSeguro" data-service="Seguros" data-companies="Pacífico Seguros,Rímac Seguros,La Positiva,Mapfre">
+                                <button class="servicio-card" id="svcSeguro" data-service="Seguros"
+                                    data-companies="Pacífico Seguros,Rímac Seguros,La Positiva,Mapfre">
                                     <div class="servicio-icon-wrap" style="background: rgba(239, 68, 68, 0.15);">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EF4444"
+                                            stroke-width="2">
                                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                                         </svg>
                                     </div>
@@ -1280,10 +1309,12 @@
                                 </button>
                             </div>
                             <div class="svc-security-note">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
                                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                                 </svg>
-                                Los pagos de servicios se liquidan al instante y están protegidos por el motor Antifraude BCP.
+                                Los pagos de servicios se liquidan al instante y están protegidos por el motor
+                                Antifraude BCP.
                             </div>
                         </div>
 
@@ -1302,21 +1333,24 @@
                                     <div class="company-chips" id="companyChipsList">
                                         <!-- Inyectado dinámicamente -->
                                     </div>
-                                    <input type="text" id="inputSvcEmpresa" class="yape-input" placeholder="Nombre de la empresa" required>
+                                    <input type="text" id="inputSvcEmpresa" class="yape-input"
+                                        placeholder="Nombre de la empresa" required>
                                 </div>
 
                                 <div class="form-group">
                                     <label id="lblSvcCodigo">Código de Suministro / N° de Recibo</label>
-                                    <input type="text" id="inputSvcCodigo" class="yape-input" placeholder="Ej: 1489201" value="4829103" required>
+                                    <input type="text" id="inputSvcCodigo" class="yape-input" placeholder="Ej: 1489201"
+                                        value="4829103" required>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Monto a Pagar (S/)</label>
                                     <div class="amount-input-wrap">
                                         <span class="amount-symbol">S/</span>
-                                        <input type="number" id="inputSvcMonto" class="yape-input-large" placeholder="0.00"
-                                            step="0.50" min="1" max="5000" value="65.50" required>
+                                        <input type="number" id="inputSvcMonto" class="yape-input-large"
+                                            placeholder="0.00" step="0.50" min="1" max="2000" value="65.50" required>
                                     </div>
+                                    <div class="yape-limit-hint">⚡ Límite por operación: <strong>S/ 2,000.00</strong> &nbsp;|&nbsp; Límite diario: <strong>S/ 2,000.00</strong></div>
                                     <div class="quick-amounts" id="quickAmountsSvc">
                                         <button type="button" class="btn-quick-amt-svc" data-val="20">+ S/ 20</button>
                                         <button type="button" class="btn-quick-amt-svc" data-val="50">+ S/ 50</button>
@@ -1327,7 +1361,8 @@
 
                                 <div class="form-group">
                                     <label>Detalle o Mes de Facturación (opcional)</label>
-                                    <input type="text" id="inputSvcNota" class="yape-input" placeholder="Ej: Recibo Setiembre 2026">
+                                    <input type="text" id="inputSvcNota" class="yape-input"
+                                        placeholder="Ej: Recibo Setiembre 2026">
                                 </div>
 
                                 <!-- Simulación Antifraude -->
@@ -1403,8 +1438,8 @@
                         <!-- Destinatario -->
                         <div class="form-group">
                             <label id="lblTransferDest">Número de celular asociado a Plin</label>
-                            <input type="text" id="inputTransferDest" class="yape-input"
-                                placeholder="Ej: 987 654 321" value="914 555 888" required>
+                            <input type="text" id="inputTransferDest" class="yape-input" placeholder="Ej: 987 654 321"
+                                value="914 555 888" required>
                         </div>
 
                         <div class="form-group">
@@ -1419,8 +1454,9 @@
                             <div class="amount-input-wrap">
                                 <span class="amount-symbol">S/</span>
                                 <input type="number" id="inputTransferMonto" class="yape-input-large" placeholder="0.00"
-                                    step="0.50" min="1" max="10000" value="50.00" required>
+                                    step="0.50" min="1" max="2000" value="50.00" required>
                             </div>
+                            <div class="yape-limit-hint">⚡ Límite por operación: <strong>S/ 2,000.00</strong> &nbsp;|&nbsp; Límite diario: <strong>S/ 2,000.00</strong></div>
                             <div class="quick-amounts" id="quickAmountsTransfer">
                                 <button type="button" class="btn-quick-amt-tf" data-val="10">+ S/ 10</button>
                                 <button type="button" class="btn-quick-amt-tf" data-val="20">+ S/ 20</button>
@@ -1475,12 +1511,14 @@
                         <div class="form-group">
                             <label>Selecciona un comercio frecuente o escribe uno:</label>
                             <div class="merchant-chips" id="merchantChips">
-                                <button type="button" class="merchant-chip active" data-name="Saga Falabella">🏬 Falabella</button>
+                                <button type="button" class="merchant-chip active" data-name="Saga Falabella">🏬
+                                    Falabella</button>
                                 <button type="button" class="merchant-chip" data-name="Ripley Perú">🛍️ Ripley</button>
                                 <button type="button" class="merchant-chip" data-name="Plaza Vea">🛒 Plaza Vea</button>
                                 <button type="button" class="merchant-chip" data-name="Tambo">🏪 Tambo</button>
                                 <button type="button" class="merchant-chip" data-name="Inkafarma">💊 Inkafarma</button>
-                                <button type="button" class="merchant-chip" data-name="Mercado Libre">📦 M. Libre</button>
+                                <button type="button" class="merchant-chip" data-name="Mercado Libre">📦 M.
+                                    Libre</button>
                             </div>
                             <input type="text" id="inputCompraComercio" class="yape-input"
                                 placeholder="Nombre de la tienda o establecimiento" value="Saga Falabella" required>
@@ -1498,7 +1536,9 @@
                             <div class="amount-input-wrap">
                                 <span class="amount-symbol">S/</span>
                                 <input type="number" id="inputCompraMonto" class="yape-input-large" placeholder="0.00"
-                                    step="0.50" min="1" max="10000" value="85.00" required>
+                                    step="0.50" min="1" max="2000" value="85.00" required>
+                            </div>
+                            <div class="yape-limit-hint">⚡ Límite por operación: <strong>S/ 2,000.00</strong> &nbsp;|&nbsp; Límite diario: <strong>S/ 2,000.00</strong></div>
                             </div>
                             <div class="quick-amounts" id="quickAmountsCompras">
                                 <button type="button" class="btn-quick-amt-cp" data-val="20">+ S/ 20</button>
@@ -1574,8 +1614,8 @@
 
                         <div class="form-group">
                             <label>Número de celular a recargar</label>
-                            <input type="tel" id="inputRecargaNumero" class="yape-input"
-                                placeholder="Ej: 987 654 321" value="987 654 321" required>
+                            <input type="tel" id="inputRecargaNumero" class="yape-input" placeholder="Ej: 987 654 321"
+                                value="987 654 321" required>
                         </div>
 
                         <!-- Monto -->

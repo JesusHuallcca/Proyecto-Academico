@@ -728,11 +728,11 @@ function configurarBotonesPrueba() {
         actualizarBotonSubmit();
     });
 
-    // Prueba 2: Monto Atípico (S/ 750)
+    // Prueba 2: Monto Atípico (S/ 350)
     document.getElementById("btnTestWarning")?.addEventListener("click", () => {
         if (modalYapear) modalYapear.style.display = "flex";
         if (inputDestinatario) inputDestinatario.value = "Carlos Quispe (912 345 678)";
-        if (inputMonto) inputMonto.value = "750.00";
+        if (inputMonto) inputMonto.value = "350.00";
         if (inputNota) inputNota.value = "Pago de cuota";
         if (chkSimularFraude) chkSimularFraude.checked = false;
         if (chkDestNuevo) chkDestNuevo.checked = true;
@@ -741,11 +741,11 @@ function configurarBotonesPrueba() {
         actualizarBotonSubmit();
     });
 
-    // Prueba 3: Intento de Fraude Crítico (S/ 4,200)
+    // Prueba 3: Intento de Fraude Crítico (S/ 480)
     document.getElementById("btnTestFraud")?.addEventListener("click", () => {
         if (modalYapear) modalYapear.style.display = "flex";
         if (inputDestinatario) inputDestinatario.value = "Destinatario Desconocido (955 888 999)";
-        if (inputMonto) inputMonto.value = "4200.00";
+        if (inputMonto) inputMonto.value = "480.00";
         if (inputNota) inputNota.value = "Transferencia urgente";
         if (chkSimularFraude) chkSimularFraude.checked = true;
         if (chkDestNuevo) chkDestNuevo.checked = true;
@@ -1111,7 +1111,7 @@ function renderizarHistorialCompleto() {
 // ============================================================
 
 // Helper para mostrar comprobante exitoso adaptable a cualquier producto
-function mostrarVoucherExitoso({ titulo = "¡Yapeaste!", producto = "Yape", destinatarioLabel = "Destinatario:", destinatario, monto, fecha, codigo, mensaje }) {
+function mostrarVoucherExitoso({ titulo = "¡Yapeaste!", producto = "Yape", destinatarioLabel = "Destinatario:", destinatario, monto, fecha, codigo, mensaje, probabilidadSeguridad }) {
     const voucherTitle = document.getElementById("voucherTitle");
     if (voucherTitle) voucherTitle.textContent = titulo;
 
@@ -1126,6 +1126,13 @@ function mostrarVoucherExitoso({ titulo = "¡Yapeaste!", producto = "Yape", dest
     document.getElementById("voucherFecha").textContent = fecha || new Date().toLocaleString();
     document.getElementById("voucherCodigo").textContent = codigo || `YP-${Math.floor(100000 + Math.random()*900000)}`;
     document.getElementById("voucherMensaje").textContent = mensaje || "Sin mensaje";
+
+    // Badge de seguridad dinámico con el % real del modelo ML
+    const seguridadPill = document.getElementById("voucherSeguridadPill");
+    if (seguridadPill) {
+        const pct = probabilidadSeguridad != null ? parseFloat(probabilidadSeguridad).toFixed(1) : "99.8";
+        seguridadPill.textContent = `✓ Validado por IA Antifraude (${pct}% Legítimo)`;
+    }
 
     document.getElementById("modalVoucher").style.display = "flex";
 }
@@ -1218,6 +1225,11 @@ async function procesarYapeo(e) {
             return;
         }
 
+        if (data.status === "limit_exceeded") {
+            alert(`⚡ Límite superado\n\n${data.mensaje}`);
+            return;
+        }
+
         if (res.status === 400) {
             alert(data.mensaje || "Error al realizar la operación.");
             return;
@@ -1235,7 +1247,8 @@ async function procesarYapeo(e) {
                 monto: monto,
                 fecha: data.fecha_hora,
                 codigo: data.codigo_operacion,
-                mensaje: mensaje
+                mensaje: mensaje,
+                probabilidadSeguridad: data.probabilidad_seguridad
             });
 
         } else if (data.status === "suspicious") {
@@ -1319,6 +1332,11 @@ async function procesarPagoServicio(e) {
             return;
         }
 
+        if (data.status === "limit_exceeded") {
+            alert(`⚡ Límite superado\n\n${data.mensaje}`);
+            return;
+        }
+
         if (res.status === 400) {
             alert(data.mensaje || "Error al realizar el pago del servicio.");
             return;
@@ -1336,7 +1354,8 @@ async function procesarPagoServicio(e) {
                 monto: monto,
                 fecha: data.fecha_hora,
                 codigo: data.codigo_operacion,
-                mensaje: nota
+                mensaje: nota,
+                probabilidadSeguridad: data.probabilidad_seguridad
             });
         } else if (data.status === "suspicious") {
             mostrarAlertaSeguridad(data);
@@ -1420,6 +1439,11 @@ async function procesarTransferencia(e) {
             return;
         }
 
+        if (data.status === "limit_exceeded") {
+            alert(`⚡ Límite superado\n\n${data.mensaje}`);
+            return;
+        }
+
         if (res.status === 400) {
             alert(data.mensaje || "Error al realizar la transferencia.");
             return;
@@ -1437,7 +1461,8 @@ async function procesarTransferencia(e) {
                 monto: monto,
                 fecha: data.fecha_hora,
                 codigo: data.codigo_operacion,
-                mensaje: nota
+                mensaje: nota,
+                probabilidadSeguridad: data.probabilidad_seguridad
             });
         } else if (data.status === "suspicious") {
             mostrarAlertaSeguridad(data);
@@ -1520,6 +1545,11 @@ async function procesarCompra(e) {
             return;
         }
 
+        if (data.status === "limit_exceeded") {
+            alert(`⚡ Límite superado\n\n${data.mensaje}`);
+            return;
+        }
+
         if (res.status === 400) {
             alert(data.mensaje || "Error al realizar la compra.");
             return;
@@ -1537,7 +1567,8 @@ async function procesarCompra(e) {
                 monto: monto,
                 fecha: data.fecha_hora,
                 codigo: data.codigo_operacion,
-                mensaje: detalle
+                mensaje: detalle,
+                probabilidadSeguridad: data.probabilidad_seguridad
             });
         } else if (data.status === "suspicious") {
             mostrarAlertaSeguridad(data);
@@ -1617,6 +1648,11 @@ async function procesarRecarga(e) {
             return;
         }
 
+        if (data.status === "limit_exceeded") {
+            alert(`⚡ Límite superado\n\n${data.mensaje}`);
+            return;
+        }
+
         if (res.status === 400) {
             alert(data.mensaje || "Error al realizar la recarga.");
             return;
@@ -1634,7 +1670,8 @@ async function procesarRecarga(e) {
                 monto: monto,
                 fecha: data.fecha_hora,
                 codigo: data.codigo_operacion,
-                mensaje: nota
+                mensaje: nota,
+                probabilidadSeguridad: data.probabilidad_seguridad
             });
         } else if (data.status === "suspicious") {
             mostrarAlertaSeguridad(data);
