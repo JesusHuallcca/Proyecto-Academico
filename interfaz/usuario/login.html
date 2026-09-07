@@ -241,22 +241,18 @@
         <form id="formLogin">
             <div class="form-group">
                 <label>Correo o Celular</label>
-                <input type="text" id="inputCorreo" placeholder="juan@correo.com" value="juan@correo.com" required>
+                <input type="text" id="inputCorreo" placeholder="juan@correo.com" required>
             </div>
 
             <div class="form-group">
                 <label>Contraseña / PIN</label>
-                <input type="password" id="inputPassword" placeholder="••••••" value="123456" required>
+                <input type="password" id="inputPassword" placeholder="••••••" required>
             </div>
 
             <button type="submit" class="btn-submit-login" id="btnSubmit">
                 Iniciar Sesión
             </button>
         </form>
-
-        <button type="button" class="btn-demo-quick" id="btnQuickDemo">
-            ⚡ Ingreso Rápido Demo (Juan Pérez)
-        </button>
 
         <div style="margin-bottom: 1.25rem; padding: 0.9rem; background: #F8FAFC; border-radius: 14px; border: 1px solid #E2E8F0;">
             <span style="font-size: 0.85rem; color: #64748B;">¿Aún no tienes cuenta en Yape?</span><br>
@@ -276,7 +272,6 @@
         const inputCorreo = document.getElementById("inputCorreo");
         const inputPassword = document.getElementById("inputPassword");
         const btnSubmit = document.getElementById("btnSubmit");
-        const btnQuickDemo = document.getElementById("btnQuickDemo");
         const loginError = document.getElementById("loginError");
 
         function mostrarError(msg) {
@@ -315,12 +310,6 @@
             }
         });
 
-        // Botón Demo Rápido
-        btnQuickDemo.addEventListener("click", () => {
-            inputCorreo.value = "juan@correo.com";
-            inputPassword.value = "123456";
-            formLogin.dispatchEvent(new Event("submit"));
-        });
     </script>
 </body>
 </html>

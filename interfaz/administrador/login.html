@@ -227,22 +227,18 @@
         <form id="formLogin">
             <div class="form-group">
                 <label>Correo Corporativo</label>
-                <input type="email" id="inputCorreo" placeholder="admin@bcp.com" value="admin@bcp.com" required>
+                <input type="email" id="inputCorreo" placeholder="admin@bcp.com" required>
             </div>
 
             <div class="form-group">
                 <label>Clave de Acceso</label>
-                <input type="password" id="inputPassword" placeholder="••••••••" value="admin123" required>
+                <input type="password" id="inputPassword" placeholder="••••••••" required>
             </div>
 
             <button type="submit" class="btn-submit-login" id="btnSubmit">
                 Ingresar a Consola SOC
             </button>
         </form>
-
-        <button type="button" class="btn-demo-quick" id="btnQuickDemo">
-            ⚡ Acceso Rápido Analista SOC (Demo)
-        </button>
 
         <div class="footer-links">
             <a href="/usuario/login">📱 Acceso a Billetera Yape (Usuario) ↗</a>
@@ -255,7 +251,6 @@
         const inputCorreo = document.getElementById("inputCorreo");
         const inputPassword = document.getElementById("inputPassword");
         const btnSubmit = document.getElementById("btnSubmit");
-        const btnQuickDemo = document.getElementById("btnQuickDemo");
         const loginError = document.getElementById("loginError");
 
         function mostrarError(msg) {
@@ -292,13 +287,6 @@
                 btnSubmit.disabled = false;
                 btnSubmit.textContent = "Ingresar a Consola SOC";
             }
-        });
-
-        // Botón Demo Rápido
-        btnQuickDemo.addEventListener("click", () => {
-            inputCorreo.value = "admin@bcp.com";
-            inputPassword.value = "admin123";
-            formLogin.dispatchEvent(new Event("submit"));
         });
     </script>
 </body>
